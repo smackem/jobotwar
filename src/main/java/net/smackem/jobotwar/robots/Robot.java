@@ -4,6 +4,7 @@ import net.smackem.jobotwar.util.Arguments;
 
 public class Robot {
     private int speedX;
+    private int speedY;
     private int aimAngle;
     private int radarAngle;
     private int x;
@@ -17,6 +18,14 @@ public class Robot {
 
     public void setSpeedX(int speedX) {
         this.speedX = speedX;
+    }
+
+    public int getSpeedY() {
+        return speedY;
+    }
+
+    public void setSpeedY(int speedY) {
+        this.speedY = speedY;
     }
 
     public int getAimAngle() {
