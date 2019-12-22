@@ -1,7 +1,7 @@
 package net.smackem.jobotwar.util;
 
 public class Arguments {
-    private Arguments() throws IllegalAccessError {
+    private Arguments() {
         throw new IllegalAccessError();
     }
 
@@ -11,6 +11,16 @@ public class Arguments {
         }
         if (value > max) {
             throw new IllegalArgumentException(String.format("value %d is greater than maximum %d", value, max));
+        }
+        return value;
+    }
+
+    public static double requireRange(double value, double min, double max) {
+        if (value < min) {
+            throw new IllegalArgumentException(String.format("value %f is less than minimum %f", value, min));
+        }
+        if (value > max) {
+            throw new IllegalArgumentException(String.format("value %f is greater than maximum %f", value, max));
         }
         return value;
     }
