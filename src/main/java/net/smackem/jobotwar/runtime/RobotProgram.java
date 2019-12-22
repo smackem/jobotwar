@@ -16,11 +16,11 @@ public class RobotProgram {
     }
 
     public boolean next(Robot robot) {
-        if (this.index >= this.instructions.size()) {
-            return false;
-        }
         this.instructions.get(this.index).accept(robot);
         this.index++;
-        return this.index < this.instructions.size();
+        if (this.index >= this.instructions.size()) {
+            this.index = 0;
+        }
+        return true;
     }
 }

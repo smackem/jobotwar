@@ -23,12 +23,8 @@ public class Projectile {
         return this.destination;
     }
 
-    public double getX() {
-        return this.position.getX();
-    }
-
-    public double getY() {
-        return this.position.getY();
+    public Vector getPosition() {
+        return this.position;
     }
 
     public double getSpeed() {
