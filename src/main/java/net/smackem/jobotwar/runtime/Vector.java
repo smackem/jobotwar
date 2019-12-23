@@ -1,5 +1,6 @@
 package net.smackem.jobotwar.runtime;
 
+import java.util.Comparator;
 import java.util.Objects;
 
 /**
@@ -8,6 +9,16 @@ import java.util.Objects;
 public final class Vector {
     private final double x;
     private final double y;
+
+    private static final double TOLERANCE = 0.0001;
+
+    public static final Comparator<Vector> PROXIMITY_COMPARATOR = (a, b) -> {
+        final double distance = Vector.distance(a, b);
+        if (distance < TOLERANCE) {
+            return 0;
+        }
+        return 1;
+    };
 
     /**
      * Initializes a new instance of {@link Vector}.
@@ -110,6 +121,16 @@ public final class Vector {
         return Math.sqrt(dx * dx + dy * dy);
     }
 
+    /**
+     * Checks whether this vector is very close (so close they can be considered equal) to the
+     * passed vector.
+     * @param other
+     * @return {@code true} if the two vectors are very close.
+     */
+    public boolean isCloseTo(Vector other) {
+        return Math.abs(this.x - other.y) < TOLERANCE && Math.abs(this.y - other.y) < TOLERANCE;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -119,7 +140,7 @@ public final class Vector {
             return false;
         }
         final Vector vector = (Vector) o;
-        return Double.compare(vector.x, x) == 0 && Double.compare(vector.y, y) == 0;
+        return Double.compare(vector.x, this.x) == 0 && Double.compare(vector.y, this.y) == 0;
     }
 
     @Override

@@ -61,4 +61,38 @@ public class GameEngineTest {
         assertThat(explodedProjectiles).containsOnly(projectile);
         assertThat(projectile.getPosition()).isEqualTo(new Vector(10, 0));
     }
+
+    @Test
+    public void shotAngle() {
+        final Robot robot = new Robot(1, new LoopProgram(
+                r -> r.setAimAngle(90),
+                r -> r.setShot(50)));
+        final Board board = new Board(100, 100, Collections.singleton(robot));
+        final GameEngine engine = new GameEngine(board);
+
+        assertThat(engine.tick()).hasSize(0);
+        assertThat(board.projectiles()).hasSize(0);
+
+        assertThat(engine.tick()).hasSize(0);
+        assertThat(board.projectiles()).hasSize(1);
+        final Projectile projectile = board.projectiles().iterator().next();
+        assertThat(projectile.getDestination())
+                .usingComparator(Vector.PROXIMITY_COMPARATOR)
+                .isEqualTo(new Vector(0, 50));
+        assertThat(projectile.getPosition())
+                .usingComparator(Vector.PROXIMITY_COMPARATOR)
+                .isEqualTo(new Vector(0, projectile.getSpeed()));
+
+        int count = 0;
+        Collection<Projectile> explodedProjectiles;
+        do {
+            explodedProjectiles = engine.tick();
+            count++;
+            assertThat(count).isLessThan(100); // make sure it ends!
+        } while (explodedProjectiles.size() == 0);
+        assertThat(explodedProjectiles).containsOnly(projectile);
+        assertThat(projectile.getPosition())
+                .usingComparator(Vector.PROXIMITY_COMPARATOR)
+                .isEqualTo(new Vector(0, 50));
+    }
 }

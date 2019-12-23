@@ -1,16 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Button?>
 <?import javafx.geometry.Insets?>
 
-<VBox alignment="CENTER" spacing="20.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.smackem.jobotwar.gui.MainController">
-   <children>
-      <Label text="Primary View" />
-      <Button fx:id="primaryButton" text="Switch to Secondary View" onAction="#switchToSecondary"/>
-   </children>
+<?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.HBox?>
+<VBox alignment="CENTER" spacing="5.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.smackem.jobotwar.gui.MainController">
    <padding>
       <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
    </padding>
+   <children>
+      <Canvas fx:id="canvas" width="500" height="500" style="-fx-background-color: #000000" />
+      <HBox spacing="5.0" >
+         <Button minWidth="80" text="Start" onMouseClicked="#startGame" />
+         <Button minWidth="80" text="Stop" onMouseClicked="#stopGame" />
+      </HBox>
+   </children>
 </VBox>

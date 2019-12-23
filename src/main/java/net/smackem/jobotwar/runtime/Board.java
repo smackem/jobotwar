@@ -14,8 +14,8 @@ public class Board {
     private final Collection<Projectile> projectiles = new ArrayList<>();
 
     public Board(int width, int height, Collection<Robot> robots) {
-        this.width = Arguments.requireRange(width, 0, 10 * 1000);
-        this.height = Arguments.requireRange(height, 0, 10 * 1000);
+        this.width = Arguments.requireRange(width, 0, Constants.MAX_BOARD_WIDTH);
+        this.height = Arguments.requireRange(height, 0, Constants.MAX_BOARD_HEIGHT);
         this.robots = new ArrayList<>(Objects.requireNonNull(robots));
     }
 
