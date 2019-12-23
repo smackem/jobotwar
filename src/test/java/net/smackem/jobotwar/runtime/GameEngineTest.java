@@ -81,7 +81,7 @@ public class GameEngineTest {
                 .isEqualTo(new Vector(0, 50));
         assertThat(projectile.getPosition())
                 .usingComparator(Vector.PROXIMITY_COMPARATOR)
-                .isEqualTo(new Vector(0, projectile.getSpeed()));
+                .isEqualTo(new Vector(robot.getX(), robot.getY() + projectile.getSpeed()));
 
         int count = 0;
         Collection<Projectile> explodedProjectiles;

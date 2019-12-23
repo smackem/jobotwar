@@ -2,10 +2,7 @@ package net.smackem.jobotwar.gui;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
-import net.smackem.jobotwar.runtime.Board;
-import net.smackem.jobotwar.runtime.Constants;
-import net.smackem.jobotwar.runtime.Projectile;
-import net.smackem.jobotwar.runtime.Robot;
+import net.smackem.jobotwar.runtime.*;
 
 import java.util.Objects;
 
@@ -17,9 +14,11 @@ public class BoardGraphics {
     }
 
     public void render(GraphicsContext gc) {
+        gc.clearRect(0,0,this.board.getWidth(), this.board.getHeight());
+
         // robots
+        gc.setFill(Color.AQUA);
         for (final Robot robot : this.board.getRobots()) {
-            gc.setFill(Color.BLUE);
             gc.fillOval(
                     robot.getX() - Constants.ROBOT_RADIUS,
                     robot.getY() - Constants.ROBOT_RADIUS,
@@ -28,5 +27,14 @@ public class BoardGraphics {
         }
 
         // projectiles
+        gc.setFill(Color.WHITE);
+        for (final Projectile projectile : this.board.projectiles()) {
+            final Vector position = projectile.getPosition();
+            gc.fillOval(
+                    position.getX() - 2,
+                    position.getY() - 2,
+                    4,
+                    4);
+        }
     }
 }

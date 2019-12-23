@@ -108,7 +108,8 @@ public class Robot {
     }
 
     public void setAimAngle(double value) {
-        this.aimAngle = Arguments.requireRange(value, 0, 360 - Constants.ANGLE_PRECISION);
+        this.aimAngle = Arguments.requireRange(value,
+                -360 + Constants.ANGLE_PRECISION, 360 - Constants.ANGLE_PRECISION);
     }
 
     public double getRadarAngle() {
@@ -116,7 +117,8 @@ public class Robot {
     }
 
     public void setRadarAngle(double value) {
-        this.radarAngle = Arguments.requireRange(value, 0, 360 - Constants.ANGLE_PRECISION);
+        this.radarAngle = Arguments.requireRange(value,
+                -360 + Constants.ANGLE_PRECISION, 360 - Constants.ANGLE_PRECISION);
     }
 
     public double getX() {
