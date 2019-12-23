@@ -92,14 +92,14 @@ public class Robot {
      */
     public void accelerate() {
         if (this.actualSpeedX < this.speedX) {
-            this.actualSpeedX = Math.max(this.actualSpeedX + this.acceleration, this.speedX);
+            this.actualSpeedX = Math.min(this.actualSpeedX + this.acceleration, this.speedX);
         } else if (this.actualSpeedX > this.speedX) {
-            this.actualSpeedX = Math.min(this.actualSpeedX - this.acceleration, this.speedX);
+            this.actualSpeedX = Math.max(this.actualSpeedX - this.acceleration, this.speedX);
         }
         if (this.actualSpeedY < this.speedY) {
-            this.actualSpeedY = Math.max(this.actualSpeedY + this.acceleration, this.speedY);
+            this.actualSpeedY = Math.min(this.actualSpeedY + this.acceleration, this.speedY);
         } else if (this.actualSpeedY > this.speedY) {
-            this.actualSpeedY = Math.min(this.actualSpeedY - this.acceleration, this.speedY);
+            this.actualSpeedY = Math.max(this.actualSpeedY - this.acceleration, this.speedY);
         }
     }
 

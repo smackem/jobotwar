@@ -11,10 +11,11 @@ public final class GameEngine {
         this.board = Objects.requireNonNull(board);
     }
 
-    public void tick() {
+    public Collection<Projectile> tick() {
         for (final Robot robot : this.board.getRobots()) {
             tickRobot(robot);
         }
+
         final Collection<Projectile> explodedProjectiles = new ArrayList<>();
         for (final Projectile projectile : this.board.projectiles()) {
             if (tickProjectile(projectile)) {
@@ -22,11 +23,12 @@ public final class GameEngine {
             }
         }
         this.board.projectiles().removeAll(explodedProjectiles);
+        return explodedProjectiles;
     }
 
     private boolean tickProjectile(Projectile projectile) {
         final Robot closeRobot = findCloseRobot(projectile, Constants.ROBOT_RADIUS);
-        if (closeRobot != null || isProjectileAtDestination(projectile)) {
+        if (closeRobot != null || isProjectileExploding(projectile)) {
             explodeProjectile(projectile);
             return true;
         }
@@ -34,11 +36,21 @@ public final class GameEngine {
         return false;
     }
 
-    private boolean isProjectileAtDestination(Projectile projectile) {
-        final double tolerance = projectile.getSpeed() / 2;
-        return Vector.distance(
-                projectile.getPosition(),
-                projectile.getDestination()) < tolerance;
+    private boolean isProjectileExploding(Projectile projectile) {
+        final Vector position = projectile.getPosition();
+        final double x = position.getX();
+        final double y = position.getY();
+
+        // out of bounds?
+        if (x < 0 || x >= this.board.getWidth()) {
+            return true;
+        }
+        if (y < 0 || y >= this.board.getHeight()) {
+            return true;
+        }
+
+        // at destination?
+        return position.equals(projectile.getDestination());
     }
 
     private void explodeProjectile(Projectile projectile) {
@@ -66,14 +78,15 @@ public final class GameEngine {
     }
 
     private void tickRobot(Robot robot) {
-        // movement
-        //
+        // execute next program statement
+        robot.getProgram().next(robot);
+
+        // handle movement
         robot.accelerate();
         robot.setX(robot.getX() + robot.getActualSpeedX());
         robot.setY(robot.getY() + robot.getActualSpeedY());
 
-        // shot
-        //
+        // handle shot
         final int shot = robot.getShot();
         if (shot > 0) {
             final double angle = Math.toRadians(robot.getAimAngle());

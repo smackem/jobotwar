@@ -31,8 +31,17 @@ public class Projectile {
         return this.speed;
     }
 
-    public Vector incrementPosition() {
+    public void incrementPosition() {
+        if (this.position.equals(this.destination)) {
+            return;
+        }
+
+        double tolerance = this.speed / 2;
+        if (Vector.distance(this.position, this.destination) < tolerance) {
+            this.position = this.destination;
+            return;
+        }
+
         this.position = this.position.add(this.directionUnit.multiply(this.speed));
-        return this.position;
     }
 }
