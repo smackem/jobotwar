@@ -10,14 +10,12 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.util.Duration;
-import net.smackem.jobotwar.runtime.Board;
-import net.smackem.jobotwar.runtime.GameEngine;
-import net.smackem.jobotwar.runtime.LoopProgram;
-import net.smackem.jobotwar.runtime.Robot;
+import net.smackem.jobotwar.runtime.*;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.stream.Collectors;
 
 public class MainController {
 
@@ -35,7 +33,7 @@ public class MainController {
         this.ticker = new Timeline(
                 new KeyFrame(Duration.millis(40), this::tick));
         this.ticker.setCycleCount(Animation.INDEFINITE);
-        this.board = new Board(500, 500, createRobots());
+        this.board = new Board(640, 480, createRobots());
         this.engine = new GameEngine(this.board);
         this.graphics = new BoardGraphics(this.board);
     }
@@ -59,7 +57,10 @@ public class MainController {
     }
 
     private void tick(ActionEvent actionEvent) {
-        this.engine.tick();
+        final Collection<Projectile> explodedProjectiles = this.engine.tick();
+        this.graphics.addExplosions(explodedProjectiles.stream()
+                .map(Projectile::getPosition)
+                .collect(Collectors.toList()));
         final GraphicsContext gc = this.canvas.getGraphicsContext2D();
         this.graphics.render(gc);
     }

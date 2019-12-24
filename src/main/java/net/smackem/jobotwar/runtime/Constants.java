@@ -14,6 +14,6 @@ public class Constants {
     public static double MAX_ROBOT_ACCELERATION = 10;
     public static double MAX_ROBOT_SPEED = 20;
     public static double PROJECTILE_SPEED = 8;
-    public static double ROBOT_RADIUS = 10;
-    public static double EXPLOSION_RADIUS = 20;
+    public static double ROBOT_RADIUS = 12;
+    public static double EXPLOSION_RADIUS = 30;
 }
