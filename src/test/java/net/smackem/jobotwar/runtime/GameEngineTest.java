@@ -12,8 +12,10 @@ public class GameEngineTest {
     @Test
     public void movement() {
         final double acceleration = 1;
-        final Robot robot = new Robot(acceleration, new LoopProgram(
-                r -> r.setSpeedX(4)));
+        final Robot robot = new Robot(acceleration, 0, new RuntimeProgram(
+                RuntimeProgram.instruction(null, r -> {
+                    r.setSpeedX(4); return null;
+                })));
         final Board board = new Board(100, 100, Collections.singleton(robot));
         final GameEngine engine = new GameEngine(board);
 
@@ -36,9 +38,14 @@ public class GameEngineTest {
 
     @Test
     public void shot() {
-        final Robot robot = new Robot(1, new LoopProgram(
-                r -> r.setAimAngle(0),
-                r -> r.setShot(10)));
+        final Robot robot = new Robot(1, 0, new RuntimeProgram(
+                RuntimeProgram.instruction(null, r -> {
+                    r.setAimAngle(0); return null;
+                }),
+                RuntimeProgram.instruction(null, r -> {
+                    r.setShot(10); return null;
+                })
+        ));
         final Board board = new Board(100, 100, Collections.singleton(robot));
         final GameEngine engine = new GameEngine(board);
 
@@ -64,9 +71,14 @@ public class GameEngineTest {
 
     @Test
     public void shotAngle() {
-        final Robot robot = new Robot(1, new LoopProgram(
-                r -> r.setAimAngle(90),
-                r -> r.setShot(50)));
+        final Robot robot = new Robot(1, 0, new RuntimeProgram(
+                RuntimeProgram.instruction(null, r -> {
+                    r.setAimAngle(90); return null;
+                }),
+                RuntimeProgram.instruction(null, r -> {
+                    r.setShot(50); return null;
+                })
+        ));
         final Board board = new Board(100, 100, Collections.singleton(robot));
         final GameEngine engine = new GameEngine(board);
 

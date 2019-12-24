@@ -12,7 +12,6 @@ import javafx.scene.layout.StackPane;
 import javafx.util.Duration;
 import net.smackem.jobotwar.runtime.*;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.stream.Collectors;
@@ -66,18 +65,29 @@ public class MainController {
     }
 
     private Collection<Robot> createRobots() {
-        final Robot r1 = new Robot(0.1, new LoopProgram(
-                r -> {
-                    if (r.getX() > 150) {
-                        r.setAimAngle((r.getAimAngle() + 15) % 360);
-                        r.setShot(200);
-                        r.setSpeedX(0);
-                        r.setSpeedY(0);
-                        return;
-                    }
-                    r.setSpeedX(4);
-                    r.setSpeedY(3);
-                }
+        final Robot r1 = new Robot(0.1, 0, new RuntimeProgram(
+                RuntimeProgram.instruction(null, r -> {
+                    r.setSpeedX(4); return null;
+                }),
+                RuntimeProgram.instruction(null, r -> {
+                    r.setSpeedY(3); return null;
+                }),
+                RuntimeProgram.instruction("MOVE", r ->
+                    r.getX() > 150 ? null : "MOVE"
+                ),
+                RuntimeProgram.instruction(null, r -> {
+                    r.setSpeedX(0); return null;
+                }),
+                RuntimeProgram.instruction(null, r -> {
+                    r.setSpeedY(0); return null;
+                }),
+                RuntimeProgram.instruction("SHOOT", r -> {
+                    r.setAimAngle((r.getAimAngle() + 5) % 360); return null;
+                }),
+                RuntimeProgram.instruction(null, r -> {
+                    r.setShot(200); return null;
+                }),
+                RuntimeProgram.instruction(null, r -> "SHOOT")
         ));
         r1.setX(10);
         r1.setY(50);

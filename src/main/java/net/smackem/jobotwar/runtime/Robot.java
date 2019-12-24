@@ -10,6 +10,7 @@ import java.util.Objects;
 public class Robot {
     private final double acceleration;
     private final RobotProgram program;
+    private final int rgb;
     private double speedX;
     private double speedY;
     private double actualSpeedX;
@@ -24,9 +25,12 @@ public class Robot {
     /**
      * Initializes a new instance of {@link Robot}.
      * @param acceleration The acceleration in pixels per tick^2. Must be positive.
+     * @param rgb The RGB color of the robot (format in hex: 0xrrggbb).
+     * @param program The program that controls the robot.
      */
-    public Robot(double acceleration, RobotProgram program) {
+    public Robot(double acceleration, int rgb, RobotProgram program) {
         this.acceleration = Arguments.requireRange(acceleration, 0, Constants.MAX_ROBOT_ACCELERATION);
+        this.rgb = rgb;
         this.program = Objects.requireNonNull(program);
     }
 
@@ -35,6 +39,13 @@ public class Robot {
      */
     public double getAcceleration() {
         return this.acceleration;
+    }
+
+    /**
+     * @return The RGB color of the robot (format in hex: 0xrrggbb)
+     */
+    public int getRgb() {
+        return this.rgb;
     }
 
     /**

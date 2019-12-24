@@ -8,21 +8,21 @@ public class RobotTest {
 
     @Test
     public void setAimAngle() {
-        final Robot robot = new Robot(1.0, LoopProgram.EMPTY);
+        final Robot robot = new Robot(1.0, 0, RuntimeProgram.EMPTY);
         assertThatIllegalArgumentException().isThrownBy(() -> robot.setAimAngle(360));
         assertThatCode(() -> robot.setAimAngle(359)).doesNotThrowAnyException();
     }
 
     @Test
     public void setRadarAngle() {
-        final Robot robot = new Robot(1.0, LoopProgram.EMPTY);
+        final Robot robot = new Robot(1.0, 0, RuntimeProgram.EMPTY);
         assertThatIllegalArgumentException().isThrownBy(() -> robot.setRadarAngle(360));
         assertThatCode(() -> robot.setRadarAngle(359)).doesNotThrowAnyException();
     }
 
     @Test
     public void accelerate() {
-        final Robot robot = new Robot(1.0, LoopProgram.EMPTY);
+        final Robot robot = new Robot(1.0, 0, RuntimeProgram.EMPTY);
         assertThat(robot.getActualSpeedX()).isEqualTo(0);
         assertThat(robot.getActualSpeedY()).isEqualTo(0);
 
@@ -63,7 +63,7 @@ public class RobotTest {
 
     @Test
     public void accelerateFast() {
-        final Robot robot = new Robot(10.0, LoopProgram.EMPTY);
+        final Robot robot = new Robot(10.0, 0, RuntimeProgram.EMPTY);
         robot.setSpeedX(15);
         robot.setSpeedY(8);
 
