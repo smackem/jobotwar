@@ -21,8 +21,11 @@ public class BoardGraphics {
         gc.clearRect(0,0,this.board.getWidth(), this.board.getHeight());
 
         // robots
-        gc.setFill(Color.AQUA);
         for (final Robot robot : this.board.getRobots()) {
+            final int rgb = robot.getRgb();
+            final double opacity = robot.isDead() ? 0.25 : 1.0;
+            final Paint color = Color.rgb(rgb >> 16 & 0xff, rgb >> 8 & 0xff, rgb >> 0 & 0xff, opacity);
+            gc.setFill(color);
             gc.fillOval(
                     robot.getX() - Constants.ROBOT_RADIUS,
                     robot.getY() - Constants.ROBOT_RADIUS,

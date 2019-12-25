@@ -16,24 +16,26 @@ public class GameEngineTest {
                 RuntimeProgram.instruction(null, r -> {
                     r.setSpeedX(4); return null;
                 })));
+        robot.setX(30);
+        robot.setY(30);
         final Board board = new Board(100, 100, Collections.singleton(robot));
         final GameEngine engine = new GameEngine(board);
 
-        assertThat(engine.tick()).hasSize(0);
+        assertThat(engine.tick().explodedProjectiles).hasSize(0);
         assertThat(robot.getActualSpeedX()).isEqualTo(1);
-        assertThat(robot.getX()).isEqualTo(1);
+        assertThat(robot.getX()).isEqualTo(31);
 
         engine.tick();
         assertThat(robot.getActualSpeedX()).isEqualTo(2);
-        assertThat(robot.getX()).isEqualTo(3);
+        assertThat(robot.getX()).isEqualTo(33);
 
         engine.tick();
         assertThat(robot.getActualSpeedX()).isEqualTo(3);
-        assertThat(robot.getX()).isEqualTo(6);
+        assertThat(robot.getX()).isEqualTo(36);
 
         engine.tick();
         assertThat(robot.getActualSpeedX()).isEqualTo(4);
-        assertThat(robot.getX()).isEqualTo(10);
+        assertThat(robot.getX()).isEqualTo(40);
     }
 
     @Test
@@ -46,27 +48,29 @@ public class GameEngineTest {
                     r.setShot(10); return null;
                 })
         ));
+        robot.setX(30);
+        robot.setY(30);
         final Board board = new Board(100, 100, Collections.singleton(robot));
         final GameEngine engine = new GameEngine(board);
 
-        assertThat(engine.tick()).hasSize(0);
+        assertThat(engine.tick().explodedProjectiles).hasSize(0);
         assertThat(board.projectiles()).hasSize(0);
 
-        assertThat(engine.tick()).hasSize(0);
+        assertThat(engine.tick().explodedProjectiles).hasSize(0);
         assertThat(board.projectiles()).hasSize(1);
         final Projectile projectile = board.projectiles().iterator().next();
-        assertThat(projectile.getDestination()).isEqualTo(new Vector(10, 0));
-        assertThat(projectile.getPosition()).isEqualTo(new Vector(projectile.getSpeed(), 0));
+        assertThat(projectile.getDestination()).isEqualTo(new Vector(40, 30));
+        assertThat(projectile.getPosition()).isEqualTo(new Vector(30 + projectile.getSpeed(), 30));
 
         int count = 0;
         Collection<Projectile> explodedProjectiles;
         do {
-            explodedProjectiles = engine.tick();
+            explodedProjectiles = engine.tick().explodedProjectiles;
             count++;
             assertThat(count).isLessThan(100); // make sure it ends!
         } while (explodedProjectiles.size() == 0);
         assertThat(explodedProjectiles).containsOnly(projectile);
-        assertThat(projectile.getPosition()).isEqualTo(new Vector(10, 0));
+        assertThat(projectile.getPosition()).isEqualTo(new Vector(40, 30));
     }
 
     @Test
@@ -79,18 +83,20 @@ public class GameEngineTest {
                     r.setShot(50); return null;
                 })
         ));
+        robot.setX(30);
+        robot.setY(30);
         final Board board = new Board(100, 100, Collections.singleton(robot));
         final GameEngine engine = new GameEngine(board);
 
-        assertThat(engine.tick()).hasSize(0);
+        assertThat(engine.tick().explodedProjectiles).hasSize(0);
         assertThat(board.projectiles()).hasSize(0);
 
-        assertThat(engine.tick()).hasSize(0);
+        assertThat(engine.tick().explodedProjectiles).hasSize(0);
         assertThat(board.projectiles()).hasSize(1);
         final Projectile projectile = board.projectiles().iterator().next();
         assertThat(projectile.getDestination())
                 .usingComparator(Vector.PROXIMITY_COMPARATOR)
-                .isEqualTo(new Vector(0, 50));
+                .isEqualTo(new Vector(30, 80));
         assertThat(projectile.getPosition())
                 .usingComparator(Vector.PROXIMITY_COMPARATOR)
                 .isEqualTo(new Vector(robot.getX(), robot.getY() + projectile.getSpeed()));
@@ -98,13 +104,13 @@ public class GameEngineTest {
         int count = 0;
         Collection<Projectile> explodedProjectiles;
         do {
-            explodedProjectiles = engine.tick();
+            explodedProjectiles = engine.tick().explodedProjectiles;
             count++;
             assertThat(count).isLessThan(100); // make sure it ends!
         } while (explodedProjectiles.size() == 0);
         assertThat(explodedProjectiles).containsOnly(projectile);
         assertThat(projectile.getPosition())
                 .usingComparator(Vector.PROXIMITY_COMPARATOR)
-                .isEqualTo(new Vector(0, 50));
+                .isEqualTo(new Vector(30, 80));
     }
 }

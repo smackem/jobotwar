@@ -11,24 +11,41 @@ public final class GameEngine {
         this.board = Objects.requireNonNull(board);
     }
 
-    public Collection<Projectile> tick() {
+    public TickResult tick() {
+        final TickResult result = new TickResult();
         for (final Robot robot : this.board.getRobots()) {
-            tickRobot(robot);
-        }
-
-        final Collection<Projectile> explodedProjectiles = new ArrayList<>();
-        for (final Projectile projectile : this.board.projectiles()) {
-            if (tickProjectile(projectile)) {
-                explodedProjectiles.add(projectile);
+            if (robot.isDead() == false) {
+                tickRobot(robot, result.collisionPositions);
+                if (robot.isDead()) {
+                    result.killedRobots.add(robot);
+                }
             }
         }
-        this.board.projectiles().removeAll(explodedProjectiles);
-        return explodedProjectiles;
+
+        for (final Projectile projectile : this.board.projectiles()) {
+            if (tickProjectile(projectile)) {
+                result.explodedProjectiles.add(projectile);
+            }
+        }
+        this.board.projectiles().removeAll(result.explodedProjectiles);
+        return result;
+    }
+
+    public static final class TickResult {
+        public final Collection<Projectile> explodedProjectiles;
+        public final Collection<Vector> collisionPositions;
+        public final Collection<Robot> killedRobots;
+
+        private TickResult() {
+            this.explodedProjectiles = new ArrayList<>();
+            this.collisionPositions = new ArrayList<>();
+            this.killedRobots = new ArrayList<>();
+        }
     }
 
     private boolean tickProjectile(Projectile projectile) {
-        final Robot closeRobot = findCloseRobot(projectile, Constants.ROBOT_RADIUS);
-        if (closeRobot != null || isProjectileExploding(projectile)) {
+        final Collection<Robot> hitRobots = hitTestRobots(projectile.getPosition(), projectile.getSourceRobot(), 0);
+        if (hitRobots.isEmpty() == false || isProjectileExploding(projectile)) {
             explodeProjectile(projectile);
             return true;
         }
@@ -54,37 +71,36 @@ public final class GameEngine {
     }
 
     private void explodeProjectile(Projectile projectile) {
-        final Vector position = projectile.getPosition();
-        for (final Robot robot : this.board.getRobots()) {
-            final Vector robotPosition = new Vector(robot.getX(), robot.getY());
-            if (Vector.distance(position, robotPosition) < Constants.EXPLOSION_RADIUS) {
-                robot.setHealth(Math.max(0, robot.getHealth() - 30));
-            }
+        final Collection<Robot> damagedRobots = hitTestRobots(projectile.getPosition(),
+                null,Constants.EXPLOSION_RADIUS);
+        for (final Robot robot : damagedRobots) {
+            robot.setHealth(Math.max(0, robot.getHealth() - 30));
         }
     }
 
-    private Robot findCloseRobot(Projectile projectile, double tolerance) {
-        final Vector position = projectile.getPosition();
+    private Collection<Robot> hitTestRobots(Vector position, Robot excludeRobot, double tolerance) {
+        final Collection<Robot> hitRobots = new ArrayList<>();
         for (final Robot robot : this.board.getRobots()) {
-            if (robot == projectile.getSourceRobot()) {
+            if (robot == excludeRobot) {
                 continue;
             }
             final Vector robotPosition = new Vector(robot.getX(), robot.getY());
-            if (Vector.distance(position, robotPosition) < tolerance) {
-                return robot;
+            if (Vector.distance(position, robotPosition) < Constants.ROBOT_RADIUS + tolerance) {
+                hitRobots.add(robot);
             }
         }
-        return null;
+        return hitRobots;
     }
 
-    private void tickRobot(Robot robot) {
+    private void tickRobot(Robot robot, Collection<Vector> collisions) {
         // execute next program statement
         robot.getProgram().next(robot);
 
         // handle movement
         robot.accelerate();
-        robot.setX(robot.getX() + robot.getActualSpeedX());
-        robot.setY(robot.getY() + robot.getActualSpeedY());
+        if (moveRobot(robot, collisions)) {
+            robot.setHealth(Math.max(0, robot.getHealth() - 10));
+        }
 
         // handle shot
         final int shot = robot.getShot();
@@ -96,5 +112,50 @@ public final class GameEngine {
             this.board.projectiles().add(projectile);
             robot.setShot(0);
         }
+    }
+
+    private boolean moveRobot(Robot robot, Collection<Vector> collisions) {
+        double nextX = robot.getX() + robot.getActualSpeedX();
+        double nextY = robot.getY() + robot.getActualSpeedY();
+
+        // collisions with wall?
+        boolean hasCollision = false;
+        double collisionX = 0, collisionY = 0;
+        if (nextX <= Constants.ROBOT_RADIUS) {
+            hasCollision = true;
+            nextX = Constants.ROBOT_RADIUS;
+        } else if (nextX >= this.board.getWidth() - Constants.ROBOT_RADIUS) {
+            hasCollision = true;
+            nextX = this.board.getWidth() - Constants.ROBOT_RADIUS;
+            collisionX = this.board.getWidth();
+        }
+        if (nextY <= Constants.ROBOT_RADIUS) {
+            hasCollision = true;
+            nextY = Constants.ROBOT_RADIUS;
+        } else if (nextY >= this.board.getHeight() - Constants.ROBOT_RADIUS) {
+            hasCollision = true;
+            nextY = this.board.getHeight() - Constants.ROBOT_RADIUS;
+            collisionY = this.board.getHeight();
+        }
+
+        if (hasCollision) {
+            collisions.add(new Vector(collisionX, collisionY));
+        }
+
+        // collisions with other robots?
+        final Vector position = new Vector(nextX, nextY);
+        final Collection<Robot> collidingRobots = hitTestRobots(position, robot, Constants.ROBOT_RADIUS);
+        if (collidingRobots.isEmpty() == false) {
+            hasCollision = true;
+            for (final Robot collidingRobot : collidingRobots) {
+                final Vector p = new Vector(collidingRobot.getX(), collidingRobot.getY());
+                final Vector center = position.add(p.subtract(position).divide(2));
+                collisions.add(center);
+            }
+        }
+
+        robot.setX(nextX);
+        robot.setY(nextY);
+        return hasCollision;
     }
 }

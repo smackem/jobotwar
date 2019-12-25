@@ -32,6 +32,7 @@ public class Robot {
         this.acceleration = Arguments.requireRange(acceleration, 0, Constants.MAX_ROBOT_ACCELERATION);
         this.rgb = rgb;
         this.program = Objects.requireNonNull(program);
+        this.health = Constants.MAX_HEALTH;
     }
 
     /**

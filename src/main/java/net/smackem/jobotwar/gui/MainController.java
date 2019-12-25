@@ -12,6 +12,7 @@ import javafx.scene.layout.StackPane;
 import javafx.util.Duration;
 import net.smackem.jobotwar.runtime.*;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.stream.Collectors;
@@ -56,8 +57,8 @@ public class MainController {
     }
 
     private void tick(ActionEvent actionEvent) {
-        final Collection<Projectile> explodedProjectiles = this.engine.tick();
-        this.graphics.addExplosions(explodedProjectiles.stream()
+        final GameEngine.TickResult tickResult = this.engine.tick();
+        this.graphics.addExplosions(tickResult.explodedProjectiles.stream()
                 .map(Projectile::getPosition)
                 .collect(Collectors.toList()));
         final GraphicsContext gc = this.canvas.getGraphicsContext2D();
@@ -65,7 +66,7 @@ public class MainController {
     }
 
     private Collection<Robot> createRobots() {
-        final Robot r1 = new Robot(0.1, 0, new RuntimeProgram(
+        final Robot r1 = new Robot(0.1, 0x40ff80, new RuntimeProgram(
                 RuntimeProgram.instruction(null, r -> {
                     r.setSpeedX(4); return null;
                 }),
@@ -91,6 +92,17 @@ public class MainController {
         ));
         r1.setX(10);
         r1.setY(50);
-        return Collections.singleton(r1);
+
+        final Robot r2 = new Robot(0.5, 0xffc020, new RuntimeProgram(
+                RuntimeProgram.instruction(null, r -> {
+                    r.setSpeedX(-5); return null;
+                }),
+                RuntimeProgram.instruction("MOVE", r ->
+                    r.getX() > 10 ? "MOVE" : null
+                )
+        ));
+        r2.setX(500);
+        r2.setY(400);
+        return Arrays.asList(r1, r2);
     }
 }
