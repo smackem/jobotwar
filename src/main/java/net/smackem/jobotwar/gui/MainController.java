@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class MainController {
 
@@ -58,11 +59,18 @@ public class MainController {
 
     private void tick(ActionEvent actionEvent) {
         final GameEngine.TickResult tickResult = this.engine.tick();
-        this.graphics.addExplosions(tickResult.explodedProjectiles.stream()
-                .map(Projectile::getPosition)
-                .collect(Collectors.toList()));
+        updateGraphics(tickResult);
         final GraphicsContext gc = this.canvas.getGraphicsContext2D();
         this.graphics.render(gc);
+    }
+
+    private void updateGraphics(GameEngine.TickResult tickResult) {
+        this.graphics.addExplosions(Stream.concat(
+                tickResult.explodedProjectiles.stream().map(Projectile::getPosition),
+                Stream.concat(
+                        tickResult.collisionPositions.stream(),
+                        tickResult.killedRobots.stream().map(r -> new Vector(r.getX(), r.getY())))
+        ).collect(Collectors.toList()));
     }
 
     private Collection<Robot> createRobots() {
@@ -90,7 +98,7 @@ public class MainController {
                 }),
                 RuntimeProgram.instruction(null, r -> "SHOOT")
         ));
-        r1.setX(10);
+        r1.setX(20);
         r1.setY(50);
 
         final Robot r2 = new Robot(0.5, 0xffc020, new RuntimeProgram(

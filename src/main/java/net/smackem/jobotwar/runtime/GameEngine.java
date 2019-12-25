@@ -124,17 +124,23 @@ public final class GameEngine {
         if (nextX <= Constants.ROBOT_RADIUS) {
             hasCollision = true;
             nextX = Constants.ROBOT_RADIUS;
+            collisionX = 0;
+            collisionY = nextY;
         } else if (nextX >= this.board.getWidth() - Constants.ROBOT_RADIUS) {
             hasCollision = true;
             nextX = this.board.getWidth() - Constants.ROBOT_RADIUS;
             collisionX = this.board.getWidth();
+            collisionY = nextY;
         }
         if (nextY <= Constants.ROBOT_RADIUS) {
             hasCollision = true;
             nextY = Constants.ROBOT_RADIUS;
+            collisionX = nextX;
+            collisionY = 0;
         } else if (nextY >= this.board.getHeight() - Constants.ROBOT_RADIUS) {
             hasCollision = true;
             nextY = this.board.getHeight() - Constants.ROBOT_RADIUS;
+            collisionX = nextX;
             collisionY = this.board.getHeight();
         }
 
