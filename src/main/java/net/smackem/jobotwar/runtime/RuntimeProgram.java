@@ -48,8 +48,8 @@ public class RuntimeProgram implements RobotProgram {
     }
 
     public static class Instruction {
-        final String label;
-        final Function<Robot, String> function;
+        private final String label;
+        private final Function<Robot, String> function;
 
         private Instruction(String label, Function<Robot, String> function) {
             this.label = label;
