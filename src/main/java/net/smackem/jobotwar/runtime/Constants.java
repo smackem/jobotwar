@@ -6,7 +6,6 @@ public class Constants {
     }
 
     public static int MAX_SHOT = 10_000;
-    public static double MAX_RANGE = 10_000;
     public static int MAX_BOARD_WIDTH  = 5_000;
     public static int MAX_BOARD_HEIGHT  = 5_000;
     public static double ANGLE_PRECISION = 0.0001;
@@ -16,4 +15,5 @@ public class Constants {
     public static double PROJECTILE_SPEED = 8;
     public static double ROBOT_RADIUS = 12;
     public static double EXPLOSION_RADIUS = 30;
+    public static int ROBOT_COOL_DOWN_HOLD_OFF = 20;
 }

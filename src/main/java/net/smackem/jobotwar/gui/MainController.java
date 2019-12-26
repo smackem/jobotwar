@@ -45,6 +45,7 @@ public class MainController {
         this.canvasContainer.maxHeightProperty().bind(this.canvas.heightProperty());
         this.canvas.setWidth(this.board.getWidth());
         this.canvas.setHeight(this.board.getHeight());
+        this.graphics.render(this.canvas.getGraphicsContext2D());
     }
 
     @FXML
@@ -74,7 +75,8 @@ public class MainController {
     }
 
     private Collection<Robot> createRobots() {
-        final Robot r1 = new Robot(0.1, 0x40ff80, new RuntimeProgram(
+        final Robot r1 = new Robot(0.1, 0x40ff80, Constants.ROBOT_COOL_DOWN_HOLD_OFF,
+            new RuntimeProgram(
                 RuntimeProgram.instruction(null, r -> {
                     r.setSpeedX(4); return null;
                 }),
@@ -94,16 +96,17 @@ public class MainController {
                     r.setAimAngle((r.getAimAngle() + 5) % 360); return null;
                 }),
                 RuntimeProgram.instruction(null, r -> {
-                    r.setShot(200); return null;
+                    r.setShot(500); return null;
                 }),
                 RuntimeProgram.instruction(null, r -> "SHOOT")
         ));
         r1.setX(20);
         r1.setY(50);
 
-        final Robot r2 = new Robot(0.5, 0xffc020, new RuntimeProgram(
+        final Robot r2 = new Robot(0.5, 0xffc020, Constants.ROBOT_COOL_DOWN_HOLD_OFF,
+            new RuntimeProgram(
                 RuntimeProgram.instruction(null, r -> {
-                    r.setSpeedX(-5); return null;
+                    r.setSpeedX(-0.5); return null;
                 }),
                 RuntimeProgram.instruction("MOVE", r ->
                     r.getX() > 10 ? "MOVE" : null
@@ -111,6 +114,15 @@ public class MainController {
         ));
         r2.setX(500);
         r2.setY(400);
-        return Arrays.asList(r1, r2);
+
+        final Robot r3 = new Robot(0.5, 0x0040ff, Constants.ROBOT_COOL_DOWN_HOLD_OFF,
+            new RuntimeProgram(
+                RuntimeProgram.instruction(null, r -> {
+                    r.setSpeedX(0.1); return null;
+                })
+        ));
+        r3.setX(20);
+        r3.setY(400);
+        return Arrays.asList(r1, r2, r3);
     }
 }

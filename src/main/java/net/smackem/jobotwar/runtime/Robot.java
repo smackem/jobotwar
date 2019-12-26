@@ -11,6 +11,7 @@ public class Robot {
     private final double acceleration;
     private final RobotProgram program;
     private final int rgb;
+    private final int coolDownTicks;
     private double speedX;
     private double speedY;
     private double actualSpeedX;
@@ -21,6 +22,7 @@ public class Robot {
     private double y;
     private int shot;
     private int health;
+    private int coolDownHoldOff;
 
     /**
      * Initializes a new instance of {@link Robot}.
@@ -28,9 +30,10 @@ public class Robot {
      * @param rgb The RGB color of the robot (format in hex: 0xrrggbb).
      * @param program The program that controls the robot.
      */
-    public Robot(double acceleration, int rgb, RobotProgram program) {
+    public Robot(double acceleration, int rgb, int coolDownTicks, RobotProgram program) {
         this.acceleration = Arguments.requireRange(acceleration, 0, Constants.MAX_ROBOT_ACCELERATION);
         this.rgb = rgb;
+        this.coolDownTicks = coolDownTicks;
         this.program = Objects.requireNonNull(program);
         this.health = Constants.MAX_HEALTH;
     }
@@ -47,6 +50,13 @@ public class Robot {
      */
     public int getRgb() {
         return this.rgb;
+    }
+
+    /**
+     * @return The number of ticks the gun needs to cool down between shots.
+     */
+    public int getCoolDownTicks() {
+        return this.coolDownTicks;
     }
 
     /**
@@ -115,57 +125,110 @@ public class Robot {
         }
     }
 
+    /**
+     * @return The angle at which the gun aims, in degrees.
+     */
     public double getAimAngle() {
         return this.aimAngle;
     }
 
+    /**
+     * Sets the angle at which the gun aims, in degrees.
+     */
     public void setAimAngle(double value) {
         this.aimAngle = Arguments.requireRange(value,
                 -360 + Constants.ANGLE_PRECISION, 360 - Constants.ANGLE_PRECISION);
     }
 
+    /**
+     * @return The angle at which the radar aims, in degrees.
+     */
     public double getRadarAngle() {
         return this.radarAngle;
     }
 
+    /**
+     * Sets the angle at which the radar aims, in degrees.
+     */
     public void setRadarAngle(double value) {
         this.radarAngle = Arguments.requireRange(value,
                 -360 + Constants.ANGLE_PRECISION, 360 - Constants.ANGLE_PRECISION);
     }
 
+    /**
+     * @return The current x-position of the robot.
+     */
     public double getX() {
         return this.x;
     }
 
+    /**
+     * Sets the current x-position of the robot.
+     */
     public void setX(double value) {
         this.x = Arguments.requireRange(value, 0, Constants.MAX_BOARD_WIDTH);
     }
 
+    /**
+     * @return The current y-position of the robot.
+     */
     public double getY() {
         return this.y;
     }
 
+    /**
+     * Sets the current y-position of the robot.
+     */
     public void setY(double value) {
         this.y = Arguments.requireRange(value, 0, Constants.MAX_BOARD_HEIGHT);
     }
 
+    /**
+     * @return The current health of the robot in the range 0..100, where 0 means dead.
+     */
     public int getHealth() {
         return this.health;
     }
 
+    /**
+     * Sets the current health of the robot in the range 0..100, where 0 means dead.
+     */
     public void setHealth(int value) {
         this.health = Arguments.requireRange(value, 0, Constants.MAX_HEALTH);
     }
 
+    /**
+     * @return {@code true} if the robot has health 0, otherwise {@code false}.
+     */
     public boolean isDead() {
         return this.health == 0;
     }
 
+    /**
+     * @return The value of the SHOT register as set by the program, meaning the distance to shoot.
+     */
     public int getShot() {
         return this.shot;
     }
 
+    /**
+     * Sets the value of SHOT register, meaning the distance to shoot.
+     */
     public void setShot(int value) {
         this.shot = Arguments.requireRange(value, 0, Constants.MAX_SHOT);
+    }
+
+    /**
+     * @return The number of ticks that the robot needs to wait until it can fire the gun again.
+     */
+    public int getCoolDownHoldOff() {
+        return this.coolDownHoldOff;
+    }
+
+    /**
+     * Sets the number of ticks that the robot needs to wait until it can fire the gun again.
+     */
+    public void setCoolDownHoldOff(int value) {
+        this.coolDownHoldOff = Arguments.requireRange(value, 0, 100_000);
     }
 }

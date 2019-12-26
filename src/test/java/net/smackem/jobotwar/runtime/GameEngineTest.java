@@ -12,7 +12,7 @@ public class GameEngineTest {
     @Test
     public void movement() {
         final double acceleration = 1;
-        final Robot robot = new Robot(acceleration, 0, new RuntimeProgram(
+        final Robot robot = new Robot(acceleration, 0, 1, new RuntimeProgram(
                 RuntimeProgram.instruction(null, r -> {
                     r.setSpeedX(4); return null;
                 })));
@@ -40,7 +40,7 @@ public class GameEngineTest {
 
     @Test
     public void shot() {
-        final Robot robot = new Robot(1, 0, new RuntimeProgram(
+        final Robot robot = new Robot(1, 0, 1, new RuntimeProgram(
                 RuntimeProgram.instruction(null, r -> {
                     r.setAimAngle(0); return null;
                 }),
@@ -75,7 +75,7 @@ public class GameEngineTest {
 
     @Test
     public void shotAngle() {
-        final Robot robot = new Robot(1, 0, new RuntimeProgram(
+        final Robot robot = new Robot(1, 0, 1, new RuntimeProgram(
                 RuntimeProgram.instruction(null, r -> {
                     r.setAimAngle(90); return null;
                 }),

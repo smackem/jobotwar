@@ -78,6 +78,7 @@ public final class GameEngine {
         }
     }
 
+    // returns a list of robots whose distance from @position is less than @tolerance
     private Collection<Robot> hitTestRobots(Vector position, Robot excludeRobot, double tolerance) {
         final Collection<Robot> hitRobots = new ArrayList<>();
         for (final Robot robot : this.board.getRobots()) {
@@ -99,19 +100,13 @@ public final class GameEngine {
         // handle movement
         robot.accelerate();
         if (moveRobot(robot, collisions)) {
-            robot.setHealth(Math.max(0, robot.getHealth() - 10));
+            robot.setHealth(Math.max(0, robot.getHealth() - 5));
         }
 
-        // handle shot
-        final int shot = robot.getShot();
-        if (shot > 0) {
-            final double angle = Math.toRadians(robot.getAimAngle());
-            final Vector position = new Vector(robot.getX(), robot.getY());
-            final Vector dest = new Vector(Math.cos(angle) * shot, Math.sin(angle) * shot);
-            final Projectile projectile = new Projectile(robot, position.add(dest), Constants.PROJECTILE_SPEED);
-            this.board.projectiles().add(projectile);
-            robot.setShot(0);
-        }
+        // handle radar
+
+        // handle cool down and shot
+        handleGun(robot);
     }
 
     private boolean moveRobot(Robot robot, Collection<Vector> collisions) {
@@ -163,5 +158,24 @@ public final class GameEngine {
         robot.setX(nextX);
         robot.setY(nextY);
         return hasCollision;
+    }
+
+    private void handleGun(Robot robot) {
+        final int coolDownHoldOff = robot.getCoolDownHoldOff();
+        if (coolDownHoldOff > 0) {
+            robot.setCoolDownHoldOff(coolDownHoldOff - 1);
+            return;
+        }
+
+        final int shot = robot.getShot();
+        if (shot > 0) {
+            final double angle = Math.toRadians(robot.getAimAngle());
+            final Vector position = new Vector(robot.getX(), robot.getY());
+            final Vector dest = new Vector(Math.cos(angle) * shot, Math.sin(angle) * shot);
+            final Projectile projectile = new Projectile(robot, position.add(dest), Constants.PROJECTILE_SPEED);
+            this.board.projectiles().add(projectile);
+            robot.setShot(0);
+            robot.setCoolDownHoldOff(robot.getCoolDownTicks());
+        }
     }
 }
