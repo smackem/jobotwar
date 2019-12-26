@@ -12,6 +12,7 @@ import java.util.Objects;
 public class BoardGraphics {
     private final Board board;
     private final Collection<Explosion> explosions = new ArrayList<>();
+    private final Collection<RenderedRadarBeam> radarBeams = new ArrayList<>();
 
     public BoardGraphics(Board board) {
         this.board = Objects.requireNonNull(board);
@@ -20,18 +21,20 @@ public class BoardGraphics {
     public void render(GraphicsContext gc) {
         gc.clearRect(0,0,this.board.getWidth(), this.board.getHeight());
 
-        // robots
-        for (final Robot robot : this.board.getRobots()) {
-            final int rgb = robot.getRgb();
-            final double opacity = robot.isDead() ? 0.25 : 1.0;
-            final Paint color = Color.rgb(rgb >> 16 & 0xff, rgb >> 8 & 0xff, rgb >> 0 & 0xff, opacity);
-            gc.setFill(color);
-            gc.fillOval(
-                    robot.getX() - Constants.ROBOT_RADIUS,
-                    robot.getY() - Constants.ROBOT_RADIUS,
-                    Constants.ROBOT_RADIUS * 2,
-                    Constants.ROBOT_RADIUS * 2);
+        // radar beams
+        for (final RenderedRadarBeam b : this.radarBeams) {
+            final Robot robot = b.beam.getSourceRobot();
+            final Paint paint = getRobotPaint(robot, b.opacity);
+            final Vector hitPos = b.beam.getHitPosition();
+            gc.setLineWidth(1.0);
+            gc.setStroke(paint);
+            gc.beginPath();
+            gc.moveTo(robot.getX(), robot.getY());
+            gc.lineTo(hitPos.getX(), hitPos.getY());
+            gc.stroke();
+            b.opacity -= 0.1;
         }
+        this.radarBeams.removeIf(beam -> beam.opacity <= 0.3);
 
         // projectiles
         gc.setFill(Color.WHITE);
@@ -42,6 +45,19 @@ public class BoardGraphics {
                     position.getY() - 2,
                     4,
                     4);
+        }
+
+        // robots
+        for (final Robot robot : this.board.getRobots()) {
+            final int rgb = robot.getRgb();
+            final double opacity = robot.isDead() ? 0.25 : 1.0;
+            final Paint color = getRobotPaint(robot, opacity);
+            gc.setFill(color);
+            gc.fillOval(
+                    robot.getX() - Constants.ROBOT_RADIUS,
+                    robot.getY() - Constants.ROBOT_RADIUS,
+                    Constants.ROBOT_RADIUS * 2,
+                    Constants.ROBOT_RADIUS * 2);
         }
 
         // explosions
@@ -65,6 +81,17 @@ public class BoardGraphics {
         }
     }
 
+    public void addRadarBeams(Collection<RadarBeam> beams) {
+        for (final RadarBeam beam : beams) {
+            this.radarBeams.add(new RenderedRadarBeam(beam));
+        }
+    }
+
+    private static Paint getRobotPaint(Robot robot, double opacity) {
+        final int rgb = robot.getRgb();
+        return Color.rgb(rgb >> 16 & 0xff, rgb >> 8 & 0xff, rgb & 0xff, opacity);
+    }
+
     private static class Explosion {
         final Vector position;
         double radius;
@@ -72,6 +99,16 @@ public class BoardGraphics {
         Explosion(Vector position) {
             this.position = position;
             this.radius = 1;
+        }
+    }
+
+    private static class RenderedRadarBeam {
+        final RadarBeam beam;
+        double opacity;
+
+        RenderedRadarBeam(RadarBeam beam) {
+            this.beam = beam;
+            opacity = 0.7;
         }
     }
 }

@@ -146,12 +146,12 @@ public final class GameEngine {
         // detect wall
         radarAngle = radarAngle < 0 ? radarAngle + 360 : radarAngle;
         final Line wall;
-        if (45 <= radarAngle && radarAngle <= 135) { // top wall
-            wall = new Line(Vector.ORIGIN, new Vector(this.board.getWidth(), 0));
+        if (45 <= radarAngle && radarAngle <= 135) { // bottom wall
+            wall = new Line(new Vector(0, this.board.getHeight()), new Vector(this.board.getWidth(), this.board.getHeight()));
         } else if (136 <= radarAngle && radarAngle <= 225) { // left wall
             wall = new Line(Vector.ORIGIN, new Vector(0, this.board.getHeight()));
-        } else if (226 <= radarAngle && radarAngle <= 315) { // bottom wall
-            wall = new Line(new Vector(0, this.board.getHeight()), new Vector(this.board.getWidth(), this.board.getHeight()));
+        } else if (226 <= radarAngle && radarAngle <= 315) { // top wall
+            wall = new Line(Vector.ORIGIN, new Vector(this.board.getWidth(), 0));
         } else { // right wall
             wall = new Line(new Vector(this.board.getWidth(), 0), new Vector(this.board.getWidth(), this.board.getHeight()));
         }

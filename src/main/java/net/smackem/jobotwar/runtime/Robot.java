@@ -135,6 +135,11 @@ public class Robot {
 
     /**
      * Sets the angle at which the gun aims, in degrees.
+     *       270
+     *   225    315
+     * 180          0
+     *   135     45
+     *       90
      */
     public void setAimAngle(double value) {
         this.aimAngle = Arguments.requireRange(value,
@@ -150,6 +155,11 @@ public class Robot {
 
     /**
      * Sets the angle at which the radar aims, in degrees - or {@code null} if radar should not be active.
+     *       270
+     *   225    315
+     * 180          0
+     *   135     45
+     *       90
      */
     public void setRadarAngle(Double value) {
         this.radarAngle = value != null

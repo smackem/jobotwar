@@ -72,6 +72,7 @@ public class MainController {
                         tickResult.collisionPositions.stream(),
                         tickResult.killedRobots.stream().map(r -> new Vector(r.getX(), r.getY())))
         ).collect(Collectors.toList()));
+        this.graphics.addRadarBeams(tickResult.radarBeams);
     }
 
     private Collection<Robot> createRobots() {
@@ -115,10 +116,16 @@ public class MainController {
         r2.setX(500);
         r2.setY(400);
 
+        final double[] radarAngle = new double[] { 0 };
         final Robot r3 = new Robot(0.5, 0x0040ff, Constants.ROBOT_COOL_DOWN_HOLD_OFF,
             new RuntimeProgram(
                 RuntimeProgram.instruction(null, r -> {
                     r.setSpeedX(0.1); return null;
+                }),
+                RuntimeProgram.instruction("RADAR", r -> {
+                    r.setRadarAngle(radarAngle[0] % 360);
+                    radarAngle[0] += 5;
+                    return "RADAR";
                 })
         ));
         r3.setX(20);
