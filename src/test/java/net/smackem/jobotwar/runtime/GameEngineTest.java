@@ -134,7 +134,7 @@ public class GameEngineTest {
                     r.setRadarAngle(270.0); return null;
                 }),
                 RuntimeProgram.instruction(null, r -> {
-                    r.setRadarAngle(135.0); return null;
+                    r.setRadarAngle(45.0); return null;
                 })
             ));
         robot.setX(width / 2.0);
@@ -153,7 +153,7 @@ public class GameEngineTest {
                 .usingComparator(vectorComparator)
                 .isEqualTo(new Vector(width, robot.getY()));
 
-        // 90 degrees - hit top wall
+        // 90 degrees - hit bottom wall
         result = engine.tick();
         assertThat(result.radarBeams).hasSize(1);
         beam = result.radarBeams.iterator().next();
@@ -161,7 +161,7 @@ public class GameEngineTest {
         assertThat(beam.getSourceRobot()).isEqualTo(robot);
         assertThat(beam.getHitPosition())
                 .usingComparator(vectorComparator)
-                .isEqualTo(new Vector(robot.getX(), 0));
+                .isEqualTo(new Vector(robot.getX(), height));
 
         // 180 degrees - hit left wall
         result = engine.tick();
@@ -173,7 +173,7 @@ public class GameEngineTest {
                 .usingComparator(vectorComparator)
                 .isEqualTo(new Vector(0, robot.getY()));
 
-        // 270 degrees - hit bottom wall
+        // 270 degrees - hit top wall
         result = engine.tick();
         assertThat(result.radarBeams).hasSize(1);
         beam = result.radarBeams.iterator().next();
@@ -181,9 +181,9 @@ public class GameEngineTest {
         assertThat(beam.getSourceRobot()).isEqualTo(robot);
         assertThat(beam.getHitPosition())
                 .usingComparator(vectorComparator)
-                .isEqualTo(new Vector(robot.getX(), height));
+                .isEqualTo(new Vector(robot.getX(), 0));
 
-        // 135 degrees - hit top right corner
+        // 45 degrees - hit bottom right corner
         result = engine.tick();
         assertThat(result.radarBeams).hasSize(1);
         beam = result.radarBeams.iterator().next();
@@ -191,7 +191,7 @@ public class GameEngineTest {
         assertThat(beam.getSourceRobot()).isEqualTo(robot);
         assertThat(beam.getHitPosition())
                 .usingComparator(vectorComparator)
-                .isEqualTo(new Vector(width, 0));
+                .isEqualTo(new Vector(width, height));
     }
 
     @Test
