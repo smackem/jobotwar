@@ -10,15 +10,7 @@ public final class Vector {
     private final double x;
     private final double y;
 
-    private static final double TOLERANCE = 0.0001;
-
-    public static final Comparator<Vector> PROXIMITY_COMPARATOR = (a, b) -> {
-        final double distance = Vector.distance(a, b);
-        if (distance < TOLERANCE) {
-            return 0;
-        }
-        return 1;
-    };
+    public static final Vector ORIGIN = new Vector(0, 0);
 
     /**
      * Initializes a new instance of {@link Vector}.
@@ -119,16 +111,6 @@ public final class Vector {
         final double dx = b.x - a.x;
         final double dy = b.y - a.y;
         return Math.sqrt(dx * dx + dy * dy);
-    }
-
-    /**
-     * Checks whether this vector is very close (so close they can be considered equal) to the
-     * passed vector.
-     * @param other
-     * @return {@code true} if the two vectors are very close.
-     */
-    public boolean isCloseTo(Vector other) {
-        return Math.abs(this.x - other.y) < TOLERANCE && Math.abs(this.y - other.y) < TOLERANCE;
     }
 
     @Override

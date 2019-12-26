@@ -17,12 +17,13 @@ public class Robot {
     private double actualSpeedX;
     private double actualSpeedY;
     private double aimAngle;
-    private double radarAngle;
+    private Double radarAngle;
     private double x;
     private double y;
     private int shot;
     private int health;
     private int coolDownHoldOff;
+    private Vector cachedPosition;
 
     /**
      * Initializes a new instance of {@link Robot}.
@@ -137,22 +138,23 @@ public class Robot {
      */
     public void setAimAngle(double value) {
         this.aimAngle = Arguments.requireRange(value,
-                -360 + Constants.ANGLE_PRECISION, 360 - Constants.ANGLE_PRECISION);
+                -180, 360 - Constants.ANGLE_PRECISION);
     }
 
     /**
-     * @return The angle at which the radar aims, in degrees.
+     * @return The angle at which the radar aims, in degrees - or {@code null} if radar is not active.
      */
-    public double getRadarAngle() {
+    public Double getRadarAngle() {
         return this.radarAngle;
     }
 
     /**
-     * Sets the angle at which the radar aims, in degrees.
+     * Sets the angle at which the radar aims, in degrees - or {@code null} if radar should not be active.
      */
-    public void setRadarAngle(double value) {
-        this.radarAngle = Arguments.requireRange(value,
-                -360 + Constants.ANGLE_PRECISION, 360 - Constants.ANGLE_PRECISION);
+    public void setRadarAngle(Double value) {
+        this.radarAngle = value != null
+            ? Arguments.requireRange(value,-180, 360 - Constants.ANGLE_PRECISION)
+            : null;
     }
 
     /**
@@ -167,6 +169,7 @@ public class Robot {
      */
     public void setX(double value) {
         this.x = Arguments.requireRange(value, 0, Constants.MAX_BOARD_WIDTH);
+        this.cachedPosition = null;
     }
 
     /**
@@ -181,6 +184,17 @@ public class Robot {
      */
     public void setY(double value) {
         this.y = Arguments.requireRange(value, 0, Constants.MAX_BOARD_HEIGHT);
+        this.cachedPosition = null;
+    }
+
+    /**
+     * @return The position of the robot as a {@link Vector}.
+     */
+    public Vector getPosition() {
+        if (this.cachedPosition == null) {
+            this.cachedPosition = new Vector(this.x, this.y);
+        }
+        return this.cachedPosition;
     }
 
     /**

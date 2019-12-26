@@ -16,8 +16,8 @@ public class RobotTest {
     @Test
     public void setRadarAngle() {
         final Robot robot = new Robot(1.0, 0, 1, RuntimeProgram.EMPTY);
-        assertThatIllegalArgumentException().isThrownBy(() -> robot.setRadarAngle(360));
-        assertThatCode(() -> robot.setRadarAngle(359)).doesNotThrowAnyException();
+        assertThatIllegalArgumentException().isThrownBy(() -> robot.setRadarAngle(360.0));
+        assertThatCode(() -> robot.setRadarAngle(359.0)).doesNotThrowAnyException();
     }
 
     @Test

@@ -15,7 +15,7 @@ public final class GameEngine {
         final TickResult result = new TickResult();
         for (final Robot robot : this.board.getRobots()) {
             if (robot.isDead() == false) {
-                tickRobot(robot, result.collisionPositions);
+                tickRobot(robot, result);
                 if (robot.isDead()) {
                     result.killedRobots.add(robot);
                 }
@@ -35,11 +35,13 @@ public final class GameEngine {
         public final Collection<Projectile> explodedProjectiles;
         public final Collection<Vector> collisionPositions;
         public final Collection<Robot> killedRobots;
+        public final Collection<RadarBeam> radarBeams;
 
         private TickResult() {
             this.explodedProjectiles = new ArrayList<>();
             this.collisionPositions = new ArrayList<>();
             this.killedRobots = new ArrayList<>();
+            this.radarBeams = new ArrayList<>();
         }
     }
 
@@ -85,7 +87,7 @@ public final class GameEngine {
             if (robot == excludeRobot) {
                 continue;
             }
-            final Vector robotPosition = new Vector(robot.getX(), robot.getY());
+            final Vector robotPosition = robot.getPosition();
             if (Vector.distance(position, robotPosition) < Constants.ROBOT_RADIUS + tolerance) {
                 hitRobots.add(robot);
             }
@@ -93,20 +95,69 @@ public final class GameEngine {
         return hitRobots;
     }
 
-    private void tickRobot(Robot robot, Collection<Vector> collisions) {
+    private void tickRobot(Robot robot, TickResult result) {
         // execute next program statement
         robot.getProgram().next(robot);
 
         // handle movement
         robot.accelerate();
-        if (moveRobot(robot, collisions)) {
+        if (moveRobot(robot, result.collisionPositions)) {
             robot.setHealth(Math.max(0, robot.getHealth() - 5));
         }
 
         // handle radar
+        final Double radarAngle = robot.getRadarAngle();
+        if (radarAngle != null) {
+            final RadarBeam beam = calcRadarBeam(robot, radarAngle);
+            result.radarBeams.add(beam);
+            robot.setRadarAngle(null);
+        }
 
         // handle cool down and shot
         handleGun(robot);
+    }
+
+    private RadarBeam calcRadarBeam(Robot robot, double radarAngle) {
+        final Vector position = robot.getPosition();
+        final Line line = Line.fromAngleAndLength(position, Math.toRadians(radarAngle), Constants.MAX_RADAR_RANGE);
+
+        // detect nearest robot
+        Vector nearestRobotPos = null;
+        double nearestRobotDistance = 0;
+        for (final Robot r : this.board.getRobots()) {
+            if (r == robot) {
+                continue;
+            }
+            final Vector p = r.getPosition();
+            final double distanceFromBeam = line.distanceFromPoint(p);
+            if (distanceFromBeam >= Constants.ROBOT_RADIUS) {
+                continue;
+            }
+            final double robotDistance = Vector.distance(position, p);
+            if (robotDistance < nearestRobotDistance || nearestRobotPos == null) {
+                nearestRobotDistance = robotDistance;
+                nearestRobotPos = p;
+            }
+        }
+        if (nearestRobotPos != null) {
+            return new RadarBeam(robot, nearestRobotPos, RadarBeamHitKind.ROBOT);
+        }
+
+        // detect wall
+        radarAngle = radarAngle < 0 ? radarAngle + 360 : radarAngle;
+        final Line wall;
+        if (45 <= radarAngle && radarAngle <= 135) { // top wall
+            wall = new Line(Vector.ORIGIN, new Vector(this.board.getWidth(), 0));
+        } else if (136 <= radarAngle && radarAngle <= 225) { // left wall
+            wall = new Line(Vector.ORIGIN, new Vector(0, this.board.getHeight()));
+        } else if (226 <= radarAngle && radarAngle <= 315) { // bottom wall
+            wall = new Line(new Vector(0, this.board.getHeight()), new Vector(this.board.getWidth(), this.board.getHeight()));
+        } else { // right wall
+            wall = new Line(new Vector(this.board.getWidth(), 0), new Vector(this.board.getWidth(), this.board.getHeight()));
+        }
+        final Vector wallIntersection = Line.intersect(line, wall);
+        assert(wallIntersection != null);
+        return new RadarBeam(robot, wallIntersection, RadarBeamHitKind.WALL);
     }
 
     private boolean moveRobot(Robot robot, Collection<Vector> collisions) {
@@ -149,7 +200,7 @@ public final class GameEngine {
         if (collidingRobots.isEmpty() == false) {
             hasCollision = true;
             for (final Robot collidingRobot : collidingRobots) {
-                final Vector p = new Vector(collidingRobot.getX(), collidingRobot.getY());
+                final Vector p = collidingRobot.getPosition();
                 final Vector center = position.add(p.subtract(position).divide(2));
                 collisions.add(center);
             }
@@ -170,7 +221,7 @@ public final class GameEngine {
         final int shot = robot.getShot();
         if (shot > 0) {
             final double angle = Math.toRadians(robot.getAimAngle());
-            final Vector position = new Vector(robot.getX(), robot.getY());
+            final Vector position = robot.getPosition();
             final Vector dest = new Vector(Math.cos(angle) * shot, Math.sin(angle) * shot);
             final Projectile projectile = new Projectile(robot, position.add(dest), Constants.PROJECTILE_SPEED);
             this.board.projectiles().add(projectile);
