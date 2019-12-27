@@ -23,6 +23,16 @@ public final class Vector {
     }
 
     /**
+     * Creates a new {@link Vector} with the given angle from the x-axis and the given length.
+     * @param angle The angle between the vector and the x-axis, in radians.
+     * @param length The length of the new vector.
+     * @return A new instance of {@link Vector}.
+     */
+    public static Vector fromAngleAndLength(double angle, double length) {
+        return new Vector(Math.cos(angle) * length, Math.sin(angle) * length);
+    }
+
+    /**
      * @return The x-coordinate.
      */
     public double getX() {
@@ -96,6 +106,17 @@ public final class Vector {
      */
     public Vector negate() {
         return new Vector(-this.x, -this.y);
+    }
+
+    /**
+     * Determines whether the {@code other} {@link Vector} is close to this {@link Vector}.
+     * @param other The other vector.
+     * @param tolerance The positive tolerance. If the absolute x- and y-differences are within
+     *                  the tolerance, the vectors are considered close.
+     * @return {@code true} if the vectors are close, otherwise {@code false}.
+     */
+    public boolean isCloseTo(Vector other, double tolerance) {
+        return Math.abs(this.x - other.x) < tolerance && Math.abs(this.y - other.y) < tolerance;
     }
 
     /**

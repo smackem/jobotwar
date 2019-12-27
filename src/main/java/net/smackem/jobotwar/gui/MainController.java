@@ -104,27 +104,33 @@ public class MainController {
         r1.setX(20);
         r1.setY(50);
 
+        final double[] radarAngle2 = new double[] { 0 };
         final Robot r2 = new Robot(0.5, 0xffc020, Constants.ROBOT_COOL_DOWN_HOLD_OFF,
             new RuntimeProgram(
                 RuntimeProgram.instruction(null, r -> {
                     r.setSpeedX(-0.5); return null;
                 }),
-                RuntimeProgram.instruction("MOVE", r ->
+                RuntimeProgram.instruction("MOVE", r -> {
+                    r.setRadarAngle(radarAngle2[0] % 360);
+                    radarAngle2[0] += 12;
+                    return null;
+                }),
+                RuntimeProgram.instruction(null, r ->
                     r.getX() > 10 ? "MOVE" : null
                 )
         ));
         r2.setX(500);
         r2.setY(400);
 
-        final double[] radarAngle = new double[] { 0 };
+        final double[] radarAngle3 = new double[] { 0 };
         final Robot r3 = new Robot(0.5, 0x0040ff, Constants.ROBOT_COOL_DOWN_HOLD_OFF,
             new RuntimeProgram(
                 RuntimeProgram.instruction(null, r -> {
                     r.setSpeedX(0.1); return null;
                 }),
                 RuntimeProgram.instruction("RADAR", r -> {
-                    r.setRadarAngle(radarAngle[0] % 360);
-                    radarAngle[0] += 5;
+                    r.setRadarAngle(radarAngle3[0] % 360);
+                    radarAngle3[0] += 5;
                     return "RADAR";
                 })
         ));

@@ -118,8 +118,10 @@ public final class GameEngine {
     }
 
     private RadarBeam calcRadarBeam(Robot robot, double radarAngle) {
+        final double radarAngleRadians = Math.toRadians(radarAngle);
         final Vector position = robot.getPosition();
-        final Line line = Line.fromAngleAndLength(position, Math.toRadians(radarAngle), Constants.MAX_RADAR_RANGE);
+        final Line line = new Line(position,
+                Vector.fromAngleAndLength(radarAngleRadians, Constants.MAX_RADAR_RANGE));
 
         // detect nearest robot
         Vector nearestRobotPos = null;
@@ -134,9 +136,13 @@ public final class GameEngine {
                 continue;
             }
             final double robotDistance = Vector.distance(position, p);
+            final Vector beamPos = position.add(Vector.fromAngleAndLength(radarAngleRadians, robotDistance));
+            if (beamPos.isCloseTo(p, Constants.ROBOT_RADIUS) == false) {
+                continue;
+            }
             if (robotDistance < nearestRobotDistance || nearestRobotPos == null) {
                 nearestRobotDistance = robotDistance;
-                nearestRobotPos = p;
+                nearestRobotPos = beamPos;
             }
         }
         if (nearestRobotPos != null) {
@@ -222,7 +228,7 @@ public final class GameEngine {
         if (shot > 0) {
             final double angle = Math.toRadians(robot.getAimAngle());
             final Vector position = robot.getPosition();
-            final Vector dest = new Vector(Math.cos(angle) * shot, Math.sin(angle) * shot);
+            final Vector dest = Vector.fromAngleAndLength(angle, shot);
             final Projectile projectile = new Projectile(robot, position.add(dest), Constants.PROJECTILE_SPEED);
             this.board.projectiles().add(projectile);
             robot.setShot(0);

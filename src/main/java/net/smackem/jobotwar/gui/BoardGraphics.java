@@ -1,8 +1,11 @@
 package net.smackem.jobotwar.gui;
 
+import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
+import javafx.scene.shape.ArcType;
+import javafx.scene.shape.Rectangle;
 import net.smackem.jobotwar.runtime.*;
 
 import java.util.ArrayList;
@@ -22,42 +25,57 @@ public class BoardGraphics {
         gc.clearRect(0,0,this.board.getWidth(), this.board.getHeight());
 
         // radar beams
+        gc.setLineWidth(1);
+        gc.setLineDashes(1, 3);
         for (final RenderedRadarBeam b : this.radarBeams) {
             final Robot robot = b.beam.getSourceRobot();
             final Paint paint = getRobotPaint(robot, b.opacity);
             final Vector hitPos = b.beam.getHitPosition();
-            gc.setLineWidth(1.0);
             gc.setStroke(paint);
-            gc.beginPath();
-            gc.moveTo(robot.getX(), robot.getY());
-            gc.lineTo(hitPos.getX(), hitPos.getY());
-            gc.stroke();
-            b.opacity -= 0.1;
+            gc.strokeLine(robot.getX(), robot.getY(), hitPos.getX(), hitPos.getY());
+            b.opacity -= 0.05;
         }
-        this.radarBeams.removeIf(beam -> beam.opacity <= 0.3);
+        this.radarBeams.removeIf(beam -> beam.opacity <= 0.2);
 
         // projectiles
         gc.setFill(Color.WHITE);
         for (final Projectile projectile : this.board.projectiles()) {
             final Vector position = projectile.getPosition();
             gc.fillOval(
-                    position.getX() - 2,
-                    position.getY() - 2,
-                    4,
-                    4);
+                    position.getX() - 3,
+                    position.getY() - 3,
+                    6,
+                    6);
         }
 
         // robots
+        gc.setLineDashes(null);
+        gc.setStroke(Color.WHITE);
+        final double healthBarWidth = 3;
         for (final Robot robot : this.board.getRobots()) {
-            final int rgb = robot.getRgb();
-            final double opacity = robot.isDead() ? 0.25 : 1.0;
-            final Paint color = getRobotPaint(robot, opacity);
-            gc.setFill(color);
-            gc.fillOval(
+            final Rectangle2D outer = new Rectangle2D(
                     robot.getX() - Constants.ROBOT_RADIUS,
                     robot.getY() - Constants.ROBOT_RADIUS,
                     Constants.ROBOT_RADIUS * 2,
                     Constants.ROBOT_RADIUS * 2);
+            final Rectangle2D inner = new Rectangle2D(
+                    outer.getMinX() + healthBarWidth,
+                    outer.getMinY() + healthBarWidth,
+                    outer.getWidth() - healthBarWidth * 2,
+                    outer.getHeight() - healthBarWidth * 2);
+            gc.setFill(Color.LIGHTGREEN);
+            gc.fillArc(
+                    outer.getMinX(), outer.getMinY(), outer.getWidth(), outer.getHeight(),
+                    90,
+                    robot.getHealth() * 360.0 / 100.0,
+                    ArcType.ROUND);
+            final int rgb = robot.getRgb();
+            final double opacity = robot.isDead() ? 0.25 : 1.0;
+            final Paint color = getRobotPaint(robot, opacity);
+            gc.setFill(color);
+            gc.fillOval(inner.getMinX(), inner.getMinY(), inner.getWidth(), inner.getHeight());
+            gc.strokeOval(inner.getMinX(), inner.getMinY(), inner.getWidth(), inner.getHeight());
+            gc.strokeOval(outer.getMinX(), outer.getMinY(), outer.getWidth(), outer.getHeight());
         }
 
         // explosions
@@ -66,10 +84,10 @@ public class BoardGraphics {
             final Paint paint = Color.rgb(0xff,0x40,0x40,1.0 - explosion.radius / (Constants.EXPLOSION_RADIUS * 1.5));
             gc.setStroke(paint);
             gc.strokeOval(
-                    explosion.position.getX() - explosion.radius / 2,
-                    explosion.position.getY() - explosion.radius / 2,
-                    explosion.radius,
-                    explosion.radius);
+                    explosion.position.getX() - explosion.radius,
+                    explosion.position.getY() - explosion.radius,
+                    explosion.radius * 2,
+                    explosion.radius * 2);
             explosion.radius += 2.5;
         }
         this.explosions.removeIf(e -> e.radius > Constants.EXPLOSION_RADIUS);
@@ -108,7 +126,7 @@ public class BoardGraphics {
 
         RenderedRadarBeam(RadarBeam beam) {
             this.beam = beam;
-            opacity = 0.7;
+            opacity = beam.getHitKind() == RadarBeamHitKind.ROBOT ? 1.0 : 0.4;
         }
     }
 }

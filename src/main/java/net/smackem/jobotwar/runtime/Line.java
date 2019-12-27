@@ -18,19 +18,6 @@ public final class Line {
     }
 
     /**
-     * Creates a new {@link Line} from a starting point, an angle and a length.
-     * @param p1 The starting point
-     * @param angle The angle in radians.
-     * @param length The new line's length.
-     * @return A new instance of {@link Line}.
-     */
-    public static Line fromAngleAndLength(Vector p1, double angle, double length) {
-        return new Line(
-                p1,
-                new Vector(Math.cos(angle) * length, Math.sin(angle) * length));
-    }
-
-    /**
      * @return The first point of the line.
      */
     public Vector getPoint1() {
