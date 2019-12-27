@@ -1,0 +1,49 @@
+// ROBOT  'MOVER'
+// INITIALIZE RANDOM NUMBER
+250 -> RANDOM
+
+// SAVE CURRENT DAMAGE
+Start:
+    DAMAGE -> damage
+
+
+// CHECK DAMAGE - GO MOVE IF DAMAGED
+// IF NOT, INCREMENT AIM
+Scan:
+    goto Move if DAMAGE != damage
+    AIM + 13 -> AIM 
+
+
+// SEND RADAR IN DIRECTION OF AIM
+// EXIT TO SCAN IF NO ENEMY FOUND
+// OR SHOOT AT ENEMY JUST SPOTTED
+// THEN GO SEE IF ENEMY IS STILL THERE
+
+Spot:
+    AIM -> RADAR
+    goto Scan if RADAR > 0
+    0 - RADAR -> SHOT
+    goto Spot
+
+
+// PICK A RANDOM PLACE TO GO
+
+Move:
+    RANDOM -> dx
+    RANDOM -> dy
+
+// TRAVEL TO NEW X LOCATION
+MoveX:
+    dx - X * 100 -> SPEEDX
+    goto MoveX if dx - X > 20 or dx - X < -20
+    0 -> SPEEDX
+
+
+// TRAVEL TO NEW Y LOCATION
+// THEN GO START SCANNING AGAIN
+
+MoveY:
+   dy - Y * 100 -> SPEEDY
+   goto MoveY if dy - Y > 20 or if dy - Y < -20
+   0 -> SPEEDY
+   goto Start
