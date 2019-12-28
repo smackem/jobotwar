@@ -26,7 +26,7 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-grammar jobotwar;
+grammar Jobotwar;
 
 program
    : line +
@@ -37,46 +37,33 @@ line
    ;
 
 label
-   : ID
+   : ID ':'
    ;
    
 statement
-   : ifstatement
-   | tostatement
-   | gosubstatement
-   | gotostatement
-   | endsubstatement
-   | accumstatement
-   ;
-
-accumstatement
-    : accumexpression;
-
-accumexpression
-    : ('='
-    | '#'
-    | ('<' expression)
-    | ('>' expression)) statement
-    ;
-
-gosubstatement
-   : 'GOSUB' label
+   : (assignstatement
+   | declstatement
+   | gotostatement) (ifclause | unlessclause)?
    ;
 
 gotostatement
-   : 'GOTO' label
+   : 'goto' ID
    ;
 
-tostatement
-   : expression? ('TO' register) +
+declstatement
+   : 'def' ID
    ;
 
-endsubstatement
-   : 'ENDSUB'
+assignstatement
+   : expression ('=>' register)+
    ;
 
-ifstatement
-   : 'IF'? condition (EOL | COMMA | DOT)? statement
+ifclause
+   : 'if' condition
+   ;
+
+unlessclause
+   : 'unless' condition
    ;
 
 condition
@@ -94,247 +81,46 @@ operation
    | '-'
    | '*'
    | '/'
+   | '%'
    ;
 
 comparison
    : '<'
+   | '<='
    | '>'
+   | '>='
    | '='
-   | '#'
+   | '!='
    ;
 
 argument
    : number
    | register
-   | DATA
+   | ID
    ;
 
 register
-   : A
-   | B
-   | C
-   | D
-   | E
-   | F
-   | G
-   | H
-   | I
-   | J
-   | K
-   | L
-   | M
-   | N
-   | O
-   | P
-   | Q
-   | R
-   | S
-   | T
-   | U
-   | V
-   | W
-   | X
-   | Y
-   | Z
-   | AIM
+   : AIM
    | SHOT
    | RADAR
    | SPEEDX
    | SPEEDY
    | RANDOM
-   | INDEX
-   | DATA
    | DAMAGE
    ;
 
-
-A
-   : 'A'
-   ;
-
-
-B
-   : 'B'
-   ;
-
-
-C
-   : 'C'
-   ;
-
-
-D
-   : 'D'
-   ;
-
-
-E
-   : 'E'
-   ;
-
-
-F
-   : 'F'
-   ;
-
-
-G
-   : 'G'
-   ;
-
-
-H
-   : 'H'
-   ;
-
-
-I
-   : 'I'
-   ;
-
-
-J
-   : 'J'
-   ;
-
-
-K
-   : 'K'
-   ;
-
-
-L
-   : 'L'
-   ;
-
-
-M
-   : 'M'
-   ;
-
-
-N
-   : 'N'
-   ;
-
-
-O
-   : 'O'
-   ;
-
-
-P
-   : 'P'
-   ;
-
-
-Q
-   : 'Q'
-   ;
-
-
-R
-   : 'R'
-   ;
-
-
-S
-   : 'S'
-   ;
-
-
-T
-   : 'T'
-   ;
-
-
-U
-   : 'U'
-   ;
-
-
-V
-   : 'V'
-   ;
-
-
-W
-   : 'W'
-   ;
-
-
-X
-   : 'X'
-   ;
-
-
-Y
-   : 'Y'
-   ;
-
-
-Z
-   : 'Z'
-   ;
-
-
-AIM
-   : 'AIM'
-   ;
-
-
-SHOT
-   : 'SHOT'
-   ;
-
-
-RADAR
-   : 'RADAR'
-   ;
-
-
-DAMAGE
-   : 'DAMAGE'
-   ;
-
-
-SPEEDX
-   : 'SPEEDX'
-   ;
-
-
-SPEEDY
-   : 'SPEEDY'
-   ;
-
-
-RANDOM
-   : 'RANDOM'
-   ;
-
-
-INDEX
-   : 'INDEX'
-   ;
-
-
-DATA
-   : 'DATA'
-   ;
-
-
-DOT
-   : '.'
-   ;
-
-
-COMMA
-   : ','
-   ;
-
+AIM : 'AIM';
+SHOT : 'SHOT';
+RADAR : 'RADAR';
+DAMAGE : 'DAMAGE';
+SPEEDX : 'SPEEDX';
+SPEEDY : 'SPEEDY';
+RANDOM : 'RANDOM';
+DOT : '.';
+COMMA : ',';
 
 ID
-   : ('a' .. 'z' | 'A' .. 'Z') ('a' .. 'z' | 'A' .. 'Z' | '0' .. '9') +
+   : ('a' .. 'z' | 'A' .. 'Z' | '_') ('a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9') +
    ;
 
 number
@@ -345,21 +131,17 @@ comment
    : COMMENT
    ;
 
-
 NUMBER
    : [0-9]+ ('.' [0-9]+)?
    ;
 
-
 COMMENT
-   : ';' ~ [\r\n]*
+   : '//' ~ [\r\n]*
    ;
-
 
 EOL
    : [\r\n] +
    ;
-
 
 WS
    : [ \t] -> skip

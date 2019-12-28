@@ -10,6 +10,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.util.Duration;
+import net.smackem.jobotwar.lang.Compiler;
 import net.smackem.jobotwar.runtime.*;
 
 import java.util.Arrays;
@@ -37,6 +38,9 @@ public class MainController {
         this.board = new Board(640, 480, createRobots());
         this.engine = new GameEngine(this.board);
         this.graphics = new BoardGraphics(this.board);
+
+        final Compiler compiler = new Compiler();
+        compiler.compile();
     }
 
     @FXML
@@ -136,6 +140,38 @@ public class MainController {
         ));
         r3.setX(20);
         r3.setY(400);
-        return Arrays.asList(r1, r2, r3);
+
+        final double[] radarAngle4 = new double[] { 0 };
+        final Robot r4 = new Robot(0.5, 0xC02000, Constants.ROBOT_COOL_DOWN_HOLD_OFF,
+                new RuntimeProgram(
+                        RuntimeProgram.instruction(null, r -> {
+                            r.setAimAngle(90); return null;
+                        }),
+                        RuntimeProgram.instruction("LEFT", r -> {
+                            r.setSpeedX(-5); return null;
+                        }),
+                        RuntimeProgram.instruction(null, r -> {
+                            r.setShot(500); return null;
+                        }),
+                        RuntimeProgram.instruction(null, r -> {
+                            return r.getX() > 100 ? "LEFT" : null;
+                        }),
+                        RuntimeProgram.instruction("RIGHT", r -> {
+                            r.setSpeedX(5); return null;
+                        }),
+                        RuntimeProgram.instruction(null, r -> {
+                            r.setShot(500); return null;
+                        }),
+                        RuntimeProgram.instruction(null, r -> {
+                            return r.getX() < 500 ? "RIGHT" : null;
+                        }),
+                        RuntimeProgram.instruction(null, r -> {
+                            return "LEFT";
+                        })
+                ));
+        r4.setX(600);
+        r4.setY(30);
+
+        return Arrays.asList(r1, r2, r3, r4);
     }
 }
