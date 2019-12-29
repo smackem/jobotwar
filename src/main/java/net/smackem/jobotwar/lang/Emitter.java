@@ -6,11 +6,19 @@ import java.util.*;
 
 public class Emitter extends JobotwarBaseListener {
     private final List<Instruction> instructions = new ArrayList<>();
+    private final Map<String, Integer> locals = new HashMap<>();
     private int labelId = 1;
     private boolean disabled;
+    private boolean passModifierClause;
 
     public List<Instruction> instructions() {
         return Collections.unmodifiableList(this.instructions);
+    }
+
+    @Override
+    public void exitDeclaration(JobotwarParser.DeclarationContext ctx) {
+        this.locals.put(ctx.ID().getText(), this.instructions.size());
+        emit(OpCode.LD_F64);
     }
 
     @Override
@@ -21,11 +29,32 @@ public class Emitter extends JobotwarBaseListener {
     @Override
     public void exitAtom(JobotwarParser.AtomContext ctx) {
         if (ctx.ID() != null) {
-            emit(OpCode.PUSH_LOC, ctx.ID().getText());
+            final Integer addr = this.locals.get(ctx.ID().getText());
+            if (addr == null) {
+                throw new RuntimeException("Unknown local " + ctx.ID().getText());
+            }
+            emit(OpCode.LD_LOC, addr);
         } else if (ctx.number() != null) {
-            emit(OpCode.PUSH_F64, Double.parseDouble(ctx.number().getText()));
+            emit(OpCode.LD_F64, Double.parseDouble(ctx.number().getText()));
         } else if (ctx.register() != null) {
-            emit(OpCode.PUSH_REG, ctx.register().getText());
+            emit(OpCode.LD_REG, ctx.register().getText());
+        }
+    }
+
+    @Override
+    public void exitCondition(JobotwarParser.ConditionContext ctx) {
+        if (ctx.conditionOperator() == null) {
+            return;
+        }
+        switch (ctx.conditionOperator().getText()) {
+            case "or":
+                emit(OpCode.OR);
+                break;
+            case "and":
+                emit(OpCode.AND);
+                break;
+            default:
+                throw new RuntimeException("Unsupported boolean operator " + ctx.conditionOperator().getText());
         }
     }
 
@@ -36,11 +65,23 @@ public class Emitter extends JobotwarBaseListener {
         }
         switch (ctx.comparator().getText()) {
             case "=":
+                emit(OpCode.EQ);
+                break;
             case "!=":
+                emit(OpCode.NEQ);
+                break;
             case ">":
+                emit(OpCode.GT);
+                break;
             case ">=":
+                emit(OpCode.GE);
+                break;
             case "<":
+                emit(OpCode.LT);
+                break;
             case "<=":
+                emit(OpCode.LE);
+                break;
             default:
                 throw new RuntimeException("Unsupported comparator: " + ctx.comparator().getText());
         }
@@ -90,24 +131,36 @@ public class Emitter extends JobotwarBaseListener {
         } else if (ctx.unlessClause() != null) {
             ParseTreeWalker.DEFAULT.walk(this, ctx.unlessClause());
         }
-        this.disabled = true;
+        this.passModifierClause = true;
     }
 
     @Override
     public void exitStatement(JobotwarParser.StatementContext ctx) {
-        this.disabled = false;
-        emit(OpCode.LABEL, this.labelId);
+        emit(OpCode.LABEL, "@" + this.labelId);
         this.labelId++;
+        this.passModifierClause = true;
+    }
+
+    @Override
+    public void enterIfClause(JobotwarParser.IfClauseContext ctx) {
+        this.disabled = this.passModifierClause;
+    }
+
+    @Override
+    public void enterUnlessClause(JobotwarParser.UnlessClauseContext ctx) {
+        this.disabled = this.passModifierClause;
     }
 
     @Override
     public void exitIfClause(JobotwarParser.IfClauseContext ctx) {
-        emit(OpCode.BR_ZERO, this.labelId);
+        emit(OpCode.BR_ZERO, "@" + this.labelId);
+        this.disabled = false;
     }
 
     @Override
     public void exitUnlessClause(JobotwarParser.UnlessClauseContext ctx) {
-        emit(OpCode.BR_NONZERO, this.labelId);
+        emit(OpCode.BR_NONZERO, "@" + this.labelId);
+        this.disabled = false;
     }
 
     @Override
@@ -120,37 +173,36 @@ public class Emitter extends JobotwarBaseListener {
         if (ctx.register() != null) {
             emit(OpCode.ST_REG, ctx.register().getText());
         } else if (ctx.ID() != null) {
-            emit(OpCode.ST_LOC, ctx.ID().getText());
+            final Integer addr = this.locals.get(ctx.ID().getText());
+            if (addr == null) {
+                throw new RuntimeException("Unknown local " + ctx.ID().getText());
+            }
+            emit(OpCode.ST_LOC, addr);
         } else {
             throw new RuntimeException("Unsupported assign target");
         }
     }
 
     private void emit(OpCode opCode) {
-        if (this.disabled) {
-            return;
-        }
-        this.instructions.add(new Instruction(opCode));
+        emit(new Instruction(opCode));
     }
 
     private void emit(OpCode opCode, int intArg) {
-        if (this.disabled) {
-            return;
-        }
-        this.instructions.add(new Instruction(opCode, intArg));
+        emit(new Instruction(opCode, intArg));
     }
 
     private void emit(OpCode opCode, double f64Arg) {
-        if (this.disabled) {
-            return;
-        }
-        this.instructions.add(new Instruction(opCode, f64Arg));
+        emit(new Instruction(opCode, f64Arg));
     }
 
     private void emit(OpCode opCode, String strArg) {
+        emit(new Instruction(opCode, strArg));
+    }
+
+    private void emit(Instruction instruction) {
         if (this.disabled) {
             return;
         }
-        this.instructions.add(new Instruction(opCode, strArg));
+        this.instructions.add(instruction);
     }
 }

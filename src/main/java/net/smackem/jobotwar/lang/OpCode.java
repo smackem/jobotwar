@@ -1,9 +1,9 @@
 package net.smackem.jobotwar.lang;
 
 public enum OpCode {
-    PUSH_F64,   // push f64Arg
-    PUSH_REG,   // push register strArg
-    PUSH_LOC,   // push local intArg
+    LD_F64,     // push f64Arg
+    LD_REG,     // push register strArg
+    LD_LOC,     // push local intArg
     ST_LOC,     // pop a, store a to local intArg
     ST_REG,     // pop a, store a to register strArg
     ADD,        // pop b, pop a, push a + b

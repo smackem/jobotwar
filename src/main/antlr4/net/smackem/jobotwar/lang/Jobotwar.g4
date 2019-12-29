@@ -29,7 +29,15 @@
 grammar Jobotwar;
 
 program
-    : line +
+    : declLine* line+
+    ;
+
+declLine
+    : (comment | declaration)? EOL
+    ;
+
+declaration
+    : 'def' ID
     ;
 
 line
@@ -39,19 +47,13 @@ line
 label
     : ID ':'
     ;
-   
+
 statement
-    : (assignStatement
-    | declStatement
-    | gotoStatement) (ifClause | unlessClause)?
+    : (assignStatement | gotoStatement) (ifClause | unlessClause)?
     ;
 
 gotoStatement
     : 'goto' ID
-    ;
-
-declStatement
-    : 'def' ID
     ;
 
 assignStatement
@@ -72,9 +74,13 @@ unlessClause
     ;
 
 condition
-    : comparison 'or' condition
-    | comparison 'and' condition
+    : comparison conditionOperator condition
     | comparison
+    ;
+
+conditionOperator
+    : 'or'
+    | 'and'
     ;
 
 comparison
