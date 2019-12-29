@@ -11,15 +11,15 @@ public final class RadarBeam {
         this.hitKind = hitKind;
     }
 
-    public Robot getSourceRobot() {
+    public Robot sourceRobot() {
         return this.sourceRobot;
     }
 
-    public Vector getHitPosition() {
+    public Vector hitPosition() {
         return this.hitPosition;
     }
 
-    public RadarBeamHitKind getHitKind() {
+    public RadarBeamHitKind hitKind() {
         return this.hitKind;
     }
 }

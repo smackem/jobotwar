@@ -15,7 +15,6 @@ import net.smackem.jobotwar.runtime.*;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -47,8 +46,8 @@ public class MainController {
     private void initialize() {
         this.canvasContainer.maxWidthProperty().bind(this.canvas.widthProperty());
         this.canvasContainer.maxHeightProperty().bind(this.canvas.heightProperty());
-        this.canvas.setWidth(this.board.getWidth());
-        this.canvas.setHeight(this.board.getHeight());
+        this.canvas.setWidth(this.board.width());
+        this.canvas.setHeight(this.board.height());
         this.graphics.render(this.canvas.getGraphicsContext2D());
     }
 
@@ -71,7 +70,7 @@ public class MainController {
 
     private void updateGraphics(GameEngine.TickResult tickResult) {
         this.graphics.addExplosions(Stream.concat(
-                tickResult.explodedProjectiles.stream().map(Projectile::getPosition),
+                tickResult.explodedProjectiles.stream().map(Projectile::position),
                 Stream.concat(
                         tickResult.collisionPositions.stream(),
                         tickResult.killedRobots.stream().map(r -> new Vector(r.getX(), r.getY())))

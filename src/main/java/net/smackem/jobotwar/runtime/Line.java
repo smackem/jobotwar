@@ -20,14 +20,14 @@ public final class Line {
     /**
      * @return The first point of the line.
      */
-    public Vector getPoint1() {
+    public Vector point1() {
         return this.p1;
     }
 
     /**
      * @return The second point of the line.
      */
-    public Vector getPoint2() {
+    public Vector point2() {
         return this.p2;
     }
 
@@ -44,12 +44,12 @@ public final class Line {
      * @return The perpendicular distance from the given point to the line.
      */
     public double distanceFromPoint(Vector point) {
-        final double x1 = this.p1.getX();
-        final double y1 = this.p1.getY();
-        final double x2 = this.p2.getX();
-        final double y2 = this.p2.getY();
-        final double x0 = point.getX();
-        final double y0 = point.getY();
+        final double x1 = this.p1.x();
+        final double y1 = this.p1.y();
+        final double x2 = this.p2.x();
+        final double y2 = this.p2.y();
+        final double x0 = point.x();
+        final double y0 = point.y();
         final double dx = x2 - x1;
         final double dy = y2 - y1;
         // denominator is line.length, but inline it here for performance
@@ -65,10 +65,10 @@ public final class Line {
     public static Vector intersect(Line line1, Line line2) {
         final Vector p1 = line1.p1, p2 = line1.p2;
         final Vector p3 = line2.p1, p4 = line2.p2;
-        final double x1 = p1.getX(), y1 = p1.getY();
-        final double x2 = p2.getX(), y2 = p2.getY();
-        final double x3 = p3.getX(), y3 = p3.getY();
-        final double x4 = p4.getX(), y4 = p4.getY();
+        final double x1 = p1.x(), y1 = p1.y();
+        final double x2 = p2.x(), y2 = p2.y();
+        final double x3 = p3.x(), y3 = p3.y();
+        final double x4 = p4.x(), y4 = p4.y();
 
         if (x1 == x2) {
             return intersectVertical(x3, y3, x4, y4, x1);

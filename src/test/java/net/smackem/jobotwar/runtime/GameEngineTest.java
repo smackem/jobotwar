@@ -60,8 +60,8 @@ public class GameEngineTest {
         assertThat(engine.tick().explodedProjectiles).hasSize(0);
         assertThat(board.projectiles()).hasSize(1);
         final Projectile projectile = board.projectiles().iterator().next();
-        assertThat(projectile.getDestination()).isEqualTo(new Vector(40, 30));
-        assertThat(projectile.getPosition()).isEqualTo(new Vector(30 + projectile.getSpeed(), 30));
+        assertThat(projectile.destination()).isEqualTo(new Vector(40, 30));
+        assertThat(projectile.position()).isEqualTo(new Vector(30 + projectile.speed(), 30));
 
         int count = 0;
         Collection<Projectile> explodedProjectiles;
@@ -71,7 +71,7 @@ public class GameEngineTest {
             assertThat(count).isLessThan(100); // make sure it ends!
         } while (explodedProjectiles.size() == 0);
         assertThat(explodedProjectiles).containsOnly(projectile);
-        assertThat(projectile.getPosition()).isEqualTo(new Vector(40, 30));
+        assertThat(projectile.position()).isEqualTo(new Vector(40, 30));
     }
 
     @Test
@@ -96,12 +96,12 @@ public class GameEngineTest {
         assertThat(engine.tick().explodedProjectiles).hasSize(0);
         assertThat(board.projectiles()).hasSize(1);
         final Projectile projectile = board.projectiles().iterator().next();
-        assertThat(projectile.getDestination())
+        assertThat(projectile.destination())
                 .usingComparator(vectorComparator)
                 .isEqualTo(new Vector(30, 80));
-        assertThat(projectile.getPosition())
+        assertThat(projectile.position())
                 .usingComparator(vectorComparator)
-                .isEqualTo(new Vector(robot.getX(), robot.getY() + projectile.getSpeed()));
+                .isEqualTo(new Vector(robot.getX(), robot.getY() + projectile.speed()));
 
         int count = 0;
         Collection<Projectile> explodedProjectiles;
@@ -111,7 +111,7 @@ public class GameEngineTest {
             assertThat(count).isLessThan(100); // make sure it ends!
         } while (explodedProjectiles.size() == 0);
         assertThat(explodedProjectiles).containsOnly(projectile);
-        assertThat(projectile.getPosition())
+        assertThat(projectile.position())
                 .usingComparator(vectorComparator)
                 .isEqualTo(new Vector(30, 80));
     }
@@ -147,9 +147,9 @@ public class GameEngineTest {
         GameEngine.TickResult result = engine.tick();
         assertThat(result.radarBeams).hasSize(1);
         RadarBeam beam = result.radarBeams.iterator().next();
-        assertThat(beam.getHitKind()).isEqualTo(RadarBeamHitKind.WALL);
-        assertThat(beam.getSourceRobot()).isEqualTo(robot);
-        assertThat(beam.getHitPosition())
+        assertThat(beam.hitKind()).isEqualTo(RadarBeamHitKind.WALL);
+        assertThat(beam.sourceRobot()).isEqualTo(robot);
+        assertThat(beam.hitPosition())
                 .usingComparator(vectorComparator)
                 .isEqualTo(new Vector(width, robot.getY()));
 
@@ -157,9 +157,9 @@ public class GameEngineTest {
         result = engine.tick();
         assertThat(result.radarBeams).hasSize(1);
         beam = result.radarBeams.iterator().next();
-        assertThat(beam.getHitKind()).isEqualTo(RadarBeamHitKind.WALL);
-        assertThat(beam.getSourceRobot()).isEqualTo(robot);
-        assertThat(beam.getHitPosition())
+        assertThat(beam.hitKind()).isEqualTo(RadarBeamHitKind.WALL);
+        assertThat(beam.sourceRobot()).isEqualTo(robot);
+        assertThat(beam.hitPosition())
                 .usingComparator(vectorComparator)
                 .isEqualTo(new Vector(robot.getX(), height));
 
@@ -167,9 +167,9 @@ public class GameEngineTest {
         result = engine.tick();
         assertThat(result.radarBeams).hasSize(1);
         beam = result.radarBeams.iterator().next();
-        assertThat(beam.getHitKind()).isEqualTo(RadarBeamHitKind.WALL);
-        assertThat(beam.getSourceRobot()).isEqualTo(robot);
-        assertThat(beam.getHitPosition())
+        assertThat(beam.hitKind()).isEqualTo(RadarBeamHitKind.WALL);
+        assertThat(beam.sourceRobot()).isEqualTo(robot);
+        assertThat(beam.hitPosition())
                 .usingComparator(vectorComparator)
                 .isEqualTo(new Vector(0, robot.getY()));
 
@@ -177,9 +177,9 @@ public class GameEngineTest {
         result = engine.tick();
         assertThat(result.radarBeams).hasSize(1);
         beam = result.radarBeams.iterator().next();
-        assertThat(beam.getHitKind()).isEqualTo(RadarBeamHitKind.WALL);
-        assertThat(beam.getSourceRobot()).isEqualTo(robot);
-        assertThat(beam.getHitPosition())
+        assertThat(beam.hitKind()).isEqualTo(RadarBeamHitKind.WALL);
+        assertThat(beam.sourceRobot()).isEqualTo(robot);
+        assertThat(beam.hitPosition())
                 .usingComparator(vectorComparator)
                 .isEqualTo(new Vector(robot.getX(), 0));
 
@@ -187,9 +187,9 @@ public class GameEngineTest {
         result = engine.tick();
         assertThat(result.radarBeams).hasSize(1);
         beam = result.radarBeams.iterator().next();
-        assertThat(beam.getHitKind()).isEqualTo(RadarBeamHitKind.WALL);
-        assertThat(beam.getSourceRobot()).isEqualTo(robot);
-        assertThat(beam.getHitPosition())
+        assertThat(beam.hitKind()).isEqualTo(RadarBeamHitKind.WALL);
+        assertThat(beam.sourceRobot()).isEqualTo(robot);
+        assertThat(beam.hitPosition())
                 .usingComparator(vectorComparator)
                 .isEqualTo(new Vector(width, height));
     }
@@ -216,9 +216,9 @@ public class GameEngineTest {
         GameEngine.TickResult result = engine.tick();
         assertThat(result.radarBeams).hasSize(1);
         RadarBeam beam = result.radarBeams.iterator().next();
-        assertThat(beam.getHitKind()).isEqualTo(RadarBeamHitKind.ROBOT);
-        assertThat(beam.getSourceRobot()).isEqualTo(robot1);
-        assertThat(beam.getHitPosition())
+        assertThat(beam.hitKind()).isEqualTo(RadarBeamHitKind.ROBOT);
+        assertThat(beam.sourceRobot()).isEqualTo(robot1);
+        assertThat(beam.hitPosition())
                 .usingComparator(vectorComparator)
                 .isEqualTo(robot2.getPosition());
     }

@@ -35,14 +35,14 @@ public final class Vector {
     /**
      * @return The x-coordinate.
      */
-    public double getX() {
+    public double x() {
         return this.x;
     }
 
     /**
      * @return The y-coordinate.
      */
-    public double getY() {
+    public double y() {
         return this.y;
     }
 

@@ -13,7 +13,7 @@ public final class GameEngine {
 
     public TickResult tick() {
         final TickResult result = new TickResult();
-        for (final Robot robot : this.board.getRobots()) {
+        for (final Robot robot : this.board.robots()) {
             if (robot.isDead() == false) {
                 tickRobot(robot, result);
                 if (robot.isDead()) {
@@ -46,7 +46,7 @@ public final class GameEngine {
     }
 
     private boolean tickProjectile(Projectile projectile) {
-        final Collection<Robot> hitRobots = hitTestRobots(projectile.getPosition(), projectile.getSourceRobot(), 0);
+        final Collection<Robot> hitRobots = hitTestRobots(projectile.position(), projectile.sourceRobot(), 0);
         if (hitRobots.isEmpty() == false || isProjectileExploding(projectile)) {
             explodeProjectile(projectile);
             return true;
@@ -56,24 +56,24 @@ public final class GameEngine {
     }
 
     private boolean isProjectileExploding(Projectile projectile) {
-        final Vector position = projectile.getPosition();
-        final double x = position.getX();
-        final double y = position.getY();
+        final Vector position = projectile.position();
+        final double x = position.x();
+        final double y = position.y();
 
         // out of bounds?
-        if (x < 0 || x >= this.board.getWidth()) {
+        if (x < 0 || x >= this.board.width()) {
             return true;
         }
-        if (y < 0 || y >= this.board.getHeight()) {
+        if (y < 0 || y >= this.board.height()) {
             return true;
         }
 
         // at destination?
-        return position.equals(projectile.getDestination());
+        return position.equals(projectile.destination());
     }
 
     private void explodeProjectile(Projectile projectile) {
-        final Collection<Robot> damagedRobots = hitTestRobots(projectile.getPosition(),
+        final Collection<Robot> damagedRobots = hitTestRobots(projectile.position(),
                 null,Constants.EXPLOSION_RADIUS);
         for (final Robot robot : damagedRobots) {
             robot.setHealth(Math.max(0, robot.getHealth() - 30));
@@ -83,7 +83,7 @@ public final class GameEngine {
     // returns a list of robots whose distance from @position is less than @tolerance
     private Collection<Robot> hitTestRobots(Vector position, Robot excludeRobot, double tolerance) {
         final Collection<Robot> hitRobots = new ArrayList<>();
-        for (final Robot robot : this.board.getRobots()) {
+        for (final Robot robot : this.board.robots()) {
             if (robot == excludeRobot) {
                 continue;
             }
@@ -97,7 +97,7 @@ public final class GameEngine {
 
     private void tickRobot(Robot robot, TickResult result) {
         // execute next program statement
-        robot.getProgram().next(robot);
+        robot.program().next(robot);
 
         // handle movement
         robot.accelerate();
@@ -126,7 +126,7 @@ public final class GameEngine {
         // detect nearest robot
         Vector nearestRobotPos = null;
         double nearestRobotDistance = 0;
-        for (final Robot r : this.board.getRobots()) {
+        for (final Robot r : this.board.robots()) {
             if (r == robot) {
                 continue;
             }
@@ -153,13 +153,13 @@ public final class GameEngine {
         radarAngle = radarAngle < 0 ? radarAngle + 360 : radarAngle;
         final Line wall;
         if (45 <= radarAngle && radarAngle <= 135) { // bottom wall
-            wall = new Line(new Vector(0, this.board.getHeight()), new Vector(this.board.getWidth(), this.board.getHeight()));
+            wall = new Line(new Vector(0, this.board.height()), new Vector(this.board.width(), this.board.height()));
         } else if (136 <= radarAngle && radarAngle <= 225) { // left wall
-            wall = new Line(Vector.ORIGIN, new Vector(0, this.board.getHeight()));
+            wall = new Line(Vector.ORIGIN, new Vector(0, this.board.height()));
         } else if (226 <= radarAngle && radarAngle <= 315) { // top wall
-            wall = new Line(Vector.ORIGIN, new Vector(this.board.getWidth(), 0));
+            wall = new Line(Vector.ORIGIN, new Vector(this.board.width(), 0));
         } else { // right wall
-            wall = new Line(new Vector(this.board.getWidth(), 0), new Vector(this.board.getWidth(), this.board.getHeight()));
+            wall = new Line(new Vector(this.board.width(), 0), new Vector(this.board.width(), this.board.height()));
         }
         final Vector wallIntersection = Line.intersect(line, wall);
         assert(wallIntersection != null);
@@ -178,10 +178,10 @@ public final class GameEngine {
             nextX = Constants.ROBOT_RADIUS;
             collisionX = 0;
             collisionY = nextY;
-        } else if (nextX >= this.board.getWidth() - Constants.ROBOT_RADIUS) {
+        } else if (nextX >= this.board.width() - Constants.ROBOT_RADIUS) {
             hasCollision = true;
-            nextX = this.board.getWidth() - Constants.ROBOT_RADIUS;
-            collisionX = this.board.getWidth();
+            nextX = this.board.width() - Constants.ROBOT_RADIUS;
+            collisionX = this.board.width();
             collisionY = nextY;
         }
         if (nextY <= Constants.ROBOT_RADIUS) {
@@ -189,11 +189,11 @@ public final class GameEngine {
             nextY = Constants.ROBOT_RADIUS;
             collisionX = nextX;
             collisionY = 0;
-        } else if (nextY >= this.board.getHeight() - Constants.ROBOT_RADIUS) {
+        } else if (nextY >= this.board.height() - Constants.ROBOT_RADIUS) {
             hasCollision = true;
-            nextY = this.board.getHeight() - Constants.ROBOT_RADIUS;
+            nextY = this.board.height() - Constants.ROBOT_RADIUS;
             collisionX = nextX;
-            collisionY = this.board.getHeight();
+            collisionY = this.board.height();
         }
 
         if (hasCollision) {
@@ -232,7 +232,7 @@ public final class GameEngine {
             final Projectile projectile = new Projectile(robot, position.add(dest), Constants.PROJECTILE_SPEED);
             this.board.projectiles().add(projectile);
             robot.setShot(0);
-            robot.setCoolDownHoldOff(robot.getCoolDownTicks());
+            robot.setCoolDownHoldOff(robot.coolDownTicks());
         }
     }
 }

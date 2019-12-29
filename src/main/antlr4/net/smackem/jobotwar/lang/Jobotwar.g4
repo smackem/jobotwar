@@ -29,85 +29,104 @@
 grammar Jobotwar;
 
 program
-   : line +
-   ;
+    : line +
+    ;
 
 line
-   : (label | comment | statement)? EOL
-   ;
+    : (label | comment | statement)? EOL
+    ;
 
 label
-   : ID ':'
-   ;
+    : ID ':'
+    ;
    
 statement
-   : (assignstatement
-   | declstatement
-   | gotostatement) (ifclause | unlessclause)?
-   ;
+    : (assignStatement
+    | declStatement
+    | gotoStatement) (ifClause | unlessClause)?
+    ;
 
-gotostatement
-   : 'goto' ID
-   ;
+gotoStatement
+    : 'goto' ID
+    ;
 
-declstatement
-   : 'def' ID
-   ;
+declStatement
+    : 'def' ID
+    ;
 
-assignstatement
-   : expression ('=>' register)+
-   ;
+assignStatement
+    : term ('=>' assignTarget)+
+    ;
 
-ifclause
-   : 'if' condition
-   ;
+assignTarget
+    : register
+    | ID
+    ;
 
-unlessclause
-   : 'unless' condition
-   ;
+ifClause
+    : 'if' condition
+    ;
+
+unlessClause
+    : 'unless' condition
+    ;
 
 condition
-   : expression comparison expression
-   ;
-
-expression
-   : (argument (operation argument)*)
-   | (operation argument)
-   | argument
-   ;
-
-operation
-   : '+'
-   | '-'
-   | '*'
-   | '/'
-   | '%'
-   ;
+    : comparison 'or' condition
+    | comparison 'and' condition
+    | comparison
+    ;
 
 comparison
-   : '<'
-   | '<='
-   | '>'
-   | '>='
-   | '='
-   | '!='
-   ;
+    : term comparator term
+    | term
+    ;
 
-argument
-   : number
-   | register
-   | ID
-   ;
+term
+    : product termOperator term
+    | product
+    ;
+
+termOperator
+    : '+'
+    | '-'
+    ;
+
+product
+    : atom productOperator product
+    | atom
+    ;
+
+productOperator
+    : '*'
+    | '/'
+    | '%'
+    ;
+
+comparator
+    : '<'
+    | '<='
+    | '>'
+    | '>='
+    | '='
+    | '!='
+    ;
+
+atom
+    : number
+    | register
+    | ID
+    ;
 
 register
-   : AIM
-   | SHOT
-   | RADAR
-   | SPEEDX
-   | SPEEDY
-   | RANDOM
-   | DAMAGE
-   ;
+    : AIM
+    | SHOT
+    | RADAR
+    | SPEEDX
+    | SPEEDY
+    | RANDOM
+    | DAMAGE
+    ;
 
 AIM : 'AIM';
 SHOT : 'SHOT';
@@ -116,33 +135,34 @@ DAMAGE : 'DAMAGE';
 SPEEDX : 'SPEEDX';
 SPEEDY : 'SPEEDY';
 RANDOM : 'RANDOM';
+
 DOT : '.';
 COMMA : ',';
 
 ID
-   : ('a' .. 'z' | 'A' .. 'Z' | '_') ('a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9') +
-   ;
+    : ('a' .. 'z' | 'A' .. 'Z' | '_') ('a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9') +
+    ;
 
 number
-   : ('+' | '-')? NUMBER
-   ;
+    : ('+' | '-')? NUMBER
+    ;
 
 comment
-   : COMMENT
-   ;
+    : COMMENT
+    ;
 
 NUMBER
-   : [0-9]+ ('.' [0-9]+)?
-   ;
+    : [0-9]+ ('.' [0-9]+)?
+    ;
 
 COMMENT
-   : '//' ~ [\r\n]*
-   ;
+    : '//' ~ [\r\n]*
+    ;
 
 EOL
-   : [\r\n] +
-   ;
+    : [\r\n] +
+    ;
 
 WS
-   : [ \t] -> skip
-   ;
+    : [ \t] -> skip
+    ;

@@ -23,7 +23,7 @@ public class BoardGraphics {
 
     public void render(GraphicsContext gc) {
         gc.save();
-        gc.clearRect(0,0, this.board.getWidth(), this.board.getHeight());
+        gc.clearRect(0,0, this.board.width(), this.board.height());
         renderRadarBeams(gc);
         renderProjectiles(gc);
         renderRobots(gc);
@@ -48,11 +48,11 @@ public class BoardGraphics {
         gc.setLineWidth(1);
         gc.setLineDashes(1, 3);
         for (final RenderedRadarBeam b : this.radarBeams) {
-            final Robot robot = b.beam.getSourceRobot();
+            final Robot robot = b.beam.sourceRobot();
             final Paint paint = getRobotPaint(robot, b.opacity);
-            final Vector hitPos = b.beam.getHitPosition();
+            final Vector hitPos = b.beam.hitPosition();
             gc.setStroke(paint);
-            gc.strokeLine(robot.getX(), robot.getY(), hitPos.getX(), hitPos.getY());
+            gc.strokeLine(robot.getX(), robot.getY(), hitPos.x(), hitPos.y());
             b.opacity -= 0.05;
         }
         this.radarBeams.removeIf(beam -> beam.opacity <= 0.2);
@@ -62,10 +62,10 @@ public class BoardGraphics {
     private void renderProjectiles(GraphicsContext gc) {
         gc.setFill(Color.WHITE);
         for (final Projectile projectile : this.board.projectiles()) {
-            final Vector position = projectile.getPosition();
+            final Vector position = projectile.position();
             gc.fillOval(
-                    position.getX() - 3,
-                    position.getY() - 3,
+                    position.x() - 3,
+                    position.y() - 3,
                     6,
                     6);
         }
@@ -76,7 +76,7 @@ public class BoardGraphics {
         final double outerW = Constants.ROBOT_RADIUS * 2;
         final double innerW = outerW - healthBarWidth * 2;
 
-        for (final Robot robot : this.board.getRobots()) {
+        for (final Robot robot : this.board.robots()) {
             final double x = robot.getX(), y = robot.getY();
             final double outerX = x - Constants.ROBOT_RADIUS;
             final double outerY = y - Constants.ROBOT_RADIUS;
@@ -123,8 +123,8 @@ public class BoardGraphics {
             final Paint paint = Color.rgb(0xff,0x40,0x40,1.0 - explosion.radius / (Constants.EXPLOSION_RADIUS * 1.5));
             gc.setStroke(paint);
             gc.strokeOval(
-                    explosion.position.getX() - explosion.radius,
-                    explosion.position.getY() - explosion.radius,
+                    explosion.position.x() - explosion.radius,
+                    explosion.position.y() - explosion.radius,
                     explosion.radius * 2,
                     explosion.radius * 2);
             explosion.radius += 2.5;
@@ -133,7 +133,7 @@ public class BoardGraphics {
     }
 
     private static Paint getRobotPaint(Robot robot, double opacity) {
-        final int rgb = robot.getRgb();
+        final int rgb = robot.rgb();
         return Color.rgb(rgb >> 16 & 0xff, rgb >> 8 & 0xff, rgb & 0xff, opacity);
     }
 
@@ -162,7 +162,7 @@ public class BoardGraphics {
 
         RenderedRadarBeam(RadarBeam beam) {
             this.beam = beam;
-            opacity = beam.getHitKind() == RadarBeamHitKind.ROBOT ? 0.8 : 0.4;
+            opacity = beam.hitKind() == RadarBeamHitKind.ROBOT ? 0.8 : 0.4;
         }
     }
 }

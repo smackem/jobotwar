@@ -42,28 +42,28 @@ public class Robot {
     /**
      * @return The built-in acceleration of the robot in pixels per tick^2.
      */
-    public double getAcceleration() {
+    public double acceleration() {
         return this.acceleration;
     }
 
     /**
      * @return The RGB color of the robot (format in hex: 0xrrggbb)
      */
-    public int getRgb() {
+    public int rgb() {
         return this.rgb;
     }
 
     /**
      * @return The number of ticks the gun needs to cool down between shots.
      */
-    public int getCoolDownTicks() {
+    public int coolDownTicks() {
         return this.coolDownTicks;
     }
 
     /**
      * @return The program that controls the robot.
      */
-    public RobotProgram getProgram() {
+    public RobotProgram program() {
         return this.program;
     }
 

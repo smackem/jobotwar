@@ -27,34 +27,34 @@ public class Projectile {
     /**
      * @return The robot that has fired the projectile.
      */
-    public Robot getSourceRobot() {
+    public Robot sourceRobot() {
         return this.sourceRobot;
     }
 
     /**
      * @return The calculated destination where the projectile is about to explode.
      */
-    public Vector getDestination() {
+    public Vector destination() {
         return this.destination;
     }
 
     /**
      * @return The current position of the projectile.
      */
-    public Vector getPosition() {
+    public Vector position() {
         return this.position;
     }
 
     /**
      * @return The speed of the projectile in pixels per tick.
      */
-    public double getSpeed() {
+    public double speed() {
         return this.speed;
     }
 
     /**
      * Advances the projectile's position according to its current position, destination and speed.
-     * If the projectile is at its destination ({@link #getPosition()} {@code ==} {@link #getDestination()}),
+     * If the projectile is at its destination ({@link #position()} {@code ==} {@link #destination()}),
      * the method does nothing. The method makes sure that the projectile will exactly hit its destination
      * in the end.
      */
