@@ -1,6 +1,6 @@
 package net.smackem.jobotwar.lang;
 
-public interface RegisterProvider {
+public interface RuntimeEnvironment {
     double readAim();
     void writeAim(double value);
 
@@ -14,9 +14,9 @@ public interface RegisterProvider {
     void writeSpeedY(double value);
 
     double readX();
-    double writeY();
+    double readY();
 
-    double readHealth();
+    double readDamage();
 
     double readShot();
     void writeShot(double value);
