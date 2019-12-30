@@ -2,18 +2,24 @@ package net.smackem.jobotwar.lang;
 
 import java.util.*;
 
-public class Interpreter {
+public final class Interpreter {
+    private final Program program;
     private final List<Instruction> code;
     private final RuntimeEnvironment runtime;
     private final Stack stack = new Stack();
     private int pc;
 
-    public Interpreter(List<Instruction> instructions, RuntimeEnvironment runtime) {
-        this.code = Objects.requireNonNull(instructions);
+    public Interpreter(Program program, RuntimeEnvironment runtime) {
+        this.program = Objects.requireNonNull(program);
+        this.code = new ArrayList<>(program.instructions());
         this.runtime = Objects.requireNonNull(runtime);
     }
 
-    public void interpret() throws StackException {
+    public Program program() {
+        return this.program;
+    }
+
+    public void runToNextLabel() throws StackException {
         while (true) {
             final int target = executeInstruction(this.code.get(this.pc));
             if (target == -2) {

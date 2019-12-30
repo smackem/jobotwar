@@ -16,6 +16,11 @@ public class Emitter extends JobotwarBaseListener {
     }
 
     @Override
+    public void exitProgram(JobotwarParser.ProgramContext ctx) {
+        fixup();
+    }
+
+    @Override
     public void exitDeclaration(JobotwarParser.DeclarationContext ctx) {
         this.locals.put(ctx.ID().getText(), this.instructions.size());
         emit(OpCode.LD_F64);
@@ -204,5 +209,28 @@ public class Emitter extends JobotwarBaseListener {
             return;
         }
         this.instructions.add(instruction);
+    }
+
+    private void fixup() {
+        final Map<String, Integer> labelIndices = new HashMap<>();
+        int index = 0;
+        for (final Instruction instr : instructions()) {
+            if (instr.opCode() == OpCode.LABEL) {
+                labelIndices.put(instr.strArg(), index);
+                instr.setIntArg(index);
+            }
+            index++;
+        }
+        instructions.stream()
+                .filter(instr -> instr.opCode() == OpCode.BR
+                     || instr.opCode() == OpCode.BR_ZERO
+                     || instr.opCode() == OpCode.BR_NONZERO)
+                .forEach(instr -> {
+                    final Integer target = labelIndices.get(instr.strArg());
+                    if (target == null) {
+                        throw new RuntimeException("Unkown label: " + instr.strArg());
+                    }
+                    instr.setIntArg(target);
+                });
     }
 }

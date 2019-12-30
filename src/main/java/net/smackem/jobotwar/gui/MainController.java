@@ -39,7 +39,7 @@ public class MainController {
         this.graphics = new BoardGraphics(this.board);
 
         final Compiler compiler = new Compiler();
-        compiler.compile();
+        compiler.compile("100 => AIM if AIM < 12");
     }
 
     @FXML

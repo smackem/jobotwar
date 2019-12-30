@@ -9,12 +9,7 @@ import java.util.stream.Collectors;
 
 public class Compiler {
 
-    public void compile() {
-        final String source = "" +
-                "// hepp\n" +
-                "START:\n" +
-                "goto START if 100 < 0\n";
-
+    public Program compile(String source) {
         final CharStream input = CharStreams.fromString(source);
         final JobotwarLexer lexer = new JobotwarLexer(input);
         final CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -22,9 +17,9 @@ public class Compiler {
         final JobotwarParser.ProgramContext tree = parser.program();
         final Emitter emitter = new Emitter();
         ParseTreeWalker.DEFAULT.walk(emitter, tree);
-
         System.out.println(emitter.instructions().stream()
                 .map(Instruction::toString)
                 .collect(Collectors.joining("\n")));
+        return new Program(emitter.instructions());
     }
 }
