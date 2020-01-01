@@ -7,17 +7,113 @@ import static org.assertj.core.api.Assertions.*;
 public class CompilerTest {
 
     @Test
-    public void testRegisters() {
+    public void testWriteRegisters() {
         final String source = "" +
-                "// hepp\n" +
-                "START:\n" +
-                "goto START if 100 < 0\n";
+                "1 => AIM\n" +
+                "2 => RADAR\n" +
+                "3 => SPEEDX\n" +
+                "4 => SPEEDY\n" +
+                "5 => SHOT\n";
+
+        final Compiler compiler = new Compiler();
+        final Program program = compiler.compile(source);
+        final TestEnvironment env = new TestEnvironment();
+        final Interpreter interpreter = new Interpreter(program, env);
+        runComplete(interpreter);
+
+        assertThat(env.readAim()).isEqualTo(1);
+        assertThat(env.readRadar()).isEqualTo(2);
+        assertThat(env.readSpeedX()).isEqualTo(3);
+        assertThat(env.readSpeedY()).isEqualTo(4);
+        assertThat(env.readShot()).isEqualTo(5);
+    }
+
+    @Test
+    public void testReadRegisters() throws Exception {
+        final String source = "" +
+                "AIM => SHOT\n" +
+                "RADAR => SHOT\n" +
+                "SPEEDX => SHOT\n" +
+                "SPEEDY => SHOT\n" +
+                "X => SHOT\n" +
+                "Y => SHOT\n" +
+                "DAMAGE => SHOT\n";
+
         final Compiler compiler = new Compiler();
         final Program program = compiler.compile(source);
         final TestEnvironment env = new TestEnvironment();
         final Interpreter interpreter = new Interpreter(program, env);
 
-        assertThat(source).isNotNull();
+        env.writeAim(1);
+        env.writeRadar(2);
+        env.writeSpeedX(3);
+        env.writeSpeedY(4);
+        env.setX(6);
+        env.setY(7);
+        env.setDamage(8);
+
+        assertThat(interpreter.runToNextLabel()).isTrue();
+        assertThat(env.readShot()).isEqualTo(1);
+        assertThat(interpreter.runToNextLabel()).isTrue();
+        assertThat(env.readShot()).isEqualTo(2);
+        assertThat(interpreter.runToNextLabel()).isTrue();
+        assertThat(env.readShot()).isEqualTo(3);
+        assertThat(interpreter.runToNextLabel()).isTrue();
+        assertThat(env.readShot()).isEqualTo(4);
+        assertThat(interpreter.runToNextLabel()).isTrue();
+        assertThat(env.readShot()).isEqualTo(6);
+        assertThat(interpreter.runToNextLabel()).isTrue();
+        assertThat(env.readShot()).isEqualTo(7);
+        assertThat(interpreter.runToNextLabel()).isTrue();
+        assertThat(env.readShot()).isEqualTo(8);
+    }
+
+    @Test
+    public void testDef() {
+        final String source = "" +
+                "def x\n" +
+                "def y\n" +
+                "1.5 => x\n" +
+                "2.5 => y\n" +
+                "x + y => SHOT\n";
+
+        final Compiler compiler = new Compiler();
+        final Program program = compiler.compile(source);
+        final TestEnvironment env = new TestEnvironment();
+        final Interpreter interpreter = new Interpreter(program, env);
+
+        runComplete(interpreter);
+
+        assertThat(env.readShot()).isEqualTo(4);
+    }
+
+    @Test
+    public void testLoop() {
+        final String source = "" +
+                "def i\n" +
+                "Loop:\n" +
+                "   i + 1 => i\n" +
+                "   goto Loop if i < 100\n" +
+                "i => SHOT\n";
+
+        final Compiler compiler = new Compiler();
+        final Program program = compiler.compile(source);
+        final TestEnvironment env = new TestEnvironment();
+        final Interpreter interpreter = new Interpreter(program, env);
+
+        runComplete(interpreter);
+
+        assertThat(env.readShot()).isEqualTo(100);
+    }
+
+    private void runComplete(Interpreter interpreter) {
+        try {
+            while (interpreter.runToNextLabel()) {
+                // proceed until program has finished
+            }
+        } catch (Interpreter.StackException e) {
+            assertThat(true).isFalse();
+        }
     }
 
     private static class TestEnvironment implements RuntimeEnvironment {

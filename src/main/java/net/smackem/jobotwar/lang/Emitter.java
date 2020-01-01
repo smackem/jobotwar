@@ -143,7 +143,7 @@ public class Emitter extends JobotwarBaseListener {
     public void exitStatement(JobotwarParser.StatementContext ctx) {
         emit(OpCode.LABEL, "@" + this.labelId);
         this.labelId++;
-        this.passModifierClause = true;
+        this.passModifierClause = false;
     }
 
     @Override

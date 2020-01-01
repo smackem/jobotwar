@@ -19,11 +19,16 @@ public final class Interpreter {
         return this.program;
     }
 
-    public void runToNextLabel() throws StackException {
-        while (true) {
+    public RuntimeEnvironment runtime() {
+        return this.runtime;
+    }
+
+    public boolean runToNextLabel() throws StackException {
+        while (this.pc < this.code.size()) {
             final int target = executeInstruction(this.code.get(this.pc));
             if (target == -2) {
-                return;
+                this.pc++;
+                return true;
             }
             if (target >= 0) {
                 this.pc = target;
@@ -31,6 +36,7 @@ public final class Interpreter {
                 this.pc++;
             }
         }
+        return false;
     }
 
     private int executeInstruction(Instruction instr) throws StackException {
@@ -130,19 +136,19 @@ public final class Interpreter {
             case "SHOT":    return this.runtime.readShot();
             case "RANDOM":  return this.runtime.getRandom();
             default:
-                throw new IllegalArgumentException("Unknown register: " + strArg);
+                throw new IllegalArgumentException("Unknown register: '" + strArg + "'");
         }
     }
 
     private void storeRegister(String strArg, double d) {
         switch (strArg) {
-            case "AIM":     this.runtime.writeAim(d);
-            case "RADAR":   this.runtime.writeRadar(d);
-            case "SPEEDX":  this.runtime.writeSpeedX(d);
-            case "SPEEDY":  this.runtime.writeSpeedY(d);
-            case "SHOT":    this.runtime.writeShot(d);
+            case "AIM":     this.runtime.writeAim(d); break;
+            case "RADAR":   this.runtime.writeRadar(d); break;
+            case "SPEEDX":  this.runtime.writeSpeedX(d); break;
+            case "SPEEDY":  this.runtime.writeSpeedY(d); break;
+            case "SHOT":    this.runtime.writeShot(d); break;
             default:
-                throw new IllegalArgumentException("Unknown register: " + strArg);
+                throw new IllegalArgumentException("Unknown register: '" + strArg + "'");
         }
     }
 

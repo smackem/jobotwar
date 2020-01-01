@@ -132,6 +132,8 @@ register
     | SPEEDY
     | RANDOM
     | DAMAGE
+    | X
+    | Y
     ;
 
 AIM : 'AIM';
@@ -141,12 +143,14 @@ DAMAGE : 'DAMAGE';
 SPEEDX : 'SPEEDX';
 SPEEDY : 'SPEEDY';
 RANDOM : 'RANDOM';
+X : 'X';
+Y : 'Y';
 
 DOT : '.';
 COMMA : ',';
 
 ID
-    : ('a' .. 'z' | 'A' .. 'Z' | '_') ('a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9') +
+    : ('a' .. 'z' | 'A' .. 'Z' | '_') ('a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9') *
     ;
 
 number
