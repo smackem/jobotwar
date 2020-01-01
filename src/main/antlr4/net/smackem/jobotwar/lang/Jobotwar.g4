@@ -57,7 +57,7 @@ gotoStatement
     ;
 
 assignStatement
-    : term ('=>' assignTarget)+
+    : term ('->' assignTarget)+
     ;
 
 assignTarget

@@ -24,7 +24,8 @@ public final class Interpreter {
     }
 
     public boolean runToNextLabel() throws StackException {
-        while (this.pc < this.code.size()) {
+        final int codeSize = this.code.size();
+        while (this.pc < codeSize) {
             final int target = executeInstruction(this.code.get(this.pc));
             if (target == -2) {
                 this.pc++;

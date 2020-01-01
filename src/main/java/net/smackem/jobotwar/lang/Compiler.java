@@ -5,8 +5,6 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
-import java.util.stream.Collectors;
-
 public class Compiler {
 
     public Program compile(String source) {
@@ -17,9 +15,6 @@ public class Compiler {
         final JobotwarParser.ProgramContext tree = parser.program();
         final Emitter emitter = new Emitter();
         ParseTreeWalker.DEFAULT.walk(emitter, tree);
-        System.out.println(emitter.instructions().stream()
-                .map(Instruction::toString)
-                .collect(Collectors.joining("\n")));
         return new Program(emitter.instructions());
     }
 }

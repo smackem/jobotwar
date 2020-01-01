@@ -37,9 +37,6 @@ public class MainController {
         this.board = new Board(640, 480, createRobots());
         this.engine = new GameEngine(this.board);
         this.graphics = new BoardGraphics(this.board);
-
-        final Compiler compiler = new Compiler();
-        compiler.compile("100 => AIM if AIM < 12");
     }
 
     @FXML
@@ -64,8 +61,7 @@ public class MainController {
     private void tick(ActionEvent actionEvent) {
         final GameEngine.TickResult tickResult = this.engine.tick();
         updateGraphics(tickResult);
-        final GraphicsContext gc = this.canvas.getGraphicsContext2D();
-        this.graphics.render(gc);
+        this.graphics.render(this.canvas.getGraphicsContext2D());
     }
 
     private void updateGraphics(GameEngine.TickResult tickResult) {

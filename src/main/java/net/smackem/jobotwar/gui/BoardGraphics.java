@@ -46,7 +46,6 @@ public class BoardGraphics {
     private void renderRadarBeams(GraphicsContext gc) {
         gc.save();
         gc.setLineWidth(1);
-        gc.setLineDashes(1, 3);
         for (final RenderedRadarBeam b : this.radarBeams) {
             final Robot robot = b.beam.sourceRobot();
             final Paint paint = getRobotPaint(robot, b.opacity);
@@ -162,7 +161,7 @@ public class BoardGraphics {
 
         RenderedRadarBeam(RadarBeam beam) {
             this.beam = beam;
-            opacity = beam.hitKind() == RadarBeamHitKind.ROBOT ? 0.8 : 0.4;
+            opacity = beam.hitKind() == RadarBeamHitKind.ROBOT ? 0.8 : 0.3;
         }
     }
 }
