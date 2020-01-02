@@ -22,7 +22,6 @@ public class MainController {
 
     private final Timeline ticker;
     private final BoardGraphics graphics;
-    private final Board board;
     private final GameEngine engine;
 
     @FXML
@@ -31,19 +30,20 @@ public class MainController {
     private Canvas canvas;
 
     public MainController() {
+        final Board board = App.instance().board();
         this.ticker = new Timeline(new KeyFrame(Duration.millis(40), this::tick));
         this.ticker.setCycleCount(Animation.INDEFINITE);
-        this.board = new Board(640, 480, createRobots());
-        this.engine = new GameEngine(this.board);
-        this.graphics = new BoardGraphics(this.board);
+        this.engine = new GameEngine(board);
+        this.graphics = new BoardGraphics(board);
     }
 
     @FXML
     private void initialize() {
+        final Board board = App.instance().board();
         this.canvasContainer.maxWidthProperty().bind(this.canvas.widthProperty());
         this.canvasContainer.maxHeightProperty().bind(this.canvas.heightProperty());
-        this.canvas.setWidth(this.board.width());
-        this.canvas.setHeight(this.board.height());
+        this.canvas.setWidth(board.width());
+        this.canvas.setHeight(board.height());
         this.graphics.render(this.canvas.getGraphicsContext2D());
     }
 

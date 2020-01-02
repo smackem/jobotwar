@@ -7,18 +7,26 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.paint.Color;
 import net.smackem.jobotwar.lang.Compiler;
 import net.smackem.jobotwar.lang.Program;
+import net.smackem.jobotwar.runtime.CompiledProgram;
+import net.smackem.jobotwar.runtime.Constants;
 import net.smackem.jobotwar.runtime.Robot;
+import net.smackem.jobotwar.runtime.Vector;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 public class EditController {
 
     private final ObservableList<RobotViewModel> robots = FXCollections.observableArrayList();
     private final ObjectProperty<RobotViewModel> selectedRobot = new SimpleObjectProperty<>();
+    private final Random random = new Random();
+    private static final int BOARD_WIDTH = 640;
+    private static final int BOARD_HEIGHT = 480;
 
     @FXML
     private TextField nameTextField;
@@ -39,7 +47,9 @@ public class EditController {
 
     @FXML
     private void startGame(MouseEvent mouseEvent) throws IOException {
-        App.instance().setRoot("main");
+        final App app = App.instance();
+        app.createBoard(BOARD_WIDTH, BOARD_HEIGHT, createRobotsFromViewModel());
+        app.setRoot("main");
     }
 
     @FXML
@@ -73,15 +83,36 @@ public class EditController {
     }
 
     private Collection<Robot> createRobotsFromViewModel() {
-        return this.robots.stream()
+        final Collection<Robot> robots = this.robots.stream()
                 .map(this::createRobotFromViewModel)
                 .collect(Collectors.toList());
+        placeRobots(robots);
+        return robots;
     }
 
-    private Robot createRobotFromViewModel(RobotViewModel r) {
-        final Compiler compiler = new Compiler();
-        final Program program = compiler.compile("");
-        final Robot robot = new Robot(0.5, 0xff, 10, null);
-        return robot;
+    private Robot createRobotFromViewModel(RobotViewModel robotViewModel) {
+        final Color color = robotViewModel.colorProperty().get();
+        final int rgb = (int)(color.getRed() * 0xff) << 16 |
+                (int)(color.getGreen() * 0xff) << 8 |
+                (int)(color.getBlue() * 0xff);
+        return new Robot(0.5, rgb, 10,
+                r -> CompiledProgram.compile(r, robotViewModel.sourceCodeProperty().get()));
+    }
+
+    private void placeRobots(Collection<Robot> robots) {
+        for (final Robot robot : robots) {
+            do {
+                robot.setX(Constants.ROBOT_RADIUS + this.random.nextDouble() * (BOARD_WIDTH - Constants.ROBOT_RADIUS * 2));
+                robot.setY(Constants.ROBOT_RADIUS + this.random.nextDouble() * (BOARD_HEIGHT - Constants.ROBOT_RADIUS * 2));
+            } while (getCloseRobot(robots, robot) != null);
+        }
+    }
+
+    private Robot getCloseRobot(Collection<Robot> robots, Robot test) {
+        return robots.stream()
+                .filter(r -> r != test)
+                .filter(r -> Vector.distance(r.getPosition(), test.getPosition()) < Constants.ROBOT_RADIUS * 2)
+                .findFirst()
+                .orElse(null);
     }
 }
