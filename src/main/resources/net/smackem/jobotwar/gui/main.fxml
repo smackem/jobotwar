@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.layout.VBox?>
-<?import javafx.geometry.Insets?>
 
 <?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.Button?>
@@ -24,7 +23,6 @@
          <Button minWidth="80" text="Stop" onMouseClicked="#stopGame" />
       </HBox>
    </VBox>
-   <TabPane tabClosingPolicy="UNAVAILABLE">
-      <Tab text="Robot 1" />
-   </TabPane>
+   <VBox>
+   </VBox>
 </SplitPane>

@@ -23,13 +23,13 @@ public class App extends Application {
         INSTANCE = this;
     }
 
-    public static App getInstance() {
+    public static App instance() {
         return INSTANCE;
     }
 
     @Override
     public void start(Stage stage) throws IOException {
-        this.scene = new Scene(loadFXML("main"), 800, 600);
+        this.scene = new Scene(loadFXML("edit"), 800, 600);
         stage.setScene(this.scene);
         stage.show();
     }

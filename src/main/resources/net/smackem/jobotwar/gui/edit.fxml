@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="net.smackem.jobotwar.gui.EditController">
+    <left>
+        <VBox minWidth="250" spacing="4" style="-fx-padding: 2">
+            <Button minWidth="80" alignment="CENTER" text="Start Game" onMouseClicked="#startGame" />
+            <Button minWidth="80" alignment="CENTER" text="New Robot" onMouseClicked="#newRobot" />
+            <Button minWidth="80" alignment="CENTER" text="Remove Robot" onMouseClicked="#removeRobot" />
+            <ListView fx:id="robotsListView" />
+        </VBox>
+    </left>
+    <center>
+        <BorderPane>
+            <top>
+                <VBox spacing="4" style="-fx-padding: 2;">
+                    <Label text="Name:" />
+                    <TextField fx:id="nameTextField" />
+                    <Label text="Color:" />
+                    <ColorPicker fx:id="colorPicker" />
+                </VBox>
+            </top>
+            <center>
+                <TextArea fx:id="sourceText" />
+            </center>
+        </BorderPane>
+    </center>
+</BorderPane>
