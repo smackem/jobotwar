@@ -97,7 +97,7 @@ public final class GameEngine {
 
     private void tickRobot(Robot robot, TickResult result) {
         // execute next program statement
-        robot.program().next(robot);
+        robot.program().next();
 
         // handle movement
         robot.accelerate();

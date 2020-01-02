@@ -1,5 +1,5 @@
 package net.smackem.jobotwar.runtime;
 
 public interface RobotProgram {
-    boolean next(Robot robot);
+    boolean next();
 }

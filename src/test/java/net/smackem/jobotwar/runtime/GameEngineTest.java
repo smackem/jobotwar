@@ -13,7 +13,8 @@ public class GameEngineTest {
     @Test
     public void movement() {
         final double acceleration = 1;
-        final Robot robot = new Robot(acceleration, 0, 1, new RuntimeProgram(
+        final Robot robot = new Robot(acceleration, 0, 1,
+            rob -> new RuntimeProgram(rob,
                 RuntimeProgram.instruction(null, r -> {
                     r.setSpeedX(4); return null;
                 })));
@@ -41,7 +42,8 @@ public class GameEngineTest {
 
     @Test
     public void shot() {
-        final Robot robot = new Robot(1, 0, 1, new RuntimeProgram(
+        final Robot robot = new Robot(1, 0, 1,
+            rob -> new RuntimeProgram(rob,
                 RuntimeProgram.instruction(null, r -> {
                     r.setAimAngle(0); return null;
                 }),
@@ -76,7 +78,8 @@ public class GameEngineTest {
 
     @Test
     public void shotAngle() {
-        final Robot robot = new Robot(1, 0, 1, new RuntimeProgram(
+        final Robot robot = new Robot(1, 0, 1,
+            rob -> new RuntimeProgram(rob,
                 RuntimeProgram.instruction(null, r -> {
                     r.setAimAngle(90); return null;
                 }),
@@ -120,7 +123,7 @@ public class GameEngineTest {
     public void radarWall() {
         final int width = 100, height = 100;
         final Robot robot = new Robot(1, 0, 1,
-            new RuntimeProgram(
+            rob -> new RuntimeProgram(rob,
                 RuntimeProgram.instruction(null, r -> {
                     r.setRadarAngle(0.0); return null;
                 }),
@@ -197,7 +200,7 @@ public class GameEngineTest {
     @Test
     public void radarRobot() {
         final Robot robot1 = new Robot(1.0, 0, 1,
-            new RuntimeProgram(
+            rob -> new RuntimeProgram(rob,
                 RuntimeProgram.instruction(null, r -> {
                     r.setRadarAngle(180.0); return null;
                 })
@@ -205,7 +208,8 @@ public class GameEngineTest {
         robot1.setX(50);
         robot1.setY(50);
 
-        final Robot robot2 = new Robot(1.0, 0, 1, RuntimeProgram.EMPTY);
+        final Robot robot2 = new Robot(1.0, 0, 1,
+                rob -> new RuntimeProgram(rob));
         robot2.setX(20);
         robot2.setY(50);
 

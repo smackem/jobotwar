@@ -3,6 +3,7 @@ package net.smackem.jobotwar.runtime;
 import net.smackem.jobotwar.util.Arguments;
 
 import java.util.Objects;
+import java.util.function.Function;
 
 /**
  * A runtime representation of a programmed robot.
@@ -29,14 +30,14 @@ public class Robot {
      * Initializes a new instance of {@link Robot}.
      * @param acceleration The acceleration in pixels per tick^2. Must be positive.
      * @param rgb The RGB color of the robot (format in hex: 0xrrggbb).
-     * @param program The program that controls the robot.
+     * @param programFactory Called by the constructor to create the program that controls the robot.
      */
-    public Robot(double acceleration, int rgb, int coolDownTicks, RobotProgram program) {
+    public Robot(double acceleration, int rgb, int coolDownTicks, Function<Robot, RobotProgram> programFactory) {
         this.acceleration = Arguments.requireRange(acceleration, 0, Constants.MAX_ROBOT_ACCELERATION);
         this.rgb = rgb;
         this.coolDownTicks = coolDownTicks;
-        this.program = Objects.requireNonNull(program);
         this.health = Constants.MAX_HEALTH;
+        this.program = programFactory.apply(this);
     }
 
     /**

@@ -29,7 +29,7 @@
 grammar Jobotwar;
 
 program
-    : declLine* line+
+    : declLine* line*
     ;
 
 declLine

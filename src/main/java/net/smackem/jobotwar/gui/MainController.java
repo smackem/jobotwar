@@ -31,8 +31,7 @@ public class MainController {
     private Canvas canvas;
 
     public MainController() {
-        this.ticker = new Timeline(
-                new KeyFrame(Duration.millis(40), this::tick));
+        this.ticker = new Timeline(new KeyFrame(Duration.millis(40), this::tick));
         this.ticker.setCycleCount(Animation.INDEFINITE);
         this.board = new Board(640, 480, createRobots());
         this.engine = new GameEngine(this.board);
@@ -76,7 +75,7 @@ public class MainController {
 
     private Collection<Robot> createRobots() {
         final Robot r1 = new Robot(0.1, 0x40ff80, Constants.ROBOT_COOL_DOWN_HOLD_OFF,
-            new RuntimeProgram(
+            robot -> new RuntimeProgram(robot,
                 RuntimeProgram.instruction(null, r -> {
                     r.setSpeedX(4); return null;
                 }),
@@ -105,7 +104,7 @@ public class MainController {
 
         final double[] radarAngle2 = new double[] { 0 };
         final Robot r2 = new Robot(0.5, 0xffc020, Constants.ROBOT_COOL_DOWN_HOLD_OFF,
-            new RuntimeProgram(
+            robot -> new RuntimeProgram(robot,
                 RuntimeProgram.instruction(null, r -> {
                     r.setSpeedX(-0.5); return null;
                 }),
@@ -123,7 +122,7 @@ public class MainController {
 
         final double[] radarAngle3 = new double[] { 0 };
         final Robot r3 = new Robot(0.5, 0x0040ff, Constants.ROBOT_COOL_DOWN_HOLD_OFF,
-            new RuntimeProgram(
+            robot -> new RuntimeProgram(robot,
                 RuntimeProgram.instruction(null, r -> {
                     r.setSpeedX(0.1); return null;
                 }),
@@ -138,7 +137,7 @@ public class MainController {
 
         final double[] radarAngle4 = new double[] { 0 };
         final Robot r4 = new Robot(0.5, 0xC02000, Constants.ROBOT_COOL_DOWN_HOLD_OFF,
-                new RuntimeProgram(
+                robot -> new RuntimeProgram(robot,
                         RuntimeProgram.instruction(null, r -> {
                             r.setAimAngle(90); return null;
                         }),

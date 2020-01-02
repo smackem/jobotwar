@@ -11,11 +11,11 @@ import java.util.function.Function;
 public class RuntimeProgram implements RobotProgram {
     private final List<Instruction> instructions;
     private final Map<String, Integer> labels;
+    private final Robot robot;
     private int pc;
 
-    public static final RuntimeProgram EMPTY = new RuntimeProgram();
-
-    public RuntimeProgram(Instruction... instructions) {
+    public RuntimeProgram(Robot robot, Instruction... instructions) {
+        this.robot = robot;
         this.instructions = Arrays.asList(instructions);
         this.labels = new HashMap<>();
         int index = 0;
@@ -28,12 +28,12 @@ public class RuntimeProgram implements RobotProgram {
     }
 
     @Override
-    public boolean next(Robot robot) {
+    public boolean next() {
         if (this.pc >= this.instructions.size()) {
             return false;
         }
 
-        final String target = this.instructions.get(this.pc).function.apply(robot);
+        final String target = this.instructions.get(this.pc).function.apply(this.robot);
         if (Strings.isNullOrEmpty(target) == false) {
             this.pc = this.labels.get(target);
         } else {
