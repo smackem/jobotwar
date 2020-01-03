@@ -24,4 +24,13 @@ public enum OpCode {
     BR_ZERO,    // pop a, if 0.0 then branch to intArg
     BR_NONZERO, // pop a, if not 0.0 then branch to intArg
     DUP,        // pop a, push a, push a
+    ABS,        // pop a, push func(a)
+    NOT,        // pop a, push func(a)
+    TAN,        // pop a, push func(a)
+    SIN,        // pop a, push func(a)
+    COS,        // pop a, push func(a)
+    ATAN,       // pop a, push func(a)
+    ASIN,       // pop a, push func(a)
+    ACOS,       // pop a, push func(a)
+    SQRT,       // pop a, push func(a)
 }

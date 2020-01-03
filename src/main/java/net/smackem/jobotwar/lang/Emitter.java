@@ -1,6 +1,7 @@
 package net.smackem.jobotwar.lang;
 
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.util.*;
 
@@ -22,8 +23,10 @@ public class Emitter extends JobotwarBaseListener {
 
     @Override
     public void exitDeclaration(JobotwarParser.DeclarationContext ctx) {
-        this.locals.put(ctx.ID().getText(), this.instructions.size());
-        emit(OpCode.LD_F64);
+        for (final TerminalNode id : ctx.ID()) {
+            this.locals.put(id.getText(), this.instructions.size());
+            emit(OpCode.LD_F64);
+        }
     }
 
     @Override
@@ -126,6 +129,44 @@ public class Emitter extends JobotwarBaseListener {
                 break;
             default:
                 throw new RuntimeException("Unsupported product operator " + ctx.productOperator());
+        }
+    }
+
+    @Override
+    public void exitMolecule(JobotwarParser.MoleculeContext ctx) {
+        if (ctx.func() == null) {
+            return;
+        }
+        switch (ctx.func().getText()) {
+            case "abs":
+                emit(OpCode.ABS);
+                break;
+            case "not":
+                emit(OpCode.NOT);
+                break;
+            case "tan":
+                emit(OpCode.TAN);
+                break;
+            case "sin":
+                emit(OpCode.SIN);
+                break;
+            case "cos":
+                emit(OpCode.COS);
+                break;
+            case "atan":
+                emit(OpCode.ATAN);
+                break;
+            case "asin":
+                emit(OpCode.ASIN);
+                break;
+            case "acos":
+                emit(OpCode.ACOS);
+                break;
+            case "sqrt":
+                emit(OpCode.SQRT);
+                break;
+            default:
+                throw new RuntimeException("Unsupported function " + ctx.func());
         }
     }
 

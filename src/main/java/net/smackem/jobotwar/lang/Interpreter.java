@@ -125,6 +125,33 @@ public final class Interpreter {
                 this.stack.push(right);
                 this.stack.push(right);
                 break;
+            case ABS:
+                this.stack.push(Math.abs(this.stack.pop()));
+                break;
+            case NOT:
+                this.stack.push(this.stack.pop() == 0 ? 1 : 0);
+                break;
+            case TAN:
+                this.stack.push(Math.tan(this.stack.pop()));
+                break;
+            case SIN:
+                this.stack.push(Math.sin(this.stack.pop()));
+                break;
+            case COS:
+                this.stack.push(Math.cos(this.stack.pop()));
+                break;
+            case ATAN:
+                this.stack.push(Math.atan(this.stack.pop()));
+                break;
+            case ASIN:
+                this.stack.push(Math.asin(this.stack.pop()));
+                break;
+            case ACOS:
+                this.stack.push(Math.acos(this.stack.pop()));
+                break;
+            case SQRT:
+                this.stack.push(Math.sqrt(this.stack.pop()));
+                break;
         }
 
         return -1;

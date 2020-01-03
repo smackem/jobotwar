@@ -37,7 +37,7 @@ declLine
     ;
 
 declaration
-    : 'def' ID
+    : 'def' ID (',' ID)*
     ;
 
 line
@@ -99,8 +99,8 @@ termOperator
     ;
 
 product
-    : atom productOperator product
-    | atom
+    : molecule productOperator product
+    | molecule
     ;
 
 productOperator
@@ -118,10 +118,16 @@ comparator
     | '!='
     ;
 
+molecule
+    : func '(' condition ')'
+    | atom
+    ;
+
 atom
     : number
     | register
     | ID
+    | '(' condition ')'
     ;
 
 register
@@ -136,18 +142,36 @@ register
     | Y
     ;
 
-AIM : 'AIM';
-SHOT : 'SHOT';
-RADAR : 'RADAR';
-DAMAGE : 'DAMAGE';
-SPEEDX : 'SPEEDX';
-SPEEDY : 'SPEEDY';
-RANDOM : 'RANDOM';
-X : 'X';
-Y : 'Y';
+func
+    : ABS
+    | NOT
+    | TAN
+    | SIN
+    | COS
+    | ATAN
+    | ASIN
+    | ACOS
+    | SQRT
+    ;
 
-DOT : '.';
-COMMA : ',';
+AIM     : 'AIM';
+SHOT    : 'SHOT';
+RADAR   : 'RADAR';
+DAMAGE  : 'DAMAGE';
+SPEEDX  : 'SPEEDX';
+SPEEDY  : 'SPEEDY';
+RANDOM  : 'RANDOM';
+X       : 'X';
+Y       : 'Y';
+ABS     : 'abs';
+NOT     : 'not';
+TAN     : 'tan';
+SIN     : 'sin';
+COS     : 'cos';
+ATAN    : 'atan';
+ASIN    : 'asin';
+ACOS    : 'acos';
+SQRT    : 'sqrt';
 
 ID
     : ('a' .. 'z' | 'A' .. 'Z' | '_') ('a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9') *
