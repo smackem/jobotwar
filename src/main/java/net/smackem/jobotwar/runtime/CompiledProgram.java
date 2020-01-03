@@ -51,7 +51,14 @@ public class CompiledProgram implements RobotProgram {
 
             @Override
             public double readRadar() {
-                return robot.getRadarAngle();
+                final RadarBeam beam = robot.getLatestRadarBeam();
+                if (beam == null) {
+                    return 0;
+                }
+                if (beam.hitKind() == RadarBeamHitKind.ROBOT) {
+                    return -(Vector.distance(beam.hitPosition(), robot.getPosition()));
+                }
+                return Vector.distance(beam.hitPosition(), robot.getPosition());
             }
 
             @Override
@@ -99,7 +106,7 @@ public class CompiledProgram implements RobotProgram {
 
             @Override
             public double readShot() {
-                return robot.getShot();
+                return robot.getCoolDownHoldOff();
             }
 
             @Override

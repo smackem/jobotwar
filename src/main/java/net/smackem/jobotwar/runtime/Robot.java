@@ -25,6 +25,7 @@ public class Robot {
     private int health;
     private int coolDownHoldOff;
     private Vector cachedPosition;
+    private RadarBeam latestRadarBeam;
 
     /**
      * Initializes a new instance of {@link Robot}.
@@ -166,6 +167,20 @@ public class Robot {
         this.radarAngle = value != null
             ? Arguments.requireRange(value,-180, 360 - Constants.ANGLE_PRECISION)
             : null;
+    }
+
+    /**
+     * @return The last emitted radar beam.
+     */
+    public RadarBeam getLatestRadarBeam() {
+        return this.latestRadarBeam;
+    }
+
+    /**
+     * Sets the last emitted radar beam.
+     */
+    public void setLatestRadarBeam(RadarBeam value) {
+        this.latestRadarBeam = value;
     }
 
     /**

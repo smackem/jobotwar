@@ -110,6 +110,7 @@ public final class GameEngine {
         if (radarAngle != null) {
             final RadarBeam beam = calcRadarBeam(robot, radarAngle);
             result.radarBeams.add(beam);
+            robot.setLatestRadarBeam(beam);
             robot.setRadarAngle(null);
         }
 
