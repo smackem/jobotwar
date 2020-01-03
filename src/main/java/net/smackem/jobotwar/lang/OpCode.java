@@ -23,4 +23,5 @@ public enum OpCode {
     BR,         // branch to label intArg
     BR_ZERO,    // pop a, if 0.0 then branch to intArg
     BR_NONZERO, // pop a, if not 0.0 then branch to intArg
+    DUP,        // pop a, push a, push a
 }

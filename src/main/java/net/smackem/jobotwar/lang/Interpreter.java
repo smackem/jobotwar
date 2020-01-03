@@ -120,6 +120,11 @@ public final class Interpreter {
                     return instr.intArg();
                 }
                 break;
+            case DUP:
+                right = this.stack.pop();
+                this.stack.push(right);
+                this.stack.push(right);
+                break;
         }
 
         return -1;

@@ -174,17 +174,22 @@ public class Emitter extends JobotwarBaseListener {
     }
 
     @Override
-    public void exitAssignTarget(JobotwarParser.AssignTargetContext ctx) {
-        if (ctx.register() != null) {
-            emit(OpCode.ST_REG, ctx.register().getText());
-        } else if (ctx.ID() != null) {
-            final Integer addr = this.locals.get(ctx.ID().getText());
-            if (addr == null) {
-                throw new RuntimeException("Unknown local " + ctx.ID().getText());
+    public void exitAssignStatement(JobotwarParser.AssignStatementContext ctx) {
+        for (int i = 0; i < ctx.assignTarget().size() - 1; i++) {
+            emit(OpCode.DUP);
+        }
+        for (final JobotwarParser.AssignTargetContext assignTarget : ctx.assignTarget()) {
+            if (assignTarget.register() != null) {
+                emit(OpCode.ST_REG, assignTarget.register().getText());
+            } else if (assignTarget.ID() != null) {
+                final Integer addr = this.locals.get(assignTarget.ID().getText());
+                if (addr == null) {
+                    throw new RuntimeException("Unknown local " + assignTarget.ID().getText());
+                }
+                emit(OpCode.ST_LOC, addr);
+            } else {
+                throw new RuntimeException("Unsupported assign target");
             }
-            emit(OpCode.ST_LOC, addr);
-        } else {
-            throw new RuntimeException("Unsupported assign target");
         }
     }
 

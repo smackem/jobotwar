@@ -1,6 +1,8 @@
 package net.smackem.jobotwar.gui;
 
+import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -22,7 +24,7 @@ import java.util.stream.Collectors;
 
 public class EditController {
 
-    private final ObservableList<RobotViewModel> robots = FXCollections.observableArrayList();
+    private final ListProperty<RobotViewModel> robots = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ObjectProperty<RobotViewModel> selectedRobot = new SimpleObjectProperty<>();
     private final Random random = new Random();
     private static final int BOARD_WIDTH = 640;
@@ -36,6 +38,8 @@ public class EditController {
     private ListView<RobotViewModel> robotsListView;
     @FXML
     private ColorPicker colorPicker;
+    @FXML
+    private Button playButton;
 
     @FXML
     private void initialize() {
@@ -43,6 +47,10 @@ public class EditController {
         this.robotsListView.getSelectionModel().selectedItemProperty().addListener((prop, old, val) -> {
             selectRobot(val);
         });
+        this.robotsListView.setCellFactory(listView -> new RobotViewModelCell());
+        this.playButton.disableProperty().bind(
+                this.robots.sizeProperty().lessThanOrEqualTo(0));
+        newRobot(null);
     }
 
     @FXML
@@ -55,8 +63,11 @@ public class EditController {
     @FXML
     private void newRobot(MouseEvent mouseEvent) {
         final RobotViewModel robot = new RobotViewModel();
-        robot.nameProperty().set("Robot " + this.robots.size() + 1);
+        robot.nameProperty().set("Robot " + (this.robots.size() + 1));
+        robot.colorProperty().set(Color.hsb(this.random.nextDouble() * 360, 1.0, 1.0));
+        robot.sourceCodeProperty().set("");
         this.robots.add(robot);
+        this.robotsListView.getSelectionModel().select(robot);
     }
 
     @FXML
@@ -114,5 +125,18 @@ public class EditController {
                 .filter(r -> Vector.distance(r.getPosition(), test.getPosition()) < Constants.ROBOT_RADIUS * 2)
                 .findFirst()
                 .orElse(null);
+    }
+
+    private static class RobotViewModelCell extends ListCell<RobotViewModel> {
+        @Override
+        protected void updateItem(RobotViewModel robotViewModel, boolean empty) {
+            super.updateItem(robotViewModel, empty);
+            if (empty) {
+                textProperty().unbind();
+                setText(null);
+            } else {
+                textProperty().bind(robotViewModel.nameProperty());
+            }
+        }
     }
 }

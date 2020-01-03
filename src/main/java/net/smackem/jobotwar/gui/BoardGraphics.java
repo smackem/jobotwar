@@ -52,7 +52,7 @@ public class BoardGraphics {
             final Vector hitPos = b.beam.hitPosition();
             gc.setStroke(paint);
             gc.strokeLine(robot.getX(), robot.getY(), hitPos.x(), hitPos.y());
-            b.opacity -= 0.05;
+            b.opacity -= 0.02;
         }
         this.radarBeams.removeIf(beam -> beam.opacity <= 0.2);
         gc.restore();

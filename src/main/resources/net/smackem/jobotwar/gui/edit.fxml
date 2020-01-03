@@ -11,7 +11,7 @@
             fx:controller="net.smackem.jobotwar.gui.EditController">
     <left>
         <VBox minWidth="250" spacing="4" style="-fx-padding: 2">
-            <Button minWidth="80" alignment="CENTER" text="Start Game" onMouseClicked="#startGame" />
+            <Button fx:id="playButton" minWidth="80" alignment="CENTER" text="Play" onMouseClicked="#startGame" />
             <Button minWidth="80" alignment="CENTER" text="New Robot" onMouseClicked="#newRobot" />
             <Button minWidth="80" alignment="CENTER" text="Remove Robot" onMouseClicked="#removeRobot" />
             <ListView fx:id="robotsListView" />

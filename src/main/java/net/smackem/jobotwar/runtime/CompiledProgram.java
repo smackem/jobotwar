@@ -10,12 +10,10 @@ import java.util.Random;
 public class CompiledProgram implements RobotProgram {
 
     private final Robot robot;
-    private final Program program;
     private final Interpreter interpreter;
 
     private CompiledProgram(Robot robot, Program program) {
         this.robot = robot;
-        this.program = program;
         this.interpreter = new Interpreter(program, environment());
     }
 
@@ -61,7 +59,7 @@ public class CompiledProgram implements RobotProgram {
                 if (value < 0) {
                     value += 360;
                 }
-                robot.setAimAngle(value % 360);
+                robot.setRadarAngle(value % 360);
             }
 
             @Override
@@ -71,7 +69,7 @@ public class CompiledProgram implements RobotProgram {
 
             @Override
             public void writeSpeedX(double value) {
-                robot.setSpeedX(value);
+                robot.setSpeedX(Math.min(value, Constants.MAX_ROBOT_SPEED));
             }
 
             @Override
@@ -81,7 +79,7 @@ public class CompiledProgram implements RobotProgram {
 
             @Override
             public void writeSpeedY(double value) {
-                robot.setSpeedY(value);
+                robot.setSpeedY(Math.min(value, Constants.MAX_ROBOT_SPEED));
             }
 
             @Override
