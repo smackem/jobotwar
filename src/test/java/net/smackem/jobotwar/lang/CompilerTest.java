@@ -187,6 +187,24 @@ public class CompilerTest {
         assertThat(env.readAim()).isEqualTo(16);
     }
 
+    @Test
+    public void testMultiAssignment() {
+        final String source = "" +
+                "def x\n" +
+                "42 -> SHOT -> AIM -> RADAR -> x \n";
+
+        final Compiler compiler = new Compiler();
+        final Program program = compiler.compile(source);
+        final TestEnvironment env = new TestEnvironment();
+        final Interpreter interpreter = new Interpreter(program, env);
+
+        runComplete(interpreter);
+
+        assertThat(env.readShot()).isEqualTo(42);
+        assertThat(env.readAim()).isEqualTo(42);
+        assertThat(env.readRadar()).isEqualTo(42);
+    }
+
     private void runComplete(Interpreter interpreter) {
         try {
             while (interpreter.runToNextLabel()) {
