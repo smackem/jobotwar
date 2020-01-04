@@ -9,7 +9,7 @@ public class Constants {
     public static double MAX_RADAR_RANGE = 10_000;
     public static int MAX_BOARD_WIDTH  = 5_000;
     public static int MAX_BOARD_HEIGHT  = 5_000;
-    public static double ANGLE_PRECISION = 0.0001;
+    public static double ANGLE_PRECISION = 0.000_1;
     public static int MAX_HEALTH = 100;
     public static double MAX_ROBOT_ACCELERATION = 8;
     public static double DEFAULT_ROBOT_ACCELERATION = 0.5;

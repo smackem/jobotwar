@@ -71,22 +71,26 @@ public class CompiledProgram implements RobotProgram {
 
             @Override
             public double readSpeedX() {
-                return robot.getSpeedX();
+                // normalize to -500 to 500
+                return robot.getSpeedX() * 500 / Constants.MAX_ROBOT_SPEED;
             }
 
             @Override
             public void writeSpeedX(double value) {
+                // normalize to -500 to 500
                 value = Math.max(Math.min(value, 500), -500);
                 robot.setSpeedX(value * Constants.MAX_ROBOT_SPEED / 500.0);
             }
 
             @Override
             public double readSpeedY() {
-                return robot.getSpeedY();
+                // normalize to -500 to 500
+                return robot.getSpeedY() * 500 / Constants.MAX_ROBOT_SPEED;
             }
 
             @Override
             public void writeSpeedY(double value) {
+                // normalize to -500 to 500
                 value = Math.max(Math.min(value, 500), -500);
                 robot.setSpeedY(value * Constants.MAX_ROBOT_SPEED / 500.0);
             }

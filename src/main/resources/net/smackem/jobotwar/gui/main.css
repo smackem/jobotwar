@@ -1,0 +1,29 @@
+.root {
+    -fx-background-color: #000000;
+}
+
+#canvasContainer {
+    -fx-border-color: #c0c0c0;
+    -fx-border-width: 1px;
+}
+
+.dark-button {
+    -fx-background-color:
+            #101010,
+            radial-gradient(center 50% 0%, radius 100%, rgba(60,60,60,0.9), rgba(255,255,255,0));
+    -fx-background-radius: 5,4,3,5;
+    -fx-background-insets: 0,1,2,0;
+    -fx-text-fill: #c0c0c0;
+    -fx-border-width: 1px;
+    -fx-border-color: #c0c0c0;
+    -fx-border-radius: 3;
+    -fx-padding: 10 20 10 20;
+}
+.dark-button:hover {
+    -fx-background-color:
+            #101010,
+            radial-gradient(center 50% 0%, radius 100%, rgba(90,90,90,0.9), rgba(255,255,255,0));
+}
+.dark-button:pressed {
+    -fx-background-color: #101010;
+}
