@@ -9,6 +9,7 @@ import java.util.function.Function;
  * A runtime representation of a programmed robot.
  */
 public class Robot {
+    private final String name;
     private final double acceleration;
     private final RobotProgram program;
     private final int rgb;
@@ -29,16 +30,92 @@ public class Robot {
 
     /**
      * Initializes a new instance of {@link Robot}.
-     * @param acceleration The acceleration in pixels per tick^2. Must be positive.
-     * @param rgb The RGB color of the robot (format in hex: 0xrrggbb).
-     * @param programFactory Called by the constructor to create the program that controls the robot.
      */
-    public Robot(double acceleration, int rgb, int coolDownTicks, Function<Robot, RobotProgram> programFactory) {
-        this.acceleration = Arguments.requireRange(acceleration, 0, Constants.MAX_ROBOT_ACCELERATION);
-        this.rgb = rgb;
-        this.coolDownTicks = coolDownTicks;
+    private Robot(Builder builder) {
+        this.name = builder.name;
+        this.acceleration = builder.acceleration;
+        this.rgb = builder.rgb;
+        this.coolDownTicks = builder.coolDownTicks;
         this.health = Constants.MAX_HEALTH;
-        this.program = programFactory.apply(this);
+        this.program = builder.programFactory.apply(this);
+        this.x = builder.x;
+        this.y = builder.y;
+    }
+
+    /**
+     * Builds a {@link Robot}.
+     */
+    public static class Builder {
+        private final Function<Robot, RobotProgram> programFactory;
+        private String name = "Rob";
+        private int rgb = 0xffffff;
+        private double acceleration = Constants.DEFAULT_ROBOT_ACCELERATION;
+        private int coolDownTicks = Constants.DEFAULT_COOL_DOWN_TICKS;
+        private double x;
+        private double y;
+
+        /**
+         * Initializes a new instance of {@link Builder}.
+         * @param programFactory Called by the constructor to create the program that controls the robot.
+         */
+        public Builder(Function<Robot, RobotProgram> programFactory) {
+            this.programFactory = programFactory;
+        }
+
+        /**
+         * The name of the robot.
+         */
+        public Builder name(String value) {
+            this.name = value;
+            return this;
+        }
+
+        /**
+         * The RGB color of the robot (format in hex: 0xrrggbb).
+         */
+        public Builder rgb(int value) {
+            this.rgb = value;
+            return this;
+        }
+
+        /**
+         * The acceleration in pixels per tick^2. Must be positive.
+         */
+        public Builder acceleration(int value) {
+            this.acceleration = Arguments.requireRange(value, 0, Constants.MAX_ROBOT_ACCELERATION);
+            return this;
+        }
+
+        /**
+         * The number of ticks the robot's gun needs to cool down (so it can fire again).
+         */
+        public Builder coolDownTicks(int value) {
+            this.coolDownTicks = value;
+            return this;
+        }
+
+        /**
+         * The initial x-position.
+         */
+        public Builder x(double value) {
+            this.x = value;
+            return this;
+        }
+
+        /**
+         * The initial y-position.
+         */
+        public Builder y(double value) {
+            this.y = value;
+            return this;
+        }
+
+        /**
+         * @return A new {@link Robot}.
+         */
+        public Robot build() {
+            return new Robot(this);
+        }
     }
 
     /**
@@ -269,6 +346,6 @@ public class Robot {
      * Sets the number of ticks that the robot needs to wait until it can fire the gun again.
      */
     public void setCoolDownHoldOff(int value) {
-        this.coolDownHoldOff = Arguments.requireRange(value, 0, 100_000);
+        this.coolDownHoldOff = Arguments.requireRange(value, 0, this.coolDownTicks);
     }
 }

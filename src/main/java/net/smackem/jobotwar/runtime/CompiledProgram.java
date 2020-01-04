@@ -76,7 +76,8 @@ public class CompiledProgram implements RobotProgram {
 
             @Override
             public void writeSpeedX(double value) {
-                robot.setSpeedX(Math.min(value, Constants.MAX_ROBOT_SPEED));
+                value = Math.max(Math.min(value, 500), -500);
+                robot.setSpeedX(value * Constants.MAX_ROBOT_SPEED / 500.0);
             }
 
             @Override
@@ -86,7 +87,8 @@ public class CompiledProgram implements RobotProgram {
 
             @Override
             public void writeSpeedY(double value) {
-                robot.setSpeedY(Math.min(value, Constants.MAX_ROBOT_SPEED));
+                value = Math.max(Math.min(value, 500), -500);
+                robot.setSpeedY(value * Constants.MAX_ROBOT_SPEED / 500.0);
             }
 
             @Override
@@ -101,7 +103,7 @@ public class CompiledProgram implements RobotProgram {
 
             @Override
             public double readDamage() {
-                return Constants.MAX_ROBOT_SPEED - robot.getHealth();
+                return Constants.MAX_HEALTH - robot.getHealth();
             }
 
             @Override

@@ -106,8 +106,10 @@ public class EditController {
         final int rgb = (int)(color.getRed() * 0xff) << 16 |
                 (int)(color.getGreen() * 0xff) << 8 |
                 (int)(color.getBlue() * 0xff);
-        return new Robot(0.5, rgb, 10,
-                r -> CompiledProgram.compile(r, robotViewModel.sourceCodeProperty().get()));
+        return new Robot.Builder(r -> CompiledProgram.compile(r, robotViewModel.sourceCodeProperty().get()))
+                .name(robotViewModel.nameProperty().get())
+                .rgb(rgb)
+                .build();
     }
 
     private void placeRobots(Collection<Robot> robots) {

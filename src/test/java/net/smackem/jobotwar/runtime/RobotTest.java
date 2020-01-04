@@ -8,21 +8,21 @@ public class RobotTest {
 
     @Test
     public void setAimAngle() {
-        final Robot robot = new Robot(1.0, 0, 1, this::createProgram);
+        final Robot robot = new Robot.Builder(this::createProgram).build();
         assertThatIllegalArgumentException().isThrownBy(() -> robot.setAimAngle(360));
         assertThatCode(() -> robot.setAimAngle(359)).doesNotThrowAnyException();
     }
 
     @Test
     public void setRadarAngle() {
-        final Robot robot = new Robot(1.0, 0, 1, this::createProgram);
+        final Robot robot = new Robot.Builder(this::createProgram).build();
         assertThatIllegalArgumentException().isThrownBy(() -> robot.setRadarAngle(360.0));
         assertThatCode(() -> robot.setRadarAngle(359.0)).doesNotThrowAnyException();
     }
 
     @Test
     public void accelerate() {
-        final Robot robot = new Robot(1.0, 0, 1, this::createProgram);
+        final Robot robot = new Robot.Builder(this::createProgram).acceleration(1).build();
         assertThat(robot.getActualSpeedX()).isEqualTo(0);
         assertThat(robot.getActualSpeedY()).isEqualTo(0);
 
@@ -63,28 +63,32 @@ public class RobotTest {
 
     @Test
     public void accelerateFast() {
-        final Robot robot = new Robot(10.0, 0, 1, this::createProgram);
-        robot.setSpeedX(15);
-        robot.setSpeedY(8);
-
-        robot.accelerate();
-        assertThat(robot.getActualSpeedX()).isEqualTo(10);
-        assertThat(robot.getActualSpeedY()).isEqualTo(8);
-
-        robot.accelerate();
-        assertThat(robot.getActualSpeedX()).isEqualTo(15);
-        assertThat(robot.getActualSpeedY()).isEqualTo(8);
-
-        robot.setSpeedX(-5);
-        robot.setSpeedY(-10);
+        final Robot robot = new Robot.Builder(this::createProgram).acceleration(5).build();
+        robot.setSpeedX(8);
+        robot.setSpeedY(4);
 
         robot.accelerate();
         assertThat(robot.getActualSpeedX()).isEqualTo(5);
-        assertThat(robot.getActualSpeedY()).isEqualTo(-2);
+        assertThat(robot.getActualSpeedY()).isEqualTo(4);
 
         robot.accelerate();
-        assertThat(robot.getActualSpeedX()).isEqualTo(-5);
-        assertThat(robot.getActualSpeedY()).isEqualTo(-10);
+        assertThat(robot.getActualSpeedX()).isEqualTo(8);
+        assertThat(robot.getActualSpeedY()).isEqualTo(4);
+
+        robot.setSpeedX(0);
+        robot.setSpeedY(-5);
+
+        robot.accelerate();
+        assertThat(robot.getActualSpeedX()).isEqualTo(3);
+        assertThat(robot.getActualSpeedY()).isEqualTo(-1);
+
+        robot.accelerate();
+        assertThat(robot.getActualSpeedX()).isEqualTo(0);
+        assertThat(robot.getActualSpeedY()).isEqualTo(-5);
+
+        robot.accelerate();
+        assertThat(robot.getActualSpeedX()).isEqualTo(0);
+        assertThat(robot.getActualSpeedY()).isEqualTo(-5);
     }
 
     private RobotProgram createProgram(Robot robot) {

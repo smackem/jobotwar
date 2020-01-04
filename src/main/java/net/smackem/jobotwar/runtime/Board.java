@@ -43,10 +43,10 @@ public class Board {
     }
 
     /**
-     * @return An unmodifiable collection of {@link Robot}s on the board.
+     * @return An modifiable collection of {@link Robot}s on the board.
      */
     public Collection<Robot> robots() {
-        return Collections.unmodifiableCollection(this.robots);
+        return this.robots;
     }
 
     /**

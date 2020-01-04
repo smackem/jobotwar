@@ -1,8 +1,12 @@
 package net.smackem.jobotwar.lang;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.*;
 
 public final class Interpreter {
+    private static final Logger log = LoggerFactory.getLogger(Interpreter.class);
     private final Program program;
     private final List<Instruction> code;
     private final RuntimeEnvironment runtime;
@@ -53,10 +57,14 @@ public final class Interpreter {
                 this.stack.push(this.stack.get(instr.intArg()));
                 break;
             case ST_LOC:
-                this.stack.set(instr.intArg(), this.stack.pop());
+                right = this.stack.pop();
+                log.info("{} <- {}", instr.strArg(), right);
+                this.stack.set(instr.intArg(), right);
                 break;
             case ST_REG:
-                storeRegister(instr.strArg(), this.stack.pop());
+                right = this.stack.pop();
+                log.info("{} <- {}", instr.strArg(), right);
+                storeRegister(instr.strArg(), right);
                 break;
             case ADD:
                 this.stack.push(this.stack.pop() + this.stack.pop());
@@ -132,22 +140,22 @@ public final class Interpreter {
                 this.stack.push(this.stack.pop() == 0 ? 1 : 0);
                 break;
             case TAN:
-                this.stack.push(Math.tan(this.stack.pop()));
+                this.stack.push(Math.tan(Math.toRadians(this.stack.pop())));
                 break;
             case SIN:
-                this.stack.push(Math.sin(this.stack.pop()));
+                this.stack.push(Math.sin(Math.toRadians(this.stack.pop())));
                 break;
             case COS:
-                this.stack.push(Math.cos(this.stack.pop()));
+                this.stack.push(Math.cos(Math.toRadians(this.stack.pop())));
                 break;
             case ATAN:
-                this.stack.push(Math.atan(this.stack.pop()));
+                this.stack.push(Math.toDegrees(Math.atan(this.stack.pop())));
                 break;
             case ASIN:
-                this.stack.push(Math.asin(this.stack.pop()));
+                this.stack.push(Math.toDegrees(Math.asin(this.stack.pop())));
                 break;
             case ACOS:
-                this.stack.push(Math.acos(this.stack.pop()));
+                this.stack.push(Math.toDegrees(Math.acos(this.stack.pop())));
                 break;
             case SQRT:
                 this.stack.push(Math.sqrt(this.stack.pop()));

@@ -74,7 +74,7 @@ public class MainController {
     }
 
     private Collection<Robot> createRobots() {
-        final Robot r1 = new Robot(0.1, 0x40ff80, Constants.ROBOT_COOL_DOWN_HOLD_OFF,
+        final Robot r1 = new Robot.Builder(
             robot -> new RuntimeProgram(robot,
                 RuntimeProgram.instruction(null, r -> {
                     r.setSpeedX(4); return null;
@@ -98,12 +98,10 @@ public class MainController {
                     r.setShot(500); return null;
                 }),
                 RuntimeProgram.instruction(null, r -> "SHOOT")
-        ));
-        r1.setX(20);
-        r1.setY(50);
+        )).rgb(0xff0000).x(20).y(50).build();
 
         final double[] radarAngle2 = new double[] { 0 };
-        final Robot r2 = new Robot(0.5, 0xffc020, Constants.ROBOT_COOL_DOWN_HOLD_OFF,
+        final Robot r2 = new Robot.Builder(
             robot -> new RuntimeProgram(robot,
                 RuntimeProgram.instruction(null, r -> {
                     r.setSpeedX(-0.5); return null;
@@ -116,12 +114,10 @@ public class MainController {
                 RuntimeProgram.instruction(null, r ->
                     r.getX() > 10 ? "MOVE" : null
                 )
-        ));
-        r2.setX(500);
-        r2.setY(400);
+        )).rgb(0xffc020).x(500).y(400).build();
 
         final double[] radarAngle3 = new double[] { 0 };
-        final Robot r3 = new Robot(0.5, 0x0040ff, Constants.ROBOT_COOL_DOWN_HOLD_OFF,
+        final Robot r3 = new Robot.Builder(
             robot -> new RuntimeProgram(robot,
                 RuntimeProgram.instruction(null, r -> {
                     r.setSpeedX(0.1); return null;
@@ -131,40 +127,36 @@ public class MainController {
                     radarAngle3[0] += 5;
                     return "RADAR";
                 })
-        ));
-        r3.setX(20);
-        r3.setY(400);
+        )).rgb(0x0040ff).x(20).y(400).build();
 
         final double[] radarAngle4 = new double[] { 0 };
-        final Robot r4 = new Robot(0.5, 0xC02000, Constants.ROBOT_COOL_DOWN_HOLD_OFF,
-                robot -> new RuntimeProgram(robot,
-                        RuntimeProgram.instruction(null, r -> {
-                            r.setAimAngle(90); return null;
-                        }),
-                        RuntimeProgram.instruction("LEFT", r -> {
-                            r.setSpeedX(-5); return null;
-                        }),
-                        RuntimeProgram.instruction(null, r -> {
-                            r.setShot(500); return null;
-                        }),
-                        RuntimeProgram.instruction(null, r -> {
-                            return r.getX() > 100 ? "LEFT" : null;
-                        }),
-                        RuntimeProgram.instruction("RIGHT", r -> {
-                            r.setSpeedX(5); return null;
-                        }),
-                        RuntimeProgram.instruction(null, r -> {
-                            r.setShot(500); return null;
-                        }),
-                        RuntimeProgram.instruction(null, r -> {
-                            return r.getX() < 500 ? "RIGHT" : null;
-                        }),
-                        RuntimeProgram.instruction(null, r -> {
-                            return "LEFT";
-                        })
-                ));
-        r4.setX(600);
-        r4.setY(30);
+        final Robot r4 = new Robot.Builder(
+            robot -> new RuntimeProgram(robot,
+                RuntimeProgram.instruction(null, r -> {
+                    r.setAimAngle(90); return null;
+                }),
+                RuntimeProgram.instruction("LEFT", r -> {
+                    r.setSpeedX(-5); return null;
+                }),
+                RuntimeProgram.instruction(null, r -> {
+                    r.setShot(500); return null;
+                }),
+                RuntimeProgram.instruction(null, r -> {
+                    return r.getX() > 100 ? "LEFT" : null;
+                }),
+                RuntimeProgram.instruction("RIGHT", r -> {
+                    r.setSpeedX(5); return null;
+                }),
+                RuntimeProgram.instruction(null, r -> {
+                    r.setShot(500); return null;
+                }),
+                RuntimeProgram.instruction(null, r -> {
+                    return r.getX() < 500 ? "RIGHT" : null;
+                }),
+                RuntimeProgram.instruction(null, r -> {
+                    return "LEFT";
+                })
+        )).rgb(0xC02000).x(600).y(30).build();
 
         return Arrays.asList(r1, r2, r3, r4);
     }

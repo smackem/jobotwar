@@ -21,6 +21,7 @@ public final class GameEngine {
                 }
             }
         }
+        this.board.robots().removeIf(Robot::isDead);
 
         for (final Projectile projectile : this.board.projectiles()) {
             if (tickProjectile(projectile)) {

@@ -74,8 +74,7 @@ public class CompilerTest {
     @Test
     public void testDef() {
         final String source = "" +
-                "def x\n" +
-                "def y\n" +
+                "def x, y\n" +
                 "1.5 -> x\n" +
                 "2.5 -> y\n" +
                 "x + y -> SHOT\n";
@@ -169,7 +168,7 @@ public class CompilerTest {
     }
 
     @Test
-    public void testArithmetics() {
+    public void testArithmetic() {
         final String source = "" +
                 "1 + 5 / 2 -> SHOT\n" +
                 "2 * 5 - 1 -> SPEEDX\n" +
@@ -203,6 +202,64 @@ public class CompilerTest {
         assertThat(env.readShot()).isEqualTo(42);
         assertThat(env.readAim()).isEqualTo(42);
         assertThat(env.readRadar()).isEqualTo(42);
+    }
+
+    @Test
+    public void testMathOperators() throws Interpreter.StackException {
+        final String source = "" +
+                "abs(-10) -> SHOT\n" +
+                "abs(10) -> SHOT\n" +
+                "sin(90) -> SHOT\n" +
+                "cos(180) -> SHOT\n" +
+                "atan(tan(90)) -> SHOT\n" +
+                "acos(cos(90)) -> SHOT\n" +
+                "asin(sin(90)) -> SHOT\n" +
+                "not(0) -> SHOT\n" +
+                "not(100) -> SHOT\n" +
+                "sqrt(9) -> SHOT\n";
+
+        final Compiler compiler = new Compiler();
+        final Program program = compiler.compile(source);
+        final TestEnvironment env = new TestEnvironment();
+        final Interpreter interpreter = new Interpreter(program, env);
+
+        assertThat(interpreter.runToNextLabel()).isTrue();
+        assertThat(env.readShot()).isEqualTo(10);
+        assertThat(interpreter.runToNextLabel()).isTrue();
+        assertThat(env.readShot()).isEqualTo(10);
+        assertThat(interpreter.runToNextLabel()).isTrue();
+        assertThat(env.readShot()).isEqualTo(1);
+        assertThat(interpreter.runToNextLabel()).isTrue();
+        assertThat(env.readShot()).isEqualTo(-1);
+        assertThat(interpreter.runToNextLabel()).isTrue();
+        assertThat(env.readShot()).isEqualTo(90);
+        assertThat(interpreter.runToNextLabel()).isTrue();
+        assertThat(env.readShot()).isEqualTo(90);
+        assertThat(interpreter.runToNextLabel()).isTrue();
+        assertThat(env.readShot()).isEqualTo(90);
+        assertThat(interpreter.runToNextLabel()).isTrue();
+        assertThat(env.readShot()).isEqualTo(1);
+        assertThat(interpreter.runToNextLabel()).isTrue();
+        assertThat(env.readShot()).isEqualTo(0);
+        assertThat(interpreter.runToNextLabel()).isTrue();
+        assertThat(env.readShot()).isEqualTo(3);
+    }
+
+    @Test
+    public void testParenExpressions() {
+        final String source = "" +
+                "abs(100 * (10 - 12)) -> SHOT\n" +
+                "50 / (40 - 3 * abs(-10)) -> AIM\n";
+
+        final Compiler compiler = new Compiler();
+        final Program program = compiler.compile(source);
+        final TestEnvironment env = new TestEnvironment();
+        final Interpreter interpreter = new Interpreter(program, env);
+
+        runComplete(interpreter);
+
+        assertThat(env.readShot()).isEqualTo(200);
+        assertThat(env.readAim()).isEqualTo(5);
     }
 
     private void runComplete(Interpreter interpreter) {

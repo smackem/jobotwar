@@ -12,14 +12,12 @@ public class GameEngineTest {
 
     @Test
     public void movement() {
-        final double acceleration = 1;
-        final Robot robot = new Robot(acceleration, 0, 1,
+        final Robot robot = new Robot.Builder(
             rob -> new RuntimeProgram(rob,
                 RuntimeProgram.instruction(null, r -> {
                     r.setSpeedX(4); return null;
-                })));
-        robot.setX(30);
-        robot.setY(30);
+                }))
+        ).acceleration(1).x(30).y(30).build();
         final Board board = new Board(100, 100, Collections.singleton(robot));
         final GameEngine engine = new GameEngine(board);
 
@@ -42,7 +40,7 @@ public class GameEngineTest {
 
     @Test
     public void shot() {
-        final Robot robot = new Robot(1, 0, 1,
+        final Robot robot = new Robot.Builder(
             rob -> new RuntimeProgram(rob,
                 RuntimeProgram.instruction(null, r -> {
                     r.setAimAngle(0); return null;
@@ -50,9 +48,7 @@ public class GameEngineTest {
                 RuntimeProgram.instruction(null, r -> {
                     r.setShot(10); return null;
                 })
-        ));
-        robot.setX(30);
-        robot.setY(30);
+        )).acceleration(1).x(30).y(30).build();
         final Board board = new Board(100, 100, Collections.singleton(robot));
         final GameEngine engine = new GameEngine(board);
 
@@ -78,7 +74,7 @@ public class GameEngineTest {
 
     @Test
     public void shotAngle() {
-        final Robot robot = new Robot(1, 0, 1,
+        final Robot robot = new Robot.Builder(
             rob -> new RuntimeProgram(rob,
                 RuntimeProgram.instruction(null, r -> {
                     r.setAimAngle(90); return null;
@@ -86,9 +82,7 @@ public class GameEngineTest {
                 RuntimeProgram.instruction(null, r -> {
                     r.setShot(50); return null;
                 })
-        ));
-        robot.setX(30);
-        robot.setY(30);
+        )).acceleration(1).x(30).y(30).build();
         final Board board = new Board(100, 100, Collections.singleton(robot));
         final GameEngine engine = new GameEngine(board);
         final VectorComparator vectorComparator = new VectorComparator(VectorComparator.DEFAULT_TOLERANCE);
@@ -122,7 +116,7 @@ public class GameEngineTest {
     @Test
     public void radarWall() {
         final int width = 100, height = 100;
-        final Robot robot = new Robot(1, 0, 1,
+        final Robot robot = new Robot.Builder(
             rob -> new RuntimeProgram(rob,
                 RuntimeProgram.instruction(null, r -> {
                     r.setRadarAngle(0.0); return null;
@@ -139,9 +133,7 @@ public class GameEngineTest {
                 RuntimeProgram.instruction(null, r -> {
                     r.setRadarAngle(45.0); return null;
                 })
-            ));
-        robot.setX(width / 2.0);
-        robot.setY(height / 2.0);
+        )).acceleration(1).x(width / 2.0).y(height / 2.0).build();
         final Board board = new Board(width, height, Collections.singleton(robot));
         final GameEngine engine = new GameEngine(board);
         final VectorComparator vectorComparator = new VectorComparator(1);
@@ -199,19 +191,15 @@ public class GameEngineTest {
 
     @Test
     public void radarRobot() {
-        final Robot robot1 = new Robot(1.0, 0, 1,
+        final Robot robot1 = new Robot.Builder(
             rob -> new RuntimeProgram(rob,
                 RuntimeProgram.instruction(null, r -> {
                     r.setRadarAngle(180.0); return null;
                 })
-            ));
-        robot1.setX(50);
-        robot1.setY(50);
+        )).x(50).y(50).build();
 
-        final Robot robot2 = new Robot(1.0, 0, 1,
-                rob -> new RuntimeProgram(rob));
-        robot2.setX(20);
-        robot2.setY(50);
+        final Robot robot2 = new Robot.Builder(
+                rob -> new RuntimeProgram(rob)).x(20).y(50).build();
 
         final Board board = new Board(100, 100, Arrays.asList(robot1, robot2));
         final GameEngine engine = new GameEngine(board);
