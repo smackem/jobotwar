@@ -119,6 +119,13 @@ public class Robot {
     }
 
     /**
+     * @return The name of the robot.
+     */
+    public String name() {
+        return this.name;
+    }
+
+    /**
      * @return The built-in acceleration of the robot in pixels per tick^2.
      */
     public double acceleration() {

@@ -5,10 +5,17 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Group;
+import javafx.scene.Parent;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.util.Duration;
 import net.smackem.jobotwar.lang.Compiler;
 import net.smackem.jobotwar.runtime.*;
@@ -28,6 +35,8 @@ public class MainController {
     private StackPane canvasContainer;
     @FXML
     private Canvas canvas;
+    @FXML
+    private Pane robotGaugesParent;
 
     public MainController() {
         final Board board = App.instance().board();
@@ -45,6 +54,10 @@ public class MainController {
         this.canvas.setWidth(board.width());
         this.canvas.setHeight(board.height());
         this.graphics.render(this.canvas.getGraphicsContext2D());
+
+        for (final Robot robot : App.instance().board().robots()) {
+            robotGaugesParent.getChildren().add(createRobotGauge(robot));
+        }
     }
 
     @FXML
@@ -71,6 +84,15 @@ public class MainController {
                         tickResult.killedRobots.stream().map(r -> new Vector(r.getX(), r.getY())))
         ).collect(Collectors.toList()));
         this.graphics.addRadarBeams(tickResult.radarBeams);
+    }
+
+    private Parent createRobotGauge(Robot robot) {
+        final int rgb = robot.rgb();
+        final Paint textFill = Color.rgb(rgb >> 16 & 0xff, rgb >> 8 & 0xff, rgb & 0xff);
+        final Label nameLabel = new Label(robot.name());
+        nameLabel.textFillProperty().set(textFill);
+        final Label healthLabel = new Label(robot.getHealth() + "%");
+        return new VBox(nameLabel, healthLabel);
     }
 
     private Collection<Robot> createRobots() {

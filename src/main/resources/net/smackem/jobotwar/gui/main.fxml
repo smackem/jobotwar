@@ -8,6 +8,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.Group?>
 <BorderPane xmlns="http://javafx.com/javafx/8.0.171"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="net.smackem.jobotwar.gui.MainController"
@@ -26,13 +27,13 @@
       </VBox>
    </left>
    <center>
-      <VBox spacing="5.0">
+      <VBox fx:id="robotGaugesParent" spacing="5.0">
          <padding>
             <Insets left="4" right="4" />
          </padding>
          <HBox spacing="5.0" alignment="CENTER">
-            <Button minWidth="80" text="Start" onMouseClicked="#startGame" styleClass="dark-button" />
-            <Button minWidth="80" text="Stop" onMouseClicked="#stopGame" styleClass="dark-button" />
+            <Button minWidth="80" text="Start" onMouseClicked="#startGame" />
+            <Button minWidth="80" text="Stop" onMouseClicked="#stopGame" />
          </HBox>
       </VBox>
    </center>
