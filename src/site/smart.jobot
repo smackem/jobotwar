@@ -14,12 +14,13 @@ scan:
 
 shift:
     7 -> inc
-    (320 - radar) / 20 -> SPEEDX
+    RANDOM * 100 -> SPEEDX if radar > 320
+    RANDOM * -100 -> SPEEDX if radar < 320
     goto scan
 
 seek:
-    X + (0 - radar) * cos(AIM) -> destX
-    Y + (0 - radar) * sin(AIM) -> destY
+    X + ((0 - radar) / 2) * cos(AIM) -> destX
+    Y + ((0 - radar) / 2) * sin(AIM) -> destY
     (destX - X) / 2 -> SPEEDX
     (destY - Y) / 2 -> SPEEDY
     (0 - radar) -> SHOT

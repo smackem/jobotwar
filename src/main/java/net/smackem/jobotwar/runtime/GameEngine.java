@@ -13,7 +13,8 @@ public final class GameEngine {
 
     public TickResult tick() {
         final TickResult result = new TickResult();
-        for (final Robot robot : this.board.robots()) {
+        final Collection<Robot> robots = this.board.robots();
+        for (final Robot robot : robots) {
             if (robot.isDead() == false) {
                 tickRobot(robot, result);
                 if (robot.isDead()) {
@@ -21,14 +22,17 @@ public final class GameEngine {
                 }
             }
         }
-        this.board.robots().removeIf(Robot::isDead);
+        if (robots.removeIf(Robot::isDead) && robots.size() == 1) {
+            result.winner = robots.iterator().next();
+        }
 
-        for (final Projectile projectile : this.board.projectiles()) {
+        final Collection<Projectile> projectiles = this.board.projectiles();
+        for (final Projectile projectile : projectiles) {
             if (tickProjectile(projectile)) {
                 result.explodedProjectiles.add(projectile);
             }
         }
-        this.board.projectiles().removeAll(result.explodedProjectiles);
+        projectiles.removeAll(result.explodedProjectiles);
         return result;
     }
 
@@ -37,6 +41,7 @@ public final class GameEngine {
         public final Collection<Vector> collisionPositions;
         public final Collection<Robot> killedRobots;
         public final Collection<RadarBeam> radarBeams;
+        public Robot winner;
 
         private TickResult() {
             this.explodedProjectiles = new ArrayList<>();

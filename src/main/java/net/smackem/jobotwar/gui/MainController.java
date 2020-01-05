@@ -41,6 +41,8 @@ public class MainController {
     private Canvas canvas;
     @FXML
     private Pane robotGaugesParent;
+    @FXML
+    private Label winnerOverlay;
 
     public MainController() {
         final Board board = App.instance().board();
@@ -83,6 +85,11 @@ public class MainController {
         this.graphics.render(this.canvas.getGraphicsContext2D());
         for (final MainRobotViewModel r : this.robots) {
             r.update();
+        }
+        if (tickResult.winner != null) {
+            this.winnerOverlay.setText(tickResult.winner.name() + " has won!");
+            this.winnerOverlay.setTextFill(RgbConvert.toColor(tickResult.winner.rgb()));
+            this.winnerOverlay.setVisible(true);
         }
     }
 

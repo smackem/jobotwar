@@ -1,29 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.VBox?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.canvas.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 
-<?import javafx.scene.canvas.Canvas?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.StackPane?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.Group?>
-<?import javafx.scene.control.ScrollPane?>
-<BorderPane xmlns="http://javafx.com/javafx/8.0.171"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="net.smackem.jobotwar.gui.MainController"
-            styleClass="root"
-            stylesheets="@main.css">
+<BorderPane styleClass="root" stylesheets="@main.css" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.smackem.jobotwar.gui.MainController">
    <padding>
-      <Insets left="4" top="4" right="4" bottom="4" />
+      <Insets bottom="4" left="4" right="4" top="4" />
    </padding>
    <left>
       <VBox spacing="4">
          <StackPane fx:id="canvasContainer">
             <Canvas fx:id="canvas" />
+            <Label fx:id="winnerOverlay"
+                   prefHeight="Infinity" prefWidth="Infinity"
+                   style="-fx-font-size: 16pt; -fx-background-color: rgba(0,0,0,0.7); -fx-alignment: center"
+                   textAlignment="CENTER" visible="false" />
          </StackPane>
-         <HBox spacing="5.0" >
+         <HBox spacing="5.0">
          </HBox>
       </VBox>
    </left>
@@ -32,9 +27,9 @@
          <padding>
             <Insets left="4" right="4" />
          </padding>
-         <HBox spacing="5.0" alignment="CENTER">
-            <Button minWidth="80" text="Start" onMouseClicked="#startGame" />
-            <Button minWidth="80" text="Stop" onMouseClicked="#stopGame" />
+         <HBox alignment="CENTER" spacing="5.0">
+            <Button minWidth="80" onMouseClicked="#startGame" text="Start" />
+            <Button minWidth="80" onMouseClicked="#stopGame" text="Stop" />
          </HBox>
       </VBox>
    </center>
