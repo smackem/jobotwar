@@ -18,9 +18,18 @@
                     <padding>
                         <Insets bottom="8" />
                     </padding>
-                    <Button fx:id="playButton" minWidth="80" alignment="CENTER" text="Play" onMouseClicked="#startGame" />
-                    <Button minWidth="80" alignment="CENTER" text="New Robot" onMouseClicked="#newRobot" />
-                    <Button minWidth="80" alignment="CENTER" text="Remove Robot" onMouseClicked="#removeRobot" />
+                    <Button fx:id="playButton" minWidth="250" text="Play" onAction="#startGame" />
+                    <HBox spacing="4">
+                        <SplitMenuButton minWidth="80" text="New Robot" onAction="#newRobot">
+                            <items>
+                                <MenuItem text="mover" />
+                                <MenuItem text="smart" />
+                                <MenuItem text="dumbshooter" />
+                                <MenuItem text="patrol" />
+                            </items>
+                        </SplitMenuButton>
+                        <Button minWidth="80" text="Remove Robot" onAction="#removeRobot" />
+                    </HBox>
                 </VBox>
             </top>
             <center>
@@ -41,6 +50,9 @@
             <center>
                 <TextArea fx:id="sourceText" />
             </center>
+            <bottom>
+                <TextField fx:id="compilerOutput" minHeight="40" disable="true" />
+            </bottom>
         </BorderPane>
     </center>
 </BorderPane>

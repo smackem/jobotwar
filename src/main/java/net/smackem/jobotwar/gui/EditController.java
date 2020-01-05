@@ -5,9 +5,9 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import net.smackem.jobotwar.runtime.CompiledProgram;
 import net.smackem.jobotwar.runtime.Constants;
@@ -37,6 +37,8 @@ public class EditController {
     private ColorPicker colorPicker;
     @FXML
     private Button playButton;
+    @FXML
+    private TextField compilerOutput;
 
     @FXML
     private void initialize() {
@@ -51,14 +53,14 @@ public class EditController {
     }
 
     @FXML
-    private void startGame(MouseEvent mouseEvent) throws IOException {
+    private void startGame(ActionEvent mouseEvent) throws IOException {
         final App app = App.instance();
         app.createBoard(BOARD_WIDTH, BOARD_HEIGHT, createRobotsFromViewModel());
         app.setRoot("main");
     }
 
     @FXML
-    private void newRobot(MouseEvent mouseEvent) {
+    private void newRobot(ActionEvent mouseEvent) {
         final EditRobotViewModel robot = new EditRobotViewModel();
         robot.nameProperty().set("Robot " + (this.robots.size() + 1));
         robot.colorProperty().set(Color.hsb(this.random.nextDouble() * 360, 1.0, 1.0));
@@ -68,7 +70,7 @@ public class EditController {
     }
 
     @FXML
-    private void removeRobot(MouseEvent mouseEvent) {
+    private void removeRobot(ActionEvent mouseEvent) {
         final EditRobotViewModel robot = this.selectedRobot.get();
         if (robot != null) {
             this.robots.remove(robot);
