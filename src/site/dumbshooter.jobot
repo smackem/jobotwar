@@ -1,0 +1,5 @@
+loop:
+    AIM + 3 -> AIM
+    500 -> SHOT
+    50 - RANDOM * 100 -> SPEEDX if AIM % 45 = 0
+    goto loop

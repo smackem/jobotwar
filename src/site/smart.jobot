@@ -1,0 +1,32 @@
+def destX, destY
+def radar, angle, inc
+
+begin:
+    AIM -> RADAR
+    15 -> inc
+
+scan:
+    RADAR -> radar
+    goto seek if radar < 0
+    AIM + inc -> angle -> RADAR -> AIM
+    goto shift if angle > 350
+    goto scan
+
+shift:
+    7 -> inc
+    (320 - radar) / 20 -> SPEEDX
+    goto scan
+
+seek:
+    X + (0 - radar) * cos(AIM) -> destX
+    Y + (0 - radar) * sin(AIM) -> destY
+    (destX - X) / 2 -> SPEEDX
+    (destY - Y) / 2 -> SPEEDY
+    (0 - radar) -> SHOT
+
+move:
+    0 -> SPEEDX if abs(destX - X) < 20
+    0 -> SPEEDY if abs(destY - Y) < 20
+    (0 - radar) -> SHOT
+    goto move unless SPEEDX = 0 and SPEEDY = 0
+    goto begin

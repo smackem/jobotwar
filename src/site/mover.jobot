@@ -1,52 +1,45 @@
 // robot  'mover'
-// initialize random number
-250 => RANDOM
+
+def damage, dx, dy
 
 // save current damage
-Start:
-    DAMAGE => damage
-
+start:
+    DAMAGE -> damage
 
 // check damage - go move if damaged
 // if not, increment aim
-Scan:
-    goto Move unless DAMAGE = damage
-    AIM + 13 => AIM 
-
+scan:
+    goto move unless DAMAGE = damage
+    AIM + 13 -> AIM 
 
 // send radar in direction of aim
 // exit to scan if no enemy found
 // or shoot at enemy just spotted
 // then go see if enemy is still there
 
-Spot:
-    AIM => RADAR
-    goto Scan if RADAR > 0
-    0 - RADAR => SHOT
-    goto Spot
-
+spot:
+    AIM -> RADAR
+    goto scan if RADAR > 0
+    0 - RADAR -> SHOT
+    goto spot
 
 // pick a random place to go
 
-def dx
-def dy
-
-Move:
-    RANDOM => dx
-    RANDOM => dy
+move:
+    50 + RANDOM * 500 -> dx
+    50 + RANDOM * 400 -> dy
 
 // travel to new x location
-MoveX:
-    dx - X * 100 => SPEEDX
-    goto MoveX if dx - X > 20 or dx - X < -20
-    0 => SPEEDX
-
+moveX:
+    dx - X -> SPEEDX
+    goto moveX if abs(dx - X) > 20
+    0 -> SPEEDX
 
 // travel to new y location
 // then go start scanning again
 
-MoveY:
-   dy - Y * 100 => SPEEDY
-   goto MoveY if dy - Y > 20 or dy - Y < -20
-   0 => SPEEDY
-   goto Start
+moveY:
+   dy - Y -> SPEEDY
+   goto moveY if abs(dy - Y) > 20
+   0 -> SPEEDY
+   goto start

@@ -6,16 +6,27 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
+<?import javafx.geometry.Insets?>
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="net.smackem.jobotwar.gui.EditController">
+            fx:controller="net.smackem.jobotwar.gui.EditController"
+            stylesheets="@edit.css">
     <left>
-        <VBox minWidth="250" spacing="4" style="-fx-padding: 2">
-            <Button fx:id="playButton" minWidth="80" alignment="CENTER" text="Play" onMouseClicked="#startGame" />
-            <Button minWidth="80" alignment="CENTER" text="New Robot" onMouseClicked="#newRobot" />
-            <Button minWidth="80" alignment="CENTER" text="Remove Robot" onMouseClicked="#removeRobot" />
-            <ListView fx:id="robotsListView" />
-        </VBox>
+        <BorderPane style="-fx-padding: 2; -fx-spacing: 2">
+            <top>
+                <VBox minWidth="250" spacing="4">
+                    <padding>
+                        <Insets bottom="8" />
+                    </padding>
+                    <Button fx:id="playButton" minWidth="80" alignment="CENTER" text="Play" onMouseClicked="#startGame" />
+                    <Button minWidth="80" alignment="CENTER" text="New Robot" onMouseClicked="#newRobot" />
+                    <Button minWidth="80" alignment="CENTER" text="Remove Robot" onMouseClicked="#removeRobot" />
+                </VBox>
+            </top>
+            <center>
+                <ListView fx:id="robotsListView" />
+            </center>
+        </BorderPane>
     </left>
     <center>
         <BorderPane>

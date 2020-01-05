@@ -1,0 +1,33 @@
+start:
+    90 -> RADAR
+    goto clean if RADAR < 0
+    goto moveToTop if RADAR > 240
+    goto moveToBottom
+
+clean:
+    RADAR -> SHOT
+    goto start
+
+moveToTop:
+    90 -> AIM
+    20 - Y -> SPEEDY
+    goto moveToTop unless abs(SPEEDY) < 20
+    goto patrolLeft
+
+moveToBottom:
+    270 -> AIM
+    460 - Y -> SPEEDY
+    goto moveToBottom unless abs(SPEEDY) < 20
+    0 -> SPEEDY
+
+patrolLeft:
+    20 - X -> SPEEDX
+    440 -> SHOT
+    goto patrolLeft unless abs(SPEEDX) < 20
+    0 -> SPEEDY
+patrolRight:
+    620 - X -> SPEEDX
+    440 -> SHOT
+    goto patrolRight unless abs(SPEEDX) < 20
+    0 -> SPEEDY
+    goto patrolLeft

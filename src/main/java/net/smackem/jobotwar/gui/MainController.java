@@ -3,6 +3,7 @@ package net.smackem.jobotwar.gui;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -102,10 +103,19 @@ public class MainController {
         final Label healthLabel = new Label();
         healthLabel.textProperty().bind(robot.healthProperty().asString().concat("%"));
         final Label speedXLabel = new Label();
-        speedXLabel.textProperty().bind(robot.speedXProperty().asString());
+        speedXLabel.textProperty().bind(Bindings.format("Speed X: %f", robot.speedXProperty()));
         final Label speedYLabel = new Label();
-        speedYLabel.textProperty().bind(robot.speedYProperty().asString());
-        return new VBox(nameLabel, healthLabel, speedXLabel, speedYLabel);
+        speedYLabel.textProperty().bind(Bindings.format("Speed Y: %f", robot.speedYProperty()));
+        final VBox vbox = new VBox(nameLabel, healthLabel, speedXLabel, speedYLabel);
+        vbox.getStyleClass().add("robotGauge");
+        vbox.opacityProperty().bind(
+                Bindings.when(robot.healthProperty().greaterThan(0.0))
+                        .then(1.0)
+                        .otherwise(0.3));
+        vbox.getChildren().stream()
+                .filter(node -> node != nameLabel && node instanceof Label)
+                .forEach(node -> node.getStyleClass().add("robotGaugeLabel"));
+        return vbox;
     }
 
     private Collection<Robot> createRobots() {
