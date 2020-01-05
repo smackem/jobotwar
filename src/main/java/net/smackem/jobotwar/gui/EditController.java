@@ -5,13 +5,10 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
-import net.smackem.jobotwar.lang.Compiler;
-import net.smackem.jobotwar.lang.Program;
 import net.smackem.jobotwar.runtime.CompiledProgram;
 import net.smackem.jobotwar.runtime.Constants;
 import net.smackem.jobotwar.runtime.Robot;
@@ -24,8 +21,8 @@ import java.util.stream.Collectors;
 
 public class EditController {
 
-    private final ListProperty<RobotViewModel> robots = new SimpleListProperty<>(FXCollections.observableArrayList());
-    private final ObjectProperty<RobotViewModel> selectedRobot = new SimpleObjectProperty<>();
+    private final ListProperty<EditRobotViewModel> robots = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ObjectProperty<EditRobotViewModel> selectedRobot = new SimpleObjectProperty<>();
     private final Random random = new Random();
     private static final int BOARD_WIDTH = 640;
     private static final int BOARD_HEIGHT = 480;
@@ -35,7 +32,7 @@ public class EditController {
     @FXML
     private TextArea sourceText;
     @FXML
-    private ListView<RobotViewModel> robotsListView;
+    private ListView<EditRobotViewModel> robotsListView;
     @FXML
     private ColorPicker colorPicker;
     @FXML
@@ -62,7 +59,7 @@ public class EditController {
 
     @FXML
     private void newRobot(MouseEvent mouseEvent) {
-        final RobotViewModel robot = new RobotViewModel();
+        final EditRobotViewModel robot = new EditRobotViewModel();
         robot.nameProperty().set("Robot " + (this.robots.size() + 1));
         robot.colorProperty().set(Color.hsb(this.random.nextDouble() * 360, 1.0, 1.0));
         robot.sourceCodeProperty().set("");
@@ -72,14 +69,14 @@ public class EditController {
 
     @FXML
     private void removeRobot(MouseEvent mouseEvent) {
-        final RobotViewModel robot = this.selectedRobot.get();
+        final EditRobotViewModel robot = this.selectedRobot.get();
         if (robot != null) {
             this.robots.remove(robot);
         }
     }
 
-    private void selectRobot(RobotViewModel robot) {
-        final RobotViewModel oldRobot = this.selectedRobot.get();
+    private void selectRobot(EditRobotViewModel robot) {
+        final EditRobotViewModel oldRobot = this.selectedRobot.get();
         if (oldRobot != null) {
             this.nameTextField.textProperty().unbindBidirectional(oldRobot.nameProperty());
             this.colorPicker.valueProperty().unbindBidirectional(oldRobot.colorProperty());
@@ -101,7 +98,7 @@ public class EditController {
         return robots;
     }
 
-    private Robot createRobotFromViewModel(RobotViewModel robotViewModel) {
+    private Robot createRobotFromViewModel(EditRobotViewModel robotViewModel) {
         final Color color = robotViewModel.colorProperty().get();
         final int rgb = (int)(color.getRed() * 0xff) << 16 |
                 (int)(color.getGreen() * 0xff) << 8 |
@@ -129,9 +126,9 @@ public class EditController {
                 .orElse(null);
     }
 
-    private static class RobotViewModelCell extends ListCell<RobotViewModel> {
+    private static class RobotViewModelCell extends ListCell<EditRobotViewModel> {
         @Override
-        protected void updateItem(RobotViewModel robotViewModel, boolean empty) {
+        protected void updateItem(EditRobotViewModel robotViewModel, boolean empty) {
             super.updateItem(robotViewModel, empty);
             if (empty) {
                 textProperty().unbind();

@@ -6,7 +6,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.paint.Color;
 
-public class RobotViewModel {
+public class EditRobotViewModel {
     private final StringProperty name = new SimpleStringProperty();
     private final StringProperty sourceCode = new SimpleStringProperty();
     private final ObjectProperty<Color> color = new SimpleObjectProperty<>();

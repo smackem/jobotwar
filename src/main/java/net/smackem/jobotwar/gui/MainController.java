@@ -3,6 +3,8 @@ package net.smackem.jobotwar.gui;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Group;
@@ -30,6 +32,7 @@ public class MainController {
     private final Timeline ticker;
     private final BoardGraphics graphics;
     private final GameEngine engine;
+    private final ObservableList<MainRobotViewModel> robots;
 
     @FXML
     private StackPane canvasContainer;
@@ -40,6 +43,9 @@ public class MainController {
 
     public MainController() {
         final Board board = App.instance().board();
+        this.robots = FXCollections.observableArrayList(board.robots().stream()
+                        .map(MainRobotViewModel::new)
+                        .collect(Collectors.toList()));
         this.ticker = new Timeline(new KeyFrame(Duration.millis(40), this::tick));
         this.ticker.setCycleCount(Animation.INDEFINITE);
         this.engine = new GameEngine(board);
@@ -55,7 +61,7 @@ public class MainController {
         this.canvas.setHeight(board.height());
         this.graphics.render(this.canvas.getGraphicsContext2D());
 
-        for (final Robot robot : App.instance().board().robots()) {
+        for (final MainRobotViewModel robot : this.robots) {
             robotGaugesParent.getChildren().add(createRobotGauge(robot));
         }
     }
@@ -74,6 +80,9 @@ public class MainController {
         final GameEngine.TickResult tickResult = this.engine.tick();
         updateGraphics(tickResult);
         this.graphics.render(this.canvas.getGraphicsContext2D());
+        for (final MainRobotViewModel r : this.robots) {
+            r.update();
+        }
     }
 
     private void updateGraphics(GameEngine.TickResult tickResult) {
@@ -86,13 +95,17 @@ public class MainController {
         this.graphics.addRadarBeams(tickResult.radarBeams);
     }
 
-    private Parent createRobotGauge(Robot robot) {
-        final int rgb = robot.rgb();
-        final Paint textFill = Color.rgb(rgb >> 16 & 0xff, rgb >> 8 & 0xff, rgb & 0xff);
-        final Label nameLabel = new Label(robot.name());
-        nameLabel.textFillProperty().set(textFill);
-        final Label healthLabel = new Label(robot.getHealth() + "%");
-        return new VBox(nameLabel, healthLabel);
+    private Parent createRobotGauge(MainRobotViewModel robot) {
+        final Label nameLabel = new Label();
+        nameLabel.textProperty().bind(robot.nameProperty());
+        nameLabel.textFillProperty().set(robot.colorProperty().get());
+        final Label healthLabel = new Label();
+        healthLabel.textProperty().bind(robot.healthProperty().asString().concat("%"));
+        final Label speedXLabel = new Label();
+        speedXLabel.textProperty().bind(robot.speedXProperty().asString());
+        final Label speedYLabel = new Label();
+        speedYLabel.textProperty().bind(robot.speedYProperty().asString());
+        return new VBox(nameLabel, healthLabel, speedXLabel, speedYLabel);
     }
 
     private Collection<Robot> createRobots() {
