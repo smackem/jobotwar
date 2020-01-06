@@ -92,7 +92,7 @@ public class CodeEditor extends CodeArea {
                     matcher.group("KEYWORD") != null ? "keyword" :
                     matcher.group("LABEL") != null ? "label" :
                     matcher.group("REGISTER") != null ? "register" :
-                    matcher.group("GOESTO") != null ? "goesto" :
+                    matcher.group("GOESTO") != null ? "goesTo" :
                     matcher.group("NUMBER") != null ? "number" :
                     matcher.group("COMMENT") != null ? "comment" :
                     null; // never happens
