@@ -51,7 +51,7 @@
                 <TextArea fx:id="sourceText" />
             </center>
             <bottom>
-                <TextField fx:id="compilerOutput" minHeight="40" disable="true" />
+                <TextArea fx:id="compilerOutput" minHeight="40" editable="false" />
             </bottom>
         </BorderPane>
     </center>

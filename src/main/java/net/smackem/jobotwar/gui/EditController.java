@@ -1,5 +1,6 @@
 package net.smackem.jobotwar.gui;
 
+import com.google.common.base.Strings;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleListProperty;
@@ -9,12 +10,14 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.paint.Color;
+import net.smackem.jobotwar.lang.Compiler;
 import net.smackem.jobotwar.runtime.CompiledProgram;
 import net.smackem.jobotwar.runtime.Constants;
 import net.smackem.jobotwar.runtime.Robot;
 import net.smackem.jobotwar.runtime.Vector;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -38,7 +41,7 @@ public class EditController {
     @FXML
     private Button playButton;
     @FXML
-    private TextField compilerOutput;
+    private TextArea compilerOutput;
 
     @FXML
     private void initialize() {
@@ -55,7 +58,11 @@ public class EditController {
     @FXML
     private void startGame(ActionEvent mouseEvent) throws IOException {
         final App app = App.instance();
-        app.createBoard(BOARD_WIDTH, BOARD_HEIGHT, createRobotsFromViewModel());
+        final Collection<Robot> robots = createRobotsFromViewModel();
+        if (robots.isEmpty()) {
+            return;
+        }
+        app.createBoard(BOARD_WIDTH, BOARD_HEIGHT, robots);
         app.setRoot("main");
     }
 
@@ -93,19 +100,31 @@ public class EditController {
     }
 
     private Collection<Robot> createRobotsFromViewModel() {
-        final Collection<Robot> robots = this.robots.stream()
-                .map(this::createRobotFromViewModel)
-                .collect(Collectors.toList());
+        final Collection<Robot> robots = new ArrayList<>();
+        for (final EditRobotViewModel rvm : this.robots) {
+            try {
+                final Robot robot = createRobotFromViewModel(rvm);
+                robots.add(robot);
+            } catch(Exception e) {
+                this.robotsListView.getSelectionModel().select(rvm);
+                this.compilerOutput.setText(e.getMessage());
+            }
+        }
         placeRobots(robots);
         return robots;
     }
 
-    private Robot createRobotFromViewModel(EditRobotViewModel robotViewModel) {
+    private Robot createRobotFromViewModel(EditRobotViewModel robotViewModel) throws Exception {
         final Color color = robotViewModel.colorProperty().get();
         final int rgb = (int)(color.getRed() * 0xff) << 16 |
                 (int)(color.getGreen() * 0xff) << 8 |
                 (int)(color.getBlue() * 0xff);
-        return new Robot.Builder(r -> CompiledProgram.compile(r, robotViewModel.sourceCodeProperty().get()))
+        final Compiler compiler = new Compiler();
+        final Compiler.Result result = compiler.compile(robotViewModel.sourceCodeProperty().get());
+        if (result.hasErrors()) {
+            throw new Exception(String.join("\n", result.errors()));
+        }
+        return new Robot.Builder(r -> new CompiledProgram(r, result.program()))
                 .name(robotViewModel.nameProperty().get())
                 .rgb(rgb)
                 .build();

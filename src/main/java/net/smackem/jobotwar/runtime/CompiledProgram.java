@@ -1,6 +1,5 @@
 package net.smackem.jobotwar.runtime;
 
-import net.smackem.jobotwar.lang.Compiler;
 import net.smackem.jobotwar.lang.Interpreter;
 import net.smackem.jobotwar.lang.Program;
 import net.smackem.jobotwar.lang.RuntimeEnvironment;
@@ -12,15 +11,9 @@ public class CompiledProgram implements RobotProgram {
     private final Robot robot;
     private final Interpreter interpreter;
 
-    private CompiledProgram(Robot robot, Program program) {
+    public CompiledProgram(Robot robot, Program program) {
         this.robot = robot;
         this.interpreter = new Interpreter(program, environment());
-    }
-
-    public static CompiledProgram compile(Robot robot, String source) {
-        final Compiler compiler = new Compiler();
-        final Program program = compiler.compile(source);
-        return new CompiledProgram(robot, program);
     }
 
     @Override
