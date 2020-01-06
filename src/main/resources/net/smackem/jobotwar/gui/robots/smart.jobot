@@ -1,3 +1,5 @@
+// robot smart
+
 def destX, destY
 def radar, angle, inc
 

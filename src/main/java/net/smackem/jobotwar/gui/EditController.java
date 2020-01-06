@@ -1,6 +1,7 @@
 package net.smackem.jobotwar.gui;
 
 import com.google.common.base.Strings;
+import com.google.common.io.CharStreams;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleListProperty;
@@ -19,6 +20,8 @@ import net.smackem.jobotwar.runtime.Robot;
 import net.smackem.jobotwar.runtime.Vector;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Random;
@@ -73,10 +76,22 @@ public class EditController {
 
     @FXML
     private void newRobot(ActionEvent mouseEvent) {
+        newRobotWithProgram("Robot", null);
+    }
+
+    private void newRobotWithProgram(String robotBaseName, String resourceName) {
         final EditRobotViewModel robot = new EditRobotViewModel();
-        robot.nameProperty().set("Robot " + (this.robots.size() + 1));
+        robot.nameProperty().set(robotBaseName + " " + (this.robots.size() + 1));
         robot.colorProperty().set(Color.hsb(this.random.nextDouble() * 360, 1.0, 1.0));
-        robot.sourceCodeProperty().set("");
+        if (resourceName != null) {
+            try (final InputStream stream = getClass().getResourceAsStream(resourceName);
+                 final InputStreamReader reader = new InputStreamReader(stream)) {
+                robot.sourceCodeProperty().set(CharStreams.toString(reader));
+            } catch (Exception ignored) {
+            }
+        } else {
+            robot.sourceCodeProperty().set("");
+        }
         this.robots.add(robot);
         this.robotsListView.getSelectionModel().select(robot);
     }
@@ -149,6 +164,31 @@ public class EditController {
                 .filter(r -> Vector.distance(r.getPosition(), test.getPosition()) < Constants.ROBOT_RADIUS * 2)
                 .findFirst()
                 .orElse(null);
+    }
+
+    @FXML
+    private void newRobotMover(ActionEvent actionEvent) {
+        newRobotWithProgram("Mover", "robots/mover.jobot");
+    }
+
+    @FXML
+    private void newRobotSmart(ActionEvent actionEvent) {
+        newRobotWithProgram("Smartie", "robots/smart.jobot");
+    }
+
+    @FXML
+    private void newRobotDumbShooter(ActionEvent actionEvent) {
+        newRobotWithProgram("DumbShooter", "robots/dumbshooter.jobot");
+    }
+
+    @FXML
+    private void newRobotPatrol(ActionEvent actionEvent) {
+        newRobotWithProgram("Patrol", "robots/patrol.jobot");
+    }
+
+    @FXML
+    private void newRobotBumblebee(ActionEvent actionEvent) {
+        newRobotWithProgram("Bumblebee", "robots/bumblebee.jobot");
     }
 
     private static class RobotViewModelCell extends ListCell<EditRobotViewModel> {

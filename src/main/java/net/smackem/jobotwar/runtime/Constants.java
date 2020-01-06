@@ -18,4 +18,5 @@ public class Constants {
     public static double ROBOT_RADIUS = 18;
     public static double EXPLOSION_RADIUS = 20;
     public static int DEFAULT_COOL_DOWN_TICKS = 20;
+    public static double MAX_ROBOT_GAME_SPEED = 500;
 }

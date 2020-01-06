@@ -1,3 +1,5 @@
+// robot patrol
+
 start:
     90 -> RADAR
     goto clean if RADAR < 0

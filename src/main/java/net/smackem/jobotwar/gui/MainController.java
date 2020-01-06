@@ -110,9 +110,13 @@ public class MainController {
         final Label healthLabel = new Label();
         healthLabel.textProperty().bind(robot.healthProperty().asString().concat("%"));
         final Label speedXLabel = new Label();
-        speedXLabel.textProperty().bind(Bindings.format("Speed X: %f", robot.speedXProperty()));
+        speedXLabel.textProperty().bind(Bindings.format(
+                "Speed X: %.1f",
+                robot.speedXProperty().multiply(Constants.MAX_ROBOT_GAME_SPEED / Constants.MAX_ROBOT_SPEED)));
         final Label speedYLabel = new Label();
-        speedYLabel.textProperty().bind(Bindings.format("Speed Y: %f", robot.speedYProperty()));
+        speedYLabel.textProperty().bind(Bindings.format(
+                "Speed Y: %.1f",
+                robot.speedYProperty().multiply(Constants.MAX_ROBOT_GAME_SPEED / Constants.MAX_ROBOT_SPEED)));
         final VBox vbox = new VBox(nameLabel, healthLabel, speedXLabel, speedYLabel);
         vbox.getStyleClass().add("robotGauge");
         vbox.opacityProperty().bind(

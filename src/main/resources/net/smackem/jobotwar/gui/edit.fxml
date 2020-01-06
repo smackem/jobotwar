@@ -23,10 +23,11 @@
                     <HBox spacing="4">
                         <SplitMenuButton minWidth="80" text="New Robot" onAction="#newRobot">
                             <items>
-                                <MenuItem text="mover" />
-                                <MenuItem text="smart" />
-                                <MenuItem text="dumbshooter" />
-                                <MenuItem text="patrol" />
+                                <MenuItem text="mover" onAction="#newRobotMover" />
+                                <MenuItem text="smart" onAction="#newRobotSmart" />
+                                <MenuItem text="dumbshooter" onAction="#newRobotDumbShooter" />
+                                <MenuItem text="patrol" onAction="#newRobotPatrol" />
+                                <MenuItem text="bumblebee" onAction="#newRobotBumblebee" />
                             </items>
                         </SplitMenuButton>
                         <Button minWidth="80" text="Remove Robot" onAction="#removeRobot" />

@@ -1,3 +1,5 @@
+// robot bumblebee
+
 loop:
     AIM + 3 -> AIM
     500 -> SHOT
