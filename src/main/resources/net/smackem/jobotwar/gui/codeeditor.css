@@ -1,21 +1,22 @@
 .keyword {
     -fx-fill: purple;
 }
+
 .goesto {
-    -fx-fill: darkorange;
-    -fx-font-weight: bold;
+    /*-fx-fill: darkorange;*/
+    -fx-fill: purple;
 }
 .label {
-    -fx-fill: teal;
+    -fx-fill: darkorange;
 }
 .number {
     -fx-fill: teal;
 }
-.paren {
+.register {
     -fx-fill: firebrick;
 }
 .comment {
-    -fx-fill: cadetblue;
+    -fx-fill: grey;
 }
 
 .paragraph-box:has-caret {

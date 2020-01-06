@@ -22,12 +22,15 @@ public class CodeEditor extends CodeArea {
     private static final Pattern PATTERN_WHITESPACE = Pattern.compile("^\\s+");
     private static final String[] KEYWORDS = new String[] {
             "and", "or", "not", "abs", "sin", "cos",
-            "if", "tan", "asin", "acos", "goto", "unless"
+            "if", "tan", "asin", "acos", "goto", "unless", "def",
+    };
+    private static final String[] REGISTERS = new String[] {
+            "AIM", "RADAR", "X", "Y", "DAMAGE", "SPEEDX", "SPEEDY", "SHOT", "RANDOM",
     };
 
     private static final String KEYWORD_PATTERN = "\\b(" + String.join("|", KEYWORDS) + ")\\b";
-    private static final String LABEL_PATTERN = "[a-fA-F_]+[0-9a-fA-F_]*:$";
-    private static final String PAREN_PATTERN = "\\(|\\)";
+    private static final String LABEL_PATTERN = "[a-zA-Z_][0-9a-zA-Z_]*:";
+    private static final String REGISTER_PATTERN = "\\b(" + String.join("|", REGISTERS) + ")\\b";
     private static final String GOES_TO_PATTERN = "->";
     private static final String NUMBER_PATTERN = "\\b\\d+(\\.\\d*)?\\b";
     private static final String COMMENT_PATTERN = "//[^\n]*";
@@ -35,7 +38,7 @@ public class CodeEditor extends CodeArea {
     private static final Pattern PATTERN = Pattern.compile(
             "(?<KEYWORD>" + KEYWORD_PATTERN + ")"
             + "|(?<LABEL>" + LABEL_PATTERN + ")"
-            + "|(?<PAREN>" + PAREN_PATTERN + ")"
+            + "|(?<REGISTER>" + REGISTER_PATTERN + ")"
             + "|(?<GOESTO>" + GOES_TO_PATTERN + ")"
             + "|(?<NUMBER>" + NUMBER_PATTERN + ")"
             + "|(?<COMMENT>" + COMMENT_PATTERN + ")"
@@ -88,7 +91,7 @@ public class CodeEditor extends CodeArea {
             final String styleClass =
                     matcher.group("KEYWORD") != null ? "keyword" :
                     matcher.group("LABEL") != null ? "label" :
-                    matcher.group("PAREN") != null ? "paren" :
+                    matcher.group("REGISTER") != null ? "register" :
                     matcher.group("GOESTO") != null ? "goesto" :
                     matcher.group("NUMBER") != null ? "number" :
                     matcher.group("COMMENT") != null ? "comment" :

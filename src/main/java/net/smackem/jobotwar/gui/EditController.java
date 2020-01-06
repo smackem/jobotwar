@@ -54,8 +54,8 @@ public class EditController {
         this.robotsListView.setCellFactory(listView -> new RobotViewModelCell());
         this.playButton.disableProperty().bind(
                 this.robots.sizeProperty().lessThanOrEqualTo(0));
-        this.sourceText.textProperty().addListener((observableValue, s, old) -> {
-            this.selectedRobot.get().sourceCodeProperty().set(s);
+        this.sourceText.textProperty().addListener((prop, old, val) -> {
+            this.selectedRobot.get().sourceCodeProperty().set(val);
         });
         newRobot(null);
     }
@@ -99,6 +99,7 @@ public class EditController {
         if (robot != null) {
             this.nameTextField.textProperty().bindBidirectional(robot.nameProperty());
             this.colorPicker.valueProperty().bindBidirectional(robot.colorProperty());
+            this.sourceText.replaceText(robot.sourceCodeProperty().get());
         }
     }
 
