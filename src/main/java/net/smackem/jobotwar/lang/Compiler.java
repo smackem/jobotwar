@@ -8,7 +8,7 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
-import java.util.stream.Collectors;
+import java.util.Collections;
 
 public class Compiler {
 
@@ -20,7 +20,7 @@ public class Compiler {
         private final Program program;
 
         private Result(Collection<String> errors, Program program) {
-            this.errors = errors;
+            this.errors = Collections.unmodifiableCollection(errors);
             this.program = program;
         }
 
@@ -47,6 +47,9 @@ public class Compiler {
     }
 
     public Result compile(String source) {
+        if (source.isEmpty() == false && source.endsWith("\n") == false) {
+            source = source + "\n";
+        }
         final ErrorListener errorListener = new ErrorListener();
         final CharStream input = CharStreams.fromString(source);
         final JobotwarLexer lexer = new JobotwarLexer(input);
@@ -58,18 +61,15 @@ public class Compiler {
         final Emitter emitter = new Emitter();
         ParseTreeWalker.DEFAULT.walk(emitter, tree);
         final Program program = new Program(emitter.instructions());
-        return new Result(errorListener.errors.stream()
-                .map(Throwable::getMessage)
-                .collect(Collectors.toList()),
-                program);
+        return new Result(errorListener.errors, program);
     }
 
     private static class ErrorListener implements ANTLRErrorListener {
-        private final Collection<RecognitionException> errors = new ArrayList<>();
+        private final Collection<String> errors = new ArrayList<>();
 
         @Override
-        public void syntaxError(Recognizer<?, ?> recognizer, Object o, int i, int i1, String s, RecognitionException e) {
-            this.errors.add(e);
+        public void syntaxError(Recognizer<?, ?> recognizer, Object o, int line, int pos, String s, RecognitionException e) {
+            this.errors.add(String.format("line %d:%d: %s", line, pos, s));
         }
 
         @Override

@@ -7,6 +7,7 @@
 <?import javafx.scene.layout.*?>
 
 <?import javafx.geometry.Insets?>
+<?import net.smackem.jobotwar.gui.CodeEditor?>
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="net.smackem.jobotwar.gui.EditController"
@@ -48,10 +49,10 @@
                 </VBox>
             </top>
             <center>
-                <TextArea fx:id="sourceText" />
+                <CodeEditor fx:id="sourceText" />
             </center>
             <bottom>
-                <TextArea fx:id="compilerOutput" minHeight="40" editable="false" />
+                <TextArea fx:id="compilerOutput" minHeight="30" editable="false" />
             </bottom>
         </BorderPane>
     </center>

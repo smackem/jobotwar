@@ -1,3 +1,8 @@
 #sourceText {
     -fx-font-family: 'Cascadia Code', 'DejaVu Sans Mono', 'Consolas', monospace;
 }
+
+#compilerOutput {
+    -fx-font-family: 'Cascadia Code', 'DejaVu Sans Mono', 'Consolas', monospace;
+    -fx-text-fill: #a00000;
+}
