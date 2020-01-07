@@ -2,10 +2,7 @@ package net.smackem.jobotwar.runtime;
 
 import net.smackem.jobotwar.util.Arguments;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * The game board.
@@ -54,5 +51,26 @@ public class Board {
      */
     public Collection<Projectile> projectiles() {
         return this.projectiles;
+    }
+
+    /**
+     * Distributes the robots on the board randomly.
+     */
+    public void disperseRobots() {
+        final Random random = new Random();
+        for (final Robot robot : this.robots) {
+            do {
+                robot.setX(Constants.ROBOT_RADIUS + random.nextDouble() * (this.width - Constants.ROBOT_RADIUS * 2));
+                robot.setY(Constants.ROBOT_RADIUS + random.nextDouble() * (this.height - Constants.ROBOT_RADIUS * 2));
+            } while (getCloseRobot(robot) != null);
+        }
+    }
+
+    private Robot getCloseRobot(Robot robot) {
+        return this.robots.stream()
+                .filter(r -> r != robot)
+                .filter(r -> Vector.distance(r.getPosition(), robot.getPosition()) < Constants.ROBOT_RADIUS * 2)
+                .findFirst()
+                .orElse(null);
     }
 }

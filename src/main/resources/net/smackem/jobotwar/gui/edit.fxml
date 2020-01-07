@@ -11,7 +11,8 @@
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="net.smackem.jobotwar.gui.EditController"
-            stylesheets="@edit.css">
+            stylesheets="@edit.css"
+            snapToPixel="false">
     <left>
         <BorderPane style="-fx-padding: 2; -fx-spacing: 2">
             <top>

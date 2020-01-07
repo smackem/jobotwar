@@ -129,7 +129,6 @@ public class EditController {
                 this.compilerOutput.setText(e.getMessage());
             }
         }
-        placeRobots(robots);
         return robots;
     }
 
@@ -147,23 +146,6 @@ public class EditController {
                 .name(robotViewModel.nameProperty().get())
                 .rgb(rgb)
                 .build();
-    }
-
-    private void placeRobots(Collection<Robot> robots) {
-        for (final Robot robot : robots) {
-            do {
-                robot.setX(Constants.ROBOT_RADIUS + this.random.nextDouble() * (BOARD_WIDTH - Constants.ROBOT_RADIUS * 2));
-                robot.setY(Constants.ROBOT_RADIUS + this.random.nextDouble() * (BOARD_HEIGHT - Constants.ROBOT_RADIUS * 2));
-            } while (getCloseRobot(robots, robot) != null);
-        }
-    }
-
-    private Robot getCloseRobot(Collection<Robot> robots, Robot test) {
-        return robots.stream()
-                .filter(r -> r != test)
-                .filter(r -> Vector.distance(r.getPosition(), test.getPosition()) < Constants.ROBOT_RADIUS * 2)
-                .findFirst()
-                .orElse(null);
     }
 
     @FXML

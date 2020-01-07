@@ -44,6 +44,7 @@ public class App extends Application {
 
     public void createBoard(int width, int height, Collection<Robot> robots) {
         this.board = new Board(width, height, robots);
+        this.board.disperseRobots();
     }
 
     void setRoot(String fxml) throws IOException {
