@@ -42,12 +42,17 @@ public class App extends Application {
         stage.show();
     }
 
-    public void createBoard(int width, int height, Collection<Robot> robots) {
+    public void startGame(int width, int height, Collection<Robot> robots) throws IOException {
         this.board = new Board(width, height, robots);
         this.board.disperseRobots();
+        setRoot("main");
     }
 
-    void setRoot(String fxml) throws IOException {
+    public void showEditor() throws IOException {
+        setRoot("edit");
+    }
+
+    private void setRoot(String fxml) throws IOException {
         this.scene.setRoot(loadFXML(fxml));
     }
 

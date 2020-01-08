@@ -70,8 +70,7 @@ public class EditController {
         if (robots.isEmpty()) {
             return;
         }
-        app.createBoard(BOARD_WIDTH, BOARD_HEIGHT, robots);
-        app.setRoot("main");
+        app.startGame(BOARD_WIDTH, BOARD_HEIGHT, robots);
     }
 
     @FXML

@@ -23,6 +23,7 @@ import javafx.util.Duration;
 import net.smackem.jobotwar.lang.Compiler;
 import net.smackem.jobotwar.runtime.*;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.stream.Collectors;
@@ -42,7 +43,9 @@ public class MainController {
     @FXML
     private Pane robotGaugesParent;
     @FXML
-    private Label winnerOverlay;
+    private Pane winnerOverlay;
+    @FXML
+    private Label winnerLabel;
 
     public MainController() {
         final Board board = App.instance().board();
@@ -79,6 +82,11 @@ public class MainController {
         this.ticker.stop();
     }
 
+    @FXML
+    private void newGame(ActionEvent actionEvent) throws IOException {
+        App.instance().showEditor();
+    }
+
     private void tick(ActionEvent actionEvent) {
         final GameEngine.TickResult tickResult = this.engine.tick();
         updateGraphics(tickResult);
@@ -87,8 +95,8 @@ public class MainController {
             r.update();
         }
         if (tickResult.winner != null) {
-            this.winnerOverlay.setText(tickResult.winner.name() + " has won!");
-            this.winnerOverlay.setTextFill(RgbConvert.toColor(tickResult.winner.rgb()));
+            this.winnerLabel.setText(tickResult.winner.name() + " has won!");
+            this.winnerLabel.setTextFill(RgbConvert.toColor(tickResult.winner.rgb()));
             this.winnerOverlay.setVisible(true);
         }
     }
@@ -127,93 +135,5 @@ public class MainController {
                 .filter(node -> node != nameLabel && node instanceof Label)
                 .forEach(node -> node.getStyleClass().add("robotGaugeLabel"));
         return vbox;
-    }
-
-    private Collection<Robot> createRobots() {
-        final Robot r1 = new Robot.Builder(
-            robot -> new RuntimeProgram(robot,
-                RuntimeProgram.instruction(null, r -> {
-                    r.setSpeedX(4); return null;
-                }),
-                RuntimeProgram.instruction(null, r -> {
-                    r.setSpeedY(3); return null;
-                }),
-                RuntimeProgram.instruction("MOVE", r ->
-                    r.getX() > 150 ? null : "MOVE"
-                ),
-                RuntimeProgram.instruction(null, r -> {
-                    r.setSpeedX(0); return null;
-                }),
-                RuntimeProgram.instruction(null, r -> {
-                    r.setSpeedY(0); return null;
-                }),
-                RuntimeProgram.instruction("SHOOT", r -> {
-                    r.setAimAngle((r.getAimAngle() + 5) % 360); return null;
-                }),
-                RuntimeProgram.instruction(null, r -> {
-                    r.setShot(500); return null;
-                }),
-                RuntimeProgram.instruction(null, r -> "SHOOT")
-        )).rgb(0xff0000).x(20).y(50).build();
-
-        final double[] radarAngle2 = new double[] { 0 };
-        final Robot r2 = new Robot.Builder(
-            robot -> new RuntimeProgram(robot,
-                RuntimeProgram.instruction(null, r -> {
-                    r.setSpeedX(-0.5); return null;
-                }),
-                RuntimeProgram.instruction("MOVE", r -> {
-                    r.setRadarAngle(radarAngle2[0] % 360);
-                    radarAngle2[0] += 12;
-                    return null;
-                }),
-                RuntimeProgram.instruction(null, r ->
-                    r.getX() > 10 ? "MOVE" : null
-                )
-        )).rgb(0xffc020).x(500).y(400).build();
-
-        final double[] radarAngle3 = new double[] { 0 };
-        final Robot r3 = new Robot.Builder(
-            robot -> new RuntimeProgram(robot,
-                RuntimeProgram.instruction(null, r -> {
-                    r.setSpeedX(0.1); return null;
-                }),
-                RuntimeProgram.instruction("RADAR", r -> {
-                    r.setRadarAngle(radarAngle3[0] % 360);
-                    radarAngle3[0] += 5;
-                    return "RADAR";
-                })
-        )).rgb(0x0040ff).x(20).y(400).build();
-
-        final double[] radarAngle4 = new double[] { 0 };
-        final Robot r4 = new Robot.Builder(
-            robot -> new RuntimeProgram(robot,
-                RuntimeProgram.instruction(null, r -> {
-                    r.setAimAngle(90); return null;
-                }),
-                RuntimeProgram.instruction("LEFT", r -> {
-                    r.setSpeedX(-5); return null;
-                }),
-                RuntimeProgram.instruction(null, r -> {
-                    r.setShot(500); return null;
-                }),
-                RuntimeProgram.instruction(null, r -> {
-                    return r.getX() > 100 ? "LEFT" : null;
-                }),
-                RuntimeProgram.instruction("RIGHT", r -> {
-                    r.setSpeedX(5); return null;
-                }),
-                RuntimeProgram.instruction(null, r -> {
-                    r.setShot(500); return null;
-                }),
-                RuntimeProgram.instruction(null, r -> {
-                    return r.getX() < 500 ? "RIGHT" : null;
-                }),
-                RuntimeProgram.instruction(null, r -> {
-                    return "LEFT";
-                })
-        )).rgb(0xC02000).x(600).y(30).build();
-
-        return Arrays.asList(r1, r2, r3, r4);
     }
 }
