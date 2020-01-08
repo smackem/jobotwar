@@ -33,4 +33,6 @@ public enum OpCode {
     ASIN,       // pop a, push func(a)
     ACOS,       // pop a, push func(a)
     SQRT,       // pop a, push func(a)
+    CALL,       // push current pc, branch to label intArg
+    RET,        // pop a, a -> pc
 }

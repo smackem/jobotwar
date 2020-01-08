@@ -234,6 +234,11 @@ public class Emitter extends JobotwarBaseListener {
         }
     }
 
+    @Override
+    public void exitGosubStatement(JobotwarParser.GosubStatementContext ctx) {
+        emit(OpCode.BR, ctx.ID().getText());
+    }
+
     private void emit(OpCode opCode) {
         emit(new Instruction(opCode));
     }
