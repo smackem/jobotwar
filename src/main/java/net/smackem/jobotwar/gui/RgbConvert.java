@@ -2,7 +2,7 @@ package net.smackem.jobotwar.gui;
 
 import javafx.scene.paint.Color;
 
-public class RgbConvert {
+class RgbConvert {
 
     private RgbConvert() {
         throw new IllegalAccessError();

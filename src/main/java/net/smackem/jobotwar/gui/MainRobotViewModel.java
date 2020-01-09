@@ -6,7 +6,7 @@ import net.smackem.jobotwar.runtime.Robot;
 
 import java.util.Objects;
 
-public class MainRobotViewModel {
+class MainRobotViewModel {
     private final Robot robot;
     private final StringProperty name = new SimpleStringProperty();
     private final ObjectProperty<Color> color = new SimpleObjectProperty<>();

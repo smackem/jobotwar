@@ -252,6 +252,28 @@ public class CompilerTest {
         assertThat(env.readAim()).isEqualTo(5);
     }
 
+    @Test
+    public void testSubs() {
+        final String source = "" +
+                "def x\n" +
+                "abs(-100 + 200) -> SHOT\n" +
+                "gosub inc\n" +
+                "x -> AIM\n" +
+                "inc:\n" +
+                "x + 1 -> x\n" +
+                "goto inc unless x >= 10\n" +
+                "endsub\n";
+
+        final Program program = compile(source);
+        final TestEnvironment env = new TestEnvironment();
+        final Interpreter interpreter = new Interpreter(program, env);
+
+        runComplete(interpreter);
+
+        assertThat(env.readShot()).isEqualTo(100);
+        assertThat(env.readAim()).isEqualTo(10);
+    }
+
     private Program compile(String source) {
         final Compiler compiler = new Compiler();
         final Compiler.Result result = compiler.compile(source);

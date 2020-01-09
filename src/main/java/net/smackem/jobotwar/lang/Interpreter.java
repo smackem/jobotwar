@@ -123,46 +123,40 @@ public final class Interpreter {
                     return instr.intArg();
                 }
                 break;
-            case BR_NONZERO:
-                if (toBool(this.stack.pop())) {
-                    return instr.intArg();
-                }
-                break;
             case DUP:
                 right = this.stack.pop();
                 this.stack.push(right);
                 this.stack.push(right);
                 break;
-            case ABS:
-                this.stack.push(Math.abs(this.stack.pop()));
-                break;
             case NOT:
-                this.stack.push(this.stack.pop() == 0 ? 1 : 0);
+                this.stack.push(toDouble(toBool(this.stack.pop()) == false));
                 break;
-            case TAN:
-                this.stack.push(Math.tan(Math.toRadians(this.stack.pop())));
+            case INVOKE:
+                this.stack.push(invoke(instr.strArg(), this.stack.pop()));
                 break;
-            case SIN:
-                this.stack.push(Math.sin(Math.toRadians(this.stack.pop())));
-                break;
-            case COS:
-                this.stack.push(Math.cos(Math.toRadians(this.stack.pop())));
-                break;
-            case ATAN:
-                this.stack.push(Math.toDegrees(Math.atan(this.stack.pop())));
-                break;
-            case ASIN:
-                this.stack.push(Math.toDegrees(Math.asin(this.stack.pop())));
-                break;
-            case ACOS:
-                this.stack.push(Math.toDegrees(Math.acos(this.stack.pop())));
-                break;
-            case SQRT:
-                this.stack.push(Math.sqrt(this.stack.pop()));
-                break;
+            case CALL:
+                this.stack.push(this.pc);
+                return instr.intArg();
+            case RET:
+                return (int)this.stack.pop();
         }
 
         return -1;
+    }
+
+    private double invoke(String strArg, double arg) {
+        switch (strArg) {
+            case "abs":     return Math.abs(arg);
+            case "tan":     return Math.tan(Math.toRadians(arg));
+            case "sin":     return Math.sin(Math.toRadians(arg));
+            case "cos":     return Math.cos(Math.toRadians(arg));
+            case "atan":    return Math.toDegrees(Math.atan(arg));
+            case "asin":    return Math.toDegrees(Math.asin(arg));
+            case "acos":    return Math.toDegrees(Math.acos(arg));
+            case "sqrt":    return Math.sqrt(arg);
+            default:
+                throw new IllegalArgumentException("Unknown built-in function: '" + strArg + "'");
+        }
     }
 
     private double loadRegister(String strArg) {

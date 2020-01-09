@@ -137,36 +137,11 @@ public class Emitter extends JobotwarBaseListener {
         if (ctx.func() == null) {
             return;
         }
-        switch (ctx.func().getText()) {
-            case "abs":
-                emit(OpCode.ABS);
-                break;
-            case "not":
-                emit(OpCode.NOT);
-                break;
-            case "tan":
-                emit(OpCode.TAN);
-                break;
-            case "sin":
-                emit(OpCode.SIN);
-                break;
-            case "cos":
-                emit(OpCode.COS);
-                break;
-            case "atan":
-                emit(OpCode.ATAN);
-                break;
-            case "asin":
-                emit(OpCode.ASIN);
-                break;
-            case "acos":
-                emit(OpCode.ACOS);
-                break;
-            case "sqrt":
-                emit(OpCode.SQRT);
-                break;
-            default:
-                throw new RuntimeException("Unsupported function " + ctx.func());
+        final String funcName = ctx.func().getText();
+        if ("not".equals(funcName)) {
+            emit(OpCode.NOT);
+        } else {
+            emit(OpCode.INVOKE, funcName);
         }
     }
 
@@ -205,7 +180,8 @@ public class Emitter extends JobotwarBaseListener {
 
     @Override
     public void exitUnlessClause(JobotwarParser.UnlessClauseContext ctx) {
-        emit(OpCode.BR_NONZERO, "@" + this.labelId);
+        emit(OpCode.NOT);
+        emit(OpCode.BR_ZERO, "@" + this.labelId);
         this.disabled = false;
     }
 
@@ -236,7 +212,12 @@ public class Emitter extends JobotwarBaseListener {
 
     @Override
     public void exitGosubStatement(JobotwarParser.GosubStatementContext ctx) {
-        emit(OpCode.BR, ctx.ID().getText());
+        emit(OpCode.CALL, ctx.ID().getText());
+    }
+
+    @Override
+    public void exitEndsubStatement(JobotwarParser.EndsubStatementContext ctx) {
+        emit(OpCode.RET);
     }
 
     private void emit(OpCode opCode) {
@@ -273,9 +254,7 @@ public class Emitter extends JobotwarBaseListener {
             index++;
         }
         this.instructions.stream()
-                .filter(instr -> instr.opCode() == OpCode.BR
-                     || instr.opCode() == OpCode.BR_ZERO
-                     || instr.opCode() == OpCode.BR_NONZERO)
+                .filter(instr -> instr.opCode().isBranch())
                 .forEach(instr -> {
                     final Integer target = labelIndices.get(instr.strArg());
                     if (target == null) {
