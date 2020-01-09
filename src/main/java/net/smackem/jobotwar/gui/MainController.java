@@ -39,6 +39,7 @@ public class MainController {
     private final BoardGraphics graphics;
     private final GameEngine engine;
     private final ObservableList<MainRobotViewModel> robots;
+    private ParticleExplosion winnerAnimation;
 
     @FXML
     private StackPane canvasContainer;
@@ -94,8 +95,9 @@ public class MainController {
 
     private void tick(ActionEvent actionEvent) {
         final GameEngine.TickResult tickResult = this.engine.tick();
+        final GraphicsContext gc = this.canvas.getGraphicsContext2D();
         updateGraphics(tickResult);
-        this.graphics.render(this.canvas.getGraphicsContext2D());
+        this.graphics.render(gc);
         for (final MainRobotViewModel r : this.robots) {
             r.update();
         }
@@ -103,6 +105,12 @@ public class MainController {
             this.winnerLabel.setText(tickResult.winner.name() + " has won!");
             this.winnerLabel.setTextFill(RgbConvert.toColor(tickResult.winner.rgb()));
             this.winnerOverlay.setVisible(true);
+            this.winnerAnimation = new ParticleExplosion(this.canvas.getWidth(), this.canvas.getHeight());
+        }
+        if (this.winnerAnimation != null) {
+            if (this.winnerAnimation.render(gc) == false) {
+                this.winnerAnimation = null;
+            }
         }
     }
 

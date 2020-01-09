@@ -14,7 +14,7 @@
          <StackPane fx:id="canvasContainer">
             <Canvas fx:id="canvas" />
             <StackPane fx:id="winnerOverlay"
-                       style="-fx-background-color: rgba(0,0,0,0.7)"
+                       style="-fx-background-color: rgba(0,0,0,0.5)"
                        prefHeight="Infinity" prefWidth="Infinity"
                        visible="false">
                <VBox spacing="12" alignment="CENTER" style="-fx-alignment: center">
