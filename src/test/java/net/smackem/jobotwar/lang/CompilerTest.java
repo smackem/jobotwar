@@ -52,21 +52,21 @@ public class CompilerTest {
         env.setY(7);
         env.setDamage(8);
 
-        assertThat(interpreter.runToNextLabel()).isTrue();
+        assertThat(interpreter.runNext()).isTrue();
         assertThat(env.readShot()).isEqualTo(1);
-        assertThat(interpreter.runToNextLabel()).isTrue();
+        assertThat(interpreter.runNext()).isTrue();
         assertThat(env.readShot()).isEqualTo(2);
-        assertThat(interpreter.runToNextLabel()).isTrue();
+        assertThat(interpreter.runNext()).isTrue();
         assertThat(env.readShot()).isEqualTo(3);
-        assertThat(interpreter.runToNextLabel()).isTrue();
+        assertThat(interpreter.runNext()).isTrue();
         assertThat(env.readShot()).isEqualTo(4);
-        assertThat(interpreter.runToNextLabel()).isTrue();
+        assertThat(interpreter.runNext()).isTrue();
         assertThat(env.readShot()).isEqualTo(6);
-        assertThat(interpreter.runToNextLabel()).isTrue();
+        assertThat(interpreter.runNext()).isTrue();
         assertThat(env.readShot()).isEqualTo(7);
-        assertThat(interpreter.runToNextLabel()).isTrue();
+        assertThat(interpreter.runNext()).isTrue();
         assertThat(env.readShot()).isEqualTo(8);
-        assertThat(interpreter.runToNextLabel()).isFalse();
+        assertThat(interpreter.runNext()).isFalse();
     }
 
     @Test
@@ -214,25 +214,25 @@ public class CompilerTest {
         final TestEnvironment env = new TestEnvironment();
         final Interpreter interpreter = new Interpreter(program, env);
 
-        assertThat(interpreter.runToNextLabel()).isTrue();
+        assertThat(interpreter.runNext()).isTrue();
         assertThat(env.readShot()).isEqualTo(10);
-        assertThat(interpreter.runToNextLabel()).isTrue();
+        assertThat(interpreter.runNext()).isTrue();
         assertThat(env.readShot()).isEqualTo(10);
-        assertThat(interpreter.runToNextLabel()).isTrue();
+        assertThat(interpreter.runNext()).isTrue();
         assertThat(env.readShot()).isEqualTo(1);
-        assertThat(interpreter.runToNextLabel()).isTrue();
+        assertThat(interpreter.runNext()).isTrue();
         assertThat(env.readShot()).isEqualTo(-1);
-        assertThat(interpreter.runToNextLabel()).isTrue();
+        assertThat(interpreter.runNext()).isTrue();
         assertThat(env.readShot()).isEqualTo(90);
-        assertThat(interpreter.runToNextLabel()).isTrue();
+        assertThat(interpreter.runNext()).isTrue();
         assertThat(env.readShot()).isEqualTo(90);
-        assertThat(interpreter.runToNextLabel()).isTrue();
+        assertThat(interpreter.runNext()).isTrue();
         assertThat(env.readShot()).isEqualTo(90);
-        assertThat(interpreter.runToNextLabel()).isTrue();
+        assertThat(interpreter.runNext()).isTrue();
         assertThat(env.readShot()).isEqualTo(1);
-        assertThat(interpreter.runToNextLabel()).isTrue();
+        assertThat(interpreter.runNext()).isTrue();
         assertThat(env.readShot()).isEqualTo(0);
-        assertThat(interpreter.runToNextLabel()).isTrue();
+        assertThat(interpreter.runNext()).isTrue();
         assertThat(env.readShot()).isEqualTo(3);
     }
 
@@ -259,10 +259,12 @@ public class CompilerTest {
                 "abs(-100 + 200) -> SHOT\n" +
                 "gosub inc\n" +
                 "x -> AIM\n" +
+                "goto end\n" +
                 "inc:\n" +
                 "x + 1 -> x\n" +
                 "goto inc unless x >= 10\n" +
-                "endsub\n";
+                "endsub\n" +
+                "end:";
 
         final Program program = compile(source);
         final TestEnvironment env = new TestEnvironment();
@@ -282,7 +284,7 @@ public class CompilerTest {
 
     private void runComplete(Interpreter interpreter) {
         try {
-            while (interpreter.runToNextLabel()) {
+            while (interpreter.runNext()) {
                 // proceed until program has finished
             }
         } catch (Interpreter.StackException e) {

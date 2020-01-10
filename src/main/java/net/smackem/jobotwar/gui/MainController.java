@@ -21,7 +21,10 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.util.Duration;
 import net.smackem.jobotwar.lang.Compiler;
+import net.smackem.jobotwar.lang.Interpreter;
 import net.smackem.jobotwar.runtime.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -31,6 +34,7 @@ import java.util.stream.Stream;
 
 public class MainController {
 
+    private static final Logger log = LoggerFactory.getLogger(MainController.class);
     private final Timeline ticker;
     private final BoardGraphics graphics;
     private final GameEngine engine;
@@ -109,6 +113,7 @@ public class MainController {
                         tickResult.killedRobots.stream().map(r -> new Vector(r.getX(), r.getY())))
         ).collect(Collectors.toList()));
         this.graphics.addRadarBeams(tickResult.radarBeams);
+        log.info("number of radar beams: {}", tickResult.radarBeams.size());
     }
 
     private Parent createRobotGauge(MainRobotViewModel robot) {

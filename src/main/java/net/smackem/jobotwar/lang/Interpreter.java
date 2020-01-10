@@ -27,18 +27,17 @@ public final class Interpreter {
         return this.runtime;
     }
 
-    public boolean runToNextLabel() throws StackException {
+    public boolean runNext() throws StackException {
         final int codeSize = this.code.size();
         while (this.pc < codeSize) {
             final int target = executeInstruction(this.code.get(this.pc));
-            if (target == -2) {
-                this.pc++;
-                return true;
-            }
             if (target >= 0) {
                 this.pc = target;
-            } else {
-                this.pc++;
+                return true;
+            }
+            this.pc++;
+            if (target < -1) {
+                return true;
             }
         }
         return false;
@@ -58,14 +57,12 @@ public final class Interpreter {
                 break;
             case ST_LOC:
                 right = this.stack.pop();
-                log.info("{} <- {}", instr.strArg(), right);
                 this.stack.set(instr.intArg(), right);
                 break;
             case ST_REG:
                 right = this.stack.pop();
-                log.info("{} <- {}", instr.strArg(), right);
                 storeRegister(instr.strArg(), right);
-                break;
+                return -2;
             case ADD:
                 this.stack.push(this.stack.pop() + this.stack.pop());
                 break;
@@ -115,7 +112,7 @@ public final class Interpreter {
                 this.stack.push(toDouble(this.stack.pop() <= right));
                 break;
             case LABEL:
-                return -2;
+                break;
             case BR:
                 return instr.intArg();
             case BR_ZERO:
@@ -135,7 +132,7 @@ public final class Interpreter {
                 this.stack.push(invoke(instr.strArg(), this.stack.pop()));
                 break;
             case CALL:
-                this.stack.push(this.pc);
+                this.stack.push(this.pc + 1);
                 return instr.intArg();
             case RET:
                 return (int)this.stack.pop();

@@ -19,7 +19,7 @@ public class CompiledProgram implements RobotProgram {
     @Override
     public boolean next() {
         try {
-            return this.interpreter.runToNextLabel();
+            return this.interpreter.runNext();
         } catch (Interpreter.StackException e) {
             e.printStackTrace();
         }
