@@ -88,6 +88,7 @@ public class MainController {
 
     @FXML
     private void newGame(ActionEvent actionEvent) throws IOException {
+        this.ticker.stop();
         App.instance().showEditor();
     }
 
@@ -113,7 +114,7 @@ public class MainController {
                         tickResult.killedRobots.stream().map(r -> new Vector(r.getX(), r.getY())))
         ).collect(Collectors.toList()));
         this.graphics.addRadarBeams(tickResult.radarBeams);
-        log.info("number of radar beams: {}", tickResult.radarBeams.size());
+        log.debug("number of radar beams: {}", tickResult.radarBeams.size());
     }
 
     private Parent createRobotGauge(MainRobotViewModel robot) {
