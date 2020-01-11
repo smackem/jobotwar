@@ -11,6 +11,7 @@ public final class Interpreter {
     private final List<Instruction> code;
     private final RuntimeEnvironment runtime;
     private final Stack stack = new Stack();
+    private boolean registerStored;
     private int pc;
 
     public Interpreter(Program program, RuntimeEnvironment runtime) {
@@ -62,7 +63,8 @@ public final class Interpreter {
             case ST_REG:
                 right = this.stack.pop();
                 storeRegister(instr.strArg(), right);
-                return -2;
+                this.registerStored = true;
+                break;
             case ADD:
                 this.stack.push(this.stack.pop() + this.stack.pop());
                 break;
@@ -112,6 +114,10 @@ public final class Interpreter {
                 this.stack.push(toDouble(this.stack.pop() <= right));
                 break;
             case LABEL:
+                if (this.registerStored) {
+                    this.registerStored = false;
+                    return -2;
+                }
                 break;
             case BR:
                 return instr.intArg();

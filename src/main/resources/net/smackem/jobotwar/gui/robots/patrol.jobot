@@ -14,6 +14,7 @@ moveToTop:
     90 -> AIM
     20 - Y -> SPEEDY
     goto moveToTop unless abs(SPEEDY) < 20
+    0 -> SPEEDY
     goto patrolLeft
 
 moveToBottom:
