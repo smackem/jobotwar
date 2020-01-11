@@ -14,6 +14,7 @@ public class Robot {
     private final RobotProgram program;
     private final int rgb;
     private final int coolDownTicks;
+    private final String imageUrl;
     private double speedX;
     private double speedY;
     private double actualSpeedX;
@@ -40,6 +41,7 @@ public class Robot {
         this.program = builder.programFactory.apply(this);
         this.x = builder.x;
         this.y = builder.y;
+        this.imageUrl = builder.imageUrl;
     }
 
     /**
@@ -53,6 +55,7 @@ public class Robot {
         private int coolDownTicks = Constants.DEFAULT_COOL_DOWN_TICKS;
         private double x;
         private double y;
+        private String imageUrl;
 
         /**
          * Initializes a new instance of {@link Builder}.
@@ -111,6 +114,14 @@ public class Robot {
         }
 
         /**
+         * The url of the robot icon image.
+         */
+        public Builder imageUrl(String value) {
+            this.imageUrl = value;
+            return this;
+        }
+
+        /**
          * @return A new {@link Robot}.
          */
         public Robot build() {
@@ -151,6 +162,13 @@ public class Robot {
      */
     public RobotProgram program() {
         return this.program;
+    }
+
+    /**
+     * @return The URL of the robot's icon image or {@code null} if none.
+     */
+    public String imageUrl() {
+        return this.imageUrl;
     }
 
     /**

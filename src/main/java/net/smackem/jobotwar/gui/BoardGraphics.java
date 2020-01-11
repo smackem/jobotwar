@@ -1,19 +1,20 @@
 package net.smackem.jobotwar.gui;
 
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.ArcType;
 import net.smackem.jobotwar.runtime.*;
+import net.smackem.jobotwar.runtime.Vector;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Objects;
+import java.util.*;
 
 public class BoardGraphics {
     private final Board board;
     private final Collection<Explosion> explosions = new ArrayList<>();
     private final Collection<RenderedRadarBeam> radarBeams = new ArrayList<>();
+    private final Map<String, Image> images = new HashMap<>();
     private static final Paint[] HEALTH_PAINT_CACHE = new Paint[101];
     private static final Paint ROBOT_CHASSIS_PAINT = Color.rgb(0x30, 0x30, 0x30);
 
@@ -113,6 +114,17 @@ public class BoardGraphics {
             gc.setLineWidth(2);
             gc.setStroke(Color.BLACK);
             gc.strokeOval(innerX, innerY, innerW, innerW);
+
+            // icon image
+            final String imageUrl = robot.imageUrl();
+            if (imageUrl != null) {
+                Image image = this.images.get(imageUrl);
+                if (image == null) {
+                    image = new Image(robot.imageUrl());
+                    this.images.put(imageUrl, image);
+                }
+                gc.drawImage(image, x - image.getWidth() / 2, y - image.getHeight() / 2);
+            }
         }
     }
 

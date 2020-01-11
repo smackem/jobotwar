@@ -12,6 +12,8 @@ import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
 import net.smackem.jobotwar.lang.Compiler;
 import net.smackem.jobotwar.runtime.CompiledProgram;
@@ -47,6 +49,8 @@ public class EditController {
     private Button playButton;
     @FXML
     private TextArea compilerOutput;
+    @FXML
+    private ComboBox<Image> iconComboBox;
 
     @FXML
     private void initialize() {
@@ -60,7 +64,20 @@ public class EditController {
         this.sourceText.textProperty().addListener((prop, old, val) -> {
             this.selectedRobot.get().sourceCodeProperty().set(val);
         });
+        this.iconComboBox.setCellFactory(listView -> new IconCell());
+        this.iconComboBox.setButtonCell(new IconCell());
+        this.iconComboBox.getItems().addAll(
+                null,
+                getResourceImage("icons/icon-rebelalliance.png"),
+                getResourceImage("icons/icon-empire.png"));
+        this.iconComboBox.getSelectionModel().selectedItemProperty().addListener((prop, old, val) -> {
+            this.selectedRobot.get().imageProperty().set(val);
+        });
         newRobot(null);
+    }
+
+    private Image getResourceImage(String resourceName) {
+        return new Image(String.valueOf(getClass().getResource(resourceName)));
     }
 
     @FXML
@@ -114,6 +131,7 @@ public class EditController {
             this.nameTextField.textProperty().bindBidirectional(robot.nameProperty());
             this.colorPicker.valueProperty().bindBidirectional(robot.colorProperty());
             this.sourceText.replaceText(robot.sourceCodeProperty().get());
+            this.iconComboBox.getSelectionModel().select(robot.imageProperty().get());
         }
     }
 
@@ -136,6 +154,7 @@ public class EditController {
         final int rgb = (int)(color.getRed() * 0xff) << 16 |
                 (int)(color.getGreen() * 0xff) << 8 |
                 (int)(color.getBlue() * 0xff);
+        final Image image = robotViewModel.imageProperty().get();
         final Compiler compiler = new Compiler();
         final Compiler.Result result = compiler.compile(robotViewModel.sourceCodeProperty().get());
         if (result.hasErrors()) {
@@ -144,6 +163,7 @@ public class EditController {
         return new Robot.Builder(r -> new CompiledProgram(r, result.program()))
                 .name(robotViewModel.nameProperty().get())
                 .rgb(rgb)
+                .imageUrl(image != null ? image.getUrl() : null)
                 .build();
     }
 
@@ -176,12 +196,31 @@ public class EditController {
         @Override
         protected void updateItem(EditRobotViewModel robotViewModel, boolean empty) {
             super.updateItem(robotViewModel, empty);
-            if (empty) {
+            if (empty ) {
                 textProperty().unbind();
                 setText(null);
-            } else {
-                textProperty().bind(robotViewModel.nameProperty());
+                return;
             }
+            textProperty().bind(robotViewModel.nameProperty());
+        }
+    }
+
+    private static class IconCell extends ListCell<Image> {
+        @Override
+        protected void updateItem(Image item, boolean empty) {
+            super.updateItem(item, empty);
+            if (empty) {
+                setGraphic(null);
+                setText(null);
+                return;
+            }
+            if (item == null) {
+                setGraphic(null);
+                setText("(None)");
+                return;
+            }
+            setGraphic(new ImageView(item));
+            setText(null);
         }
     }
 }

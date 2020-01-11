@@ -44,17 +44,25 @@
         <BorderPane>
             <top>
                 <VBox spacing="4" style="-fx-padding: 2;">
-                    <Label text="Name:" />
-                    <TextField fx:id="nameTextField" />
-                    <Label text="Color:" />
-                    <ColorPicker fx:id="colorPicker" />
+                    <HBox spacing="4" alignment="BASELINE_LEFT">
+                        <Label text="Name:" />
+                        <TextField fx:id="nameTextField" />
+                    </HBox>
+                    <HBox spacing="4" alignment="BASELINE_LEFT">
+                        <Label text="Color:" />
+                        <ColorPicker fx:id="colorPicker" />
+                    </HBox>
+                    <HBox spacing="4" alignment="BASELINE_LEFT">
+                        <Label text="Icon:" />
+                        <ComboBox fx:id="iconComboBox" />
+                    </HBox>
                 </VBox>
             </top>
             <center>
                 <CodeEditor fx:id="sourceText" />
             </center>
             <bottom>
-                <TextArea fx:id="compilerOutput" minHeight="30" editable="false" />
+                <TextArea fx:id="compilerOutput" prefHeight="30" editable="false" />
             </bottom>
         </BorderPane>
     </center>
