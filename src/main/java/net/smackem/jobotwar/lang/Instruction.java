@@ -2,7 +2,12 @@ package net.smackem.jobotwar.lang;
 
 import java.util.Objects;
 
-public final class Instruction {
+/**
+ * Instructions are used to build executable programs. Each instruction has an {@link OpCode} that specifies
+ * what to do, and a typed argument (either double, int or string) that holds the data to operate on (if any).
+ * The type of argument depends upon the {@link OpCode}.
+ */
+final class Instruction {
     private final OpCode opCode;
     private double f64Arg;
     private int intArg;

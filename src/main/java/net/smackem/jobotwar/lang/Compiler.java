@@ -10,7 +10,10 @@ import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
 
-public class Compiler {
+/**
+ * The compiler that translates jobotwar source code into a {@link Program} that can be executed by an {@link Interpreter}.
+ */
+public final class Compiler {
 
     /**
      * Contains the result of a compilation.
@@ -46,6 +49,11 @@ public class Compiler {
         }
     }
 
+    /**
+     * Compiles the specified {@code source} to an executable program.
+     * @param source The jobotwar source code to compile.
+     * @return A {@link Result} that contains the compilation result: the compiled program or error messages.
+     */
     public Result compile(String source) {
         if (source.isEmpty() == false && source.endsWith("\n") == false) {
             source = source + "\n";

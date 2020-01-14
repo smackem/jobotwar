@@ -10,13 +10,14 @@ import net.smackem.jobotwar.runtime.Vector;
 
 import java.util.*;
 
-public class BoardGraphics {
+class BoardGraphics {
     private final Board board;
     private final Collection<Explosion> explosions = new ArrayList<>();
     private final Collection<RenderedRadarBeam> radarBeams = new ArrayList<>();
     private final Map<String, Image> images = new HashMap<>();
     private static final Paint[] HEALTH_PAINT_CACHE = new Paint[101];
     private static final Paint ROBOT_CHASSIS_PAINT = Color.rgb(0x30, 0x30, 0x30);
+    private ParticleExplosion winnerAnimation;
 
     public BoardGraphics(Board board) {
         this.board = Objects.requireNonNull(board);
@@ -29,6 +30,7 @@ public class BoardGraphics {
         renderProjectiles(gc);
         renderRobots(gc);
         renderExplosions(gc);
+        renderWinnerAnimation(gc);
         gc.restore();
     }
 
@@ -44,6 +46,10 @@ public class BoardGraphics {
         }
     }
 
+    public void createWinnerAnimation() {
+        this.winnerAnimation = new ParticleExplosion(this.board.width(), this.board.height());
+    }
+
     private void renderRadarBeams(GraphicsContext gc) {
         gc.save();
         gc.setLineWidth(1);
@@ -57,6 +63,14 @@ public class BoardGraphics {
         }
         this.radarBeams.removeIf(beam -> beam.opacity <= 0.2);
         gc.restore();
+    }
+
+    private void renderWinnerAnimation(GraphicsContext gc) {
+        if (this.winnerAnimation != null) {
+            if (this.winnerAnimation.render(gc) == false) {
+                this.winnerAnimation = null;
+            }
+        }
     }
 
     private void renderProjectiles(GraphicsContext gc) {

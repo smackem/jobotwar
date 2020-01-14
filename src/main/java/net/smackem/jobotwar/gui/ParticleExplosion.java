@@ -9,7 +9,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
-public class ParticleExplosion {
+class ParticleExplosion {
     private final Collection<Dot> dots;
     private final double width, height;
     private static final List<Color[]> PRECOMPUTED_COLORS;

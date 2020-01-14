@@ -5,7 +5,7 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.util.*;
 
-public class Emitter extends JobotwarBaseListener {
+class Emitter extends JobotwarBaseListener {
     private final List<Instruction> instructions = new ArrayList<>();
     private final Map<String, Integer> locals = new HashMap<>();
     private int labelId = 1;

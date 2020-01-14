@@ -10,19 +10,19 @@ public class VectorTest {
 
     @Test
     public void getLength() {
-        assertThat(new Vector(1, 0).getLength()).isEqualTo(1);
-        assertThat(new Vector(1, 0).getLength()).isEqualTo(1);
-        assertThat(new Vector(0, 2).getLength()).isEqualTo(2);
-        assertThat(new Vector(-2, 0).getLength()).isEqualTo(2);
+        assertThat(new Vector(1, 0).length()).isEqualTo(1);
+        assertThat(new Vector(1, 0).length()).isEqualTo(1);
+        assertThat(new Vector(0, 2).length()).isEqualTo(2);
+        assertThat(new Vector(-2, 0).length()).isEqualTo(2);
     }
 
     @Test
     public void normalize() {
-        assertThat(new Vector(100, 12).normalize().getLength())
+        assertThat(new Vector(100, 12).normalize().length())
                 .isEqualTo(1, offset(DELTA));
-        assertThat(new Vector(452, 2436).normalize().getLength())
+        assertThat(new Vector(452, 2436).normalize().length())
                 .isEqualTo(1, offset(DELTA));
-        assertThat(new Vector(4, -1234).normalize().getLength())
+        assertThat(new Vector(4, -1234).normalize().length())
                 .isEqualTo(1, offset(DELTA));
     }
 

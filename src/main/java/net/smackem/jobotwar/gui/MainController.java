@@ -39,7 +39,6 @@ public class MainController {
     private final BoardGraphics graphics;
     private final GameEngine engine;
     private final ObservableList<MainRobotViewModel> robots;
-    private ParticleExplosion winnerAnimation;
 
     @FXML
     private StackPane canvasContainer;
@@ -105,12 +104,6 @@ public class MainController {
             this.winnerLabel.setText(tickResult.winner.name() + " has won!");
             this.winnerLabel.setTextFill(RgbConvert.toColor(tickResult.winner.rgb()));
             this.winnerOverlay.setVisible(true);
-            this.winnerAnimation = new ParticleExplosion(this.canvas.getWidth(), this.canvas.getHeight());
-        }
-        if (this.winnerAnimation != null) {
-            if (this.winnerAnimation.render(gc) == false) {
-                this.winnerAnimation = null;
-            }
         }
     }
 
@@ -122,7 +115,9 @@ public class MainController {
                         tickResult.killedRobots.stream().map(r -> new Vector(r.getX(), r.getY())))
         ).collect(Collectors.toList()));
         this.graphics.addRadarBeams(tickResult.radarBeams);
-        log.debug("number of radar beams: {}", tickResult.radarBeams.size());
+        if (tickResult.winner != null) {
+            this.graphics.createWinnerAnimation();
+        }
     }
 
     private Parent createRobotGauge(MainRobotViewModel robot) {

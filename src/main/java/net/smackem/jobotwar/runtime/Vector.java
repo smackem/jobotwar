@@ -1,6 +1,5 @@
 package net.smackem.jobotwar.runtime;
 
-import java.util.Comparator;
 import java.util.Objects;
 
 /**
@@ -49,7 +48,7 @@ public final class Vector {
     /**
      * @return The length or magnitude of the vector (distance from origin).
      */
-    public double getLength() {
+    public double length() {
         return Math.sqrt(this.x * this.x + this.y * this.y);
     }
 
@@ -58,7 +57,8 @@ public final class Vector {
      * @return A vector with the length 1.
      */
     public Vector normalize() {
-        final double im = 1.0 / getLength();
+        final double mag = length();
+        final double im = mag != 0.0 ? 1.0 / mag : 0.0;
         return new Vector(x * im, y * im);
     }
 

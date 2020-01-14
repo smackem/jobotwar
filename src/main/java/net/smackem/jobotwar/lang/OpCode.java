@@ -1,6 +1,6 @@
 package net.smackem.jobotwar.lang;
 
-public enum OpCode {
+enum OpCode {
     LD_F64(false),     // push f64Arg
     LD_REG(false),     // push register strArg
     LD_LOC(false),     // push local intArg
@@ -24,7 +24,7 @@ public enum OpCode {
     BR_ZERO(true),     // pop a, if 0.0 then branch to intArg
     DUP(false),        // pop a, push a, push a
     NOT(false),        // pop a push a != 0
-    INVOKE(false),     // pop a, push BuiltinFunc_strArg(a)
+    INVOKE(false),     // pop a, push BuiltinFunc:strArg(a)
     CALL(true),        // push current pc, branch to label intArg
     RET(false);        // pop a, a -> pc
 
