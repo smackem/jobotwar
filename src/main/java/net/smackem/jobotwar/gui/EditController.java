@@ -83,8 +83,10 @@ public class EditController {
     @FXML
     private void startGame(ActionEvent mouseEvent) throws IOException {
         final App app = App.instance();
-        final Collection<Robot> robots = createRobotsFromViewModel();
-        if (robots.isEmpty()) {
+        final Collection<Robot> robots;
+        try {
+            robots = createRobotsFromViewModel();
+        } catch (Exception e) {
             return;
         }
         app.startGame(BOARD_WIDTH, BOARD_HEIGHT, robots);
@@ -135,15 +137,16 @@ public class EditController {
         }
     }
 
-    private Collection<Robot> createRobotsFromViewModel() {
+    private Collection<Robot> createRobotsFromViewModel() throws Exception {
         final Collection<Robot> robots = new ArrayList<>();
         for (final EditRobotViewModel rvm : this.robots) {
             try {
                 final Robot robot = createRobotFromViewModel(rvm);
                 robots.add(robot);
-            } catch(Exception e) {
+            } catch (Exception e) {
                 this.robotsListView.getSelectionModel().select(rvm);
                 this.compilerOutput.setText(e.getMessage());
+                throw e;
             }
         }
         return robots;

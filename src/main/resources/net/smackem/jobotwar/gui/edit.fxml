@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
@@ -59,11 +56,11 @@
                 </VBox>
             </top>
             <center>
-                <CodeEditor fx:id="sourceText" />
+                <SplitPane orientation="VERTICAL" dividerPositions="0.8">
+                    <CodeEditor fx:id="sourceText" SplitPane.resizableWithParent="true" />
+                    <TextArea fx:id="compilerOutput" minHeight="50" editable="false" />
+                </SplitPane>
             </center>
-            <bottom>
-                <TextArea fx:id="compilerOutput" prefHeight="30" editable="false" />
-            </bottom>
         </BorderPane>
     </center>
 </BorderPane>
