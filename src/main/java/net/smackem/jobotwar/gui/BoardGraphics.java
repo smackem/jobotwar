@@ -55,7 +55,7 @@ class BoardGraphics {
         gc.setLineWidth(1);
         for (final RenderedRadarBeam b : this.radarBeams) {
             final Robot robot = b.beam.sourceRobot();
-            final Paint paint = getRobotPaint(robot, b.opacity);
+            final Paint paint = RgbConvert.toColor(robot.rgb(), b.opacity);
             final Vector hitPos = b.beam.hitPosition();
             gc.setStroke(paint);
             gc.strokeLine(robot.getX(), robot.getY(), hitPos.x(), hitPos.y());
@@ -122,7 +122,7 @@ class BoardGraphics {
 
             // body
             final double opacity = robot.isDead() ? 0.25 : 1.0;
-            final Paint color = getRobotPaint(robot, opacity);
+            final Paint color = RgbConvert.toColor(robot.rgb(), opacity);
             gc.setFill(color);
             gc.fillOval(innerX, innerY, innerW, innerW);
             gc.setLineWidth(2);
@@ -155,11 +155,6 @@ class BoardGraphics {
             explosion.radius += 2.5;
         }
         this.explosions.removeIf(e -> e.radius > Constants.EXPLOSION_RADIUS);
-    }
-
-    private static Paint getRobotPaint(Robot robot, double opacity) {
-        final int rgb = robot.rgb();
-        return Color.rgb(rgb >> 16 & 0xff, rgb >> 8 & 0xff, rgb & 0xff, opacity);
     }
 
     private static Paint getHealthPaint(int health) {

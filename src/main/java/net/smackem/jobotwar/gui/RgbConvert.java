@@ -17,4 +17,8 @@ class RgbConvert {
     public static Color toColor(int rgb) {
         return Color.rgb(rgb >> 16 & 0xff, rgb >> 8 & 0xff, rgb & 0xff);
     }
+
+    public static Color toColor(int rgb, double opacity) {
+        return Color.rgb(rgb >> 16 & 0xff, rgb >> 8 & 0xff, rgb & 0xff, opacity);
+    }
 }

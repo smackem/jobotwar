@@ -1,0 +1,8 @@
+
+K := gauss(15)
+kernelSum := sum(K)
+
+for p in Bounds {
+    alpha := fetchAlpha(p, K) | sum($) / kernelSum
+    @p = rgba(@p, alpha)
+}
