@@ -41,3 +41,30 @@
 .robotGaugeLabel {
     -fx-text-fill: #c0c0c0;
 }
+
+.scroll-pane{
+    -fx-background-color:transparent;
+}
+
+.scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar {
+    -fx-background-color: #101010;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: #303030;
+    -fx-border-color: #101010;
+}
+
+.text-area {
+    -fx-background-color: #000000;
+    -fx-font-family: 'Cascadia Code', 'DejaVu Sans Mono', 'Consolas', monospace;
+    -fx-text-fill: #c0c0c0;
+}
+
+.text-area .content {
+    -fx-background-color: transparent;
+}

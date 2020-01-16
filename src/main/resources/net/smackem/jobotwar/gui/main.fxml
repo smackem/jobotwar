@@ -23,19 +23,28 @@
                </VBox>
             </StackPane>
          </StackPane>
-         <HBox spacing="5.0">
-         </HBox>
+         <TextArea fx:id="messagesTextArea" editable="false" />
       </VBox>
    </left>
    <center>
-      <VBox fx:id="robotGaugesParent" spacing="5.0">
+      <BorderPane>
          <padding>
             <Insets left="4" right="4" />
          </padding>
-         <HBox alignment="CENTER" spacing="5.0">
-            <Button minWidth="80" onMouseClicked="#startGame" text="Start" />
-            <Button minWidth="80" onMouseClicked="#stopGame" text="Stop" />
-         </HBox>
-      </VBox>
+         <top>
+            <HBox alignment="CENTER" spacing="5.0">
+               <padding>
+                  <Insets bottom="8" />
+               </padding>
+               <Button minWidth="80" onMouseClicked="#startGame" text="Start" />
+               <Button minWidth="80" onMouseClicked="#stopGame" text="Stop" />
+            </HBox>
+         </top>
+         <center>
+            <ScrollPane fitToWidth="true">
+               <VBox fx:id="robotGaugesParent" spacing="5.0" />
+            </ScrollPane>
+         </center>
+      </BorderPane>
    </center>
 </BorderPane>
