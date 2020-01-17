@@ -3,7 +3,7 @@
 }
 
 #canvasContainer {
-    -fx-border-color: #c0c0c0;
+    -fx-border-color: #404040;
     -fx-border-width: 1px;
 }
 
@@ -63,6 +63,8 @@
     -fx-background-color: #000000;
     -fx-font-family: 'Cascadia Code', 'DejaVu Sans Mono', 'Consolas', monospace;
     -fx-text-fill: #c0c0c0;
+    -fx-border-color: #404040;
+    -fx-border-width: 1px;
 }
 
 .text-area .content {

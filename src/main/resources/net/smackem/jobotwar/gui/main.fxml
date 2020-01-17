@@ -10,7 +10,7 @@
       <Insets bottom="4" left="4" right="4" top="4" />
    </padding>
    <left>
-      <VBox spacing="4">
+      <VBox spacing="6">
          <StackPane fx:id="canvasContainer">
             <Canvas fx:id="canvas" />
             <StackPane fx:id="winnerOverlay"
