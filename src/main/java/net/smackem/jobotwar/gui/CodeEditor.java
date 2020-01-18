@@ -23,9 +23,10 @@ public class CodeEditor extends CodeArea {
     private static final String[] KEYWORDS = new String[] {
             "and", "or", "not", "abs", "sin", "cos",
             "if", "tan", "asin", "acos", "goto", "unless", "def",
+            "gosub", "endsub",
     };
     private static final String[] REGISTERS = new String[] {
-            "AIM", "RADAR", "X", "Y", "DAMAGE", "SPEEDX", "SPEEDY", "SHOT", "RANDOM",
+            "AIM", "RADAR", "X", "Y", "DAMAGE", "SPEEDX", "SPEEDY", "SHOT", "RANDOM", "OUT",
     };
 
     private static final String KEYWORD_PATTERN = "\\b(" + String.join("|", KEYWORDS) + ")\\b";

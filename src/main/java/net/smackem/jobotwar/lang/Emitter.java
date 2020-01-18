@@ -1,5 +1,7 @@
 package net.smackem.jobotwar.lang;
 
+import org.antlr.v4.runtime.RecognitionException;
+import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
@@ -11,6 +13,7 @@ class Emitter extends JobotwarBaseListener {
     private int labelId = 1;
     private boolean disabled;
     private boolean passModifierClause;
+    private String lastLoadedSymbol;
 
     public List<Instruction> instructions() {
         return Collections.unmodifiableList(this.instructions);
@@ -36,17 +39,27 @@ class Emitter extends JobotwarBaseListener {
 
     @Override
     public void exitAtom(JobotwarParser.AtomContext ctx) {
+        final String symbol;
         if (ctx.ID() != null) {
-            final Integer addr = this.locals.get(ctx.ID().getText());
+            final String ident = ctx.ID().getText();
+            final Integer addr = this.locals.get(ident);
             if (addr == null) {
-                throw new RuntimeException("Unknown local " + ctx.ID().getText());
+                throw new RuntimeException("Unknown local " + ident);
             }
             emit(OpCode.LD_LOC, addr);
+            symbol = ident;
         } else if (ctx.number() != null) {
-            emit(OpCode.LD_F64, Double.parseDouble(ctx.number().getText()));
+            final String literal = ctx.number().getText();
+            emit(OpCode.LD_F64, Double.parseDouble(literal));
+            symbol = literal;
         } else if (ctx.register() != null) {
-            emit(OpCode.LD_REG, ctx.register().getText());
+            final String register = ctx.register().getText();
+            emit(OpCode.LD_REG, register);
+            symbol = register;
+        } else {
+            symbol = null; // paren expr
         }
+        this.lastLoadedSymbol = symbol;
     }
 
     @Override
@@ -197,16 +210,28 @@ class Emitter extends JobotwarBaseListener {
         }
         for (final JobotwarParser.AssignTargetContext assignTarget : ctx.assignTarget()) {
             if (assignTarget.register() != null) {
-                emit(OpCode.ST_REG, assignTarget.register().getText());
-            } else if (assignTarget.ID() != null) {
-                final Integer addr = this.locals.get(assignTarget.ID().getText());
+                final String ident = assignTarget.register().getText();
+                emit(OpCode.ST_REG, ident);
+                this.lastLoadedSymbol = ident;
+                continue;
+            }
+            if (assignTarget.ID() != null) {
+                final String ident = assignTarget.ID().getText();
+                final Integer addr = this.locals.get(ident);
                 if (addr == null) {
                     throw new RuntimeException("Unknown local " + assignTarget.ID().getText());
                 }
                 emit(OpCode.ST_LOC, addr);
-            } else {
-                throw new RuntimeException("Unsupported assign target");
+                this.lastLoadedSymbol = ident;
+                continue;
             }
+            if (assignTarget.specialAssignTarget() != null) {
+                if (assignTarget.specialAssignTarget().OUT() != null) {
+                    emit(OpCode.LOG, this.lastLoadedSymbol);
+                    continue;
+                }
+            }
+            throw new RuntimeException("Unsupported assign target");
         }
     }
 

@@ -163,11 +163,16 @@ public class EditController {
         if (result.hasErrors()) {
             throw new Exception(String.join("\n", result.errors()));
         }
-        return new Robot.Builder(r -> new CompiledProgram(r, result.program()))
+        return new Robot.Builder(r -> new CompiledProgram(r, result.program(), (category, v) -> log(r, category, v)))
                 .name(robotViewModel.nameProperty().get())
                 .rgb(rgb)
                 .imageUrl(image != null ? image.getUrl() : null)
                 .build();
+    }
+
+    private static void log(Robot robot, String category, Double value) {
+        //noinspection UnstableApiUsage
+        App.instance().eventBus().post(new RobotLogMessage(robot, category, value));
     }
 
     @FXML

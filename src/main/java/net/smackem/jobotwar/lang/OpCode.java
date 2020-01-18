@@ -26,7 +26,8 @@ enum OpCode {
     NOT(false),        // pop a push a != 0
     INVOKE(false),     // pop a, push BuiltinFunc:strArg(a)
     CALL(true),        // push current pc, branch to label intArg
-    RET(false);        // pop a, a -> pc
+    RET(false),        // pop a, a -> pc
+    LOG(false);        // pop a, print 'strArg: a'
 
     private final boolean branch;
 

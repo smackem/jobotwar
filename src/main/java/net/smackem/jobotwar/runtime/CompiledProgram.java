@@ -4,16 +4,20 @@ import net.smackem.jobotwar.lang.Interpreter;
 import net.smackem.jobotwar.lang.Program;
 import net.smackem.jobotwar.lang.RuntimeEnvironment;
 
+import java.util.Objects;
 import java.util.Random;
+import java.util.function.BiConsumer;
 
 public class CompiledProgram implements RobotProgram {
 
     private final Robot robot;
     private final Interpreter interpreter;
+    private final BiConsumer<String, Double> logger;
 
-    public CompiledProgram(Robot robot, Program program) {
-        this.robot = robot;
-        this.interpreter = new Interpreter(program, environment());
+    public CompiledProgram(Robot robot, Program program, BiConsumer<String, Double> logger) {
+        this.robot = Objects.requireNonNull(robot);
+        this.interpreter = new Interpreter(Objects.requireNonNull(program), environment());
+        this.logger = Objects.requireNonNull(logger);
     }
 
     @Override
@@ -116,6 +120,11 @@ public class CompiledProgram implements RobotProgram {
             @Override
             public double getRandom() {
                 return random.nextDouble();
+            }
+
+            @Override
+            public void log(String category, double value) {
+                logger.accept(category, value);
             }
         };
     }

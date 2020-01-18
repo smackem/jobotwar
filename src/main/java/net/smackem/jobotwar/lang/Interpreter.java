@@ -142,6 +142,9 @@ public final class Interpreter {
                 return instr.intArg();
             case RET:
                 return (int)this.stack.pop();
+            case LOG:
+                this.runtime.log(instr.strArg(), this.stack.pop());
+                break;
         }
 
         return -1;

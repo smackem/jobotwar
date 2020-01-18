@@ -45,6 +45,7 @@ assignStatement
 
 assignTarget
     : register
+    | specialAssignTarget
     | ID
     ;
 
@@ -137,6 +138,10 @@ func
     | SQRT
     ;
 
+specialAssignTarget
+    : OUT
+    ;
+
 AIM     : 'AIM';
 SHOT    : 'SHOT';
 RADAR   : 'RADAR';
@@ -155,6 +160,8 @@ ATAN    : 'atan';
 ASIN    : 'asin';
 ACOS    : 'acos';
 SQRT    : 'sqrt';
+
+OUT     : 'OUT';
 
 ID
     : ('a' .. 'z' | 'A' .. 'Z' | '_') ('a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9') *

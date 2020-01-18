@@ -2,6 +2,9 @@ package net.smackem.jobotwar.lang;
 
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.*;
@@ -276,6 +279,29 @@ public class CompilerTest {
         assertThat(env.readAim()).isEqualTo(10);
     }
 
+    @Test
+    public void testLog() {
+        final String source = "" +
+                "def a, b\n" +
+                "1 -> SHOT -> OUT\n" +
+                "2 -> SPEEDX -> OUT\n" +
+                "3 -> SPEEDY -> OUT\n" +
+                "4 -> a -> OUT\n" +
+                "5 -> b -> OUT\n" +
+                "6 -> a\n" +
+                "a -> OUT\n" +
+                "7 -> AIM\n" +
+                "AIM -> OUT\n";
+        final Program program = compile(source);
+        final TestEnvironment env = new TestEnvironment();
+        final Interpreter interpreter = new Interpreter(program, env);
+
+        runComplete(interpreter);
+
+        assertThat(env.loggedCategories).isEqualTo(Arrays.asList("SHOT", "SPEEDX", "SPEEDY", "a", "b", "a", "AIM"));
+        assertThat(env.loggedValues).isEqualTo(Arrays.asList(1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0));
+    }
+
     private Program compile(String source) {
         final Compiler compiler = new Compiler();
         final Compiler.Result result = compiler.compile(source);
@@ -301,6 +327,8 @@ public class CompilerTest {
         private double y;
         private double shot;
         private double damage;
+        private final Collection<Double> loggedValues = new ArrayList<>();
+        private final Collection<String> loggedCategories = new ArrayList<>();
 
         @Override
         public double readAim() {
@@ -372,6 +400,12 @@ public class CompilerTest {
             return 42;
         }
 
+        @Override
+        public void log(String category, double value) {
+            this.loggedCategories.add(category);
+            this.loggedValues.add(value);
+        }
+
         public void setX(double value) {
             this.x = value;
         }
@@ -382,6 +416,14 @@ public class CompilerTest {
 
         public void setDamage(double value) {
             this.damage = value;
+        }
+
+        public Collection<Double> loggedValues() {
+            return this.loggedValues;
+        }
+
+        public Collection<String> loggedCategories() {
+            return this.loggedCategories;
         }
     }
 }

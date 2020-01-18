@@ -73,4 +73,9 @@ public interface RuntimeEnvironment {
      * @return The contents of the RANDOM register: random value between 0 and 1.
      */
     double getRandom();
+
+    /**
+     * Logs a value to the game console.
+     */
+    void log(String category, double value);
 }

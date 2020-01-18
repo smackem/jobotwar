@@ -1,5 +1,6 @@
 package net.smackem.jobotwar.gui;
 
+import com.google.common.eventbus.Subscribe;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -34,6 +35,7 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@SuppressWarnings("UnstableApiUsage") // for EventBus
 public class MainController {
 
     private static final Logger log = LoggerFactory.getLogger(MainController.class);
@@ -64,6 +66,7 @@ public class MainController {
         this.ticker.setCycleCount(Animation.INDEFINITE);
         this.engine = new GameEngine(board);
         this.graphics = new BoardGraphics(board);
+        App.instance().eventBus().register(this);
     }
 
     @FXML
@@ -93,6 +96,7 @@ public class MainController {
     @FXML
     private void newGame(ActionEvent actionEvent) throws IOException {
         this.ticker.stop();
+        App.instance().eventBus().unregister(this);
         App.instance().showEditor();
     }
 
@@ -148,5 +152,10 @@ public class MainController {
                 .filter(node -> node != nameLabel && node instanceof Label)
                 .forEach(node -> node.getStyleClass().add("robotGaugeLabel"));
         return vbox;
+    }
+
+    @Subscribe
+    private void onRobotLogMessage(RobotLogMessage message) {
+        this.messagesTextArea.appendText(String.format("[%s] %s: %f\n", message.robot.name(), message.category, message.value));
     }
 }
