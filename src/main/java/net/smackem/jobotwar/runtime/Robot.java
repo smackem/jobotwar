@@ -343,7 +343,7 @@ public class Robot {
      * @return {@code true} if the robot has health 0, otherwise {@code false}.
      */
     public boolean isDead() {
-        return this.health == 0;
+        return this.health <= 0;
     }
 
     /**

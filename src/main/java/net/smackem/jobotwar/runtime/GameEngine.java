@@ -17,15 +17,14 @@ public final class GameEngine {
         for (final Robot robot : robots) {
             if (robot.isDead() == false) {
                 tickRobot(robot, result);
-                if (robot.isDead()) {
-                    result.killedRobots.add(robot);
-                }
+            } else {
+                result.killedRobots.add(robot);
             }
         }
-        if (robots.removeIf(Robot::isDead) && robots.size() == 1) {
+        robots.removeAll(result.killedRobots);
+        if (result.killedRobots.isEmpty() == false && robots.size() == 1) {
             result.winner = robots.iterator().next();
         }
-
         final Collection<Projectile> projectiles = this.board.projectiles();
         for (final Projectile projectile : projectiles) {
             if (tickProjectile(projectile)) {

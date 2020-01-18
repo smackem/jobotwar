@@ -1,13 +1,10 @@
 package net.smackem.jobotwar.gui;
 
-import com.google.common.base.Strings;
 import com.google.common.io.CharStreams;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -17,9 +14,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
 import net.smackem.jobotwar.lang.Compiler;
 import net.smackem.jobotwar.runtime.CompiledProgram;
-import net.smackem.jobotwar.runtime.Constants;
 import net.smackem.jobotwar.runtime.Robot;
-import net.smackem.jobotwar.runtime.Vector;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,7 +22,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Random;
-import java.util.stream.Collectors;
 
 public class EditController {
 
@@ -171,7 +165,6 @@ public class EditController {
     }
 
     private static void log(Robot robot, String category, Double value) {
-        //noinspection UnstableApiUsage
         App.instance().eventBus().post(new RobotLogMessage(robot, category, value));
     }
 

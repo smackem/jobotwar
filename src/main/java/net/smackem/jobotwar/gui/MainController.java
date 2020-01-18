@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.stream.Collectors;
@@ -86,11 +87,13 @@ public class MainController {
     @FXML
     private void startGame(MouseEvent mouseEvent) {
         this.ticker.play();
+        this.messagesTextArea.appendText("Game started at " + LocalDateTime.now() + "\n");
     }
 
     @FXML
     private void stopGame(MouseEvent mouseEvent) {
         this.ticker.stop();
+        this.messagesTextArea.appendText("Game paused at " + LocalDateTime.now() + "\n");
     }
 
     @FXML
@@ -108,10 +111,14 @@ public class MainController {
         for (final MainRobotViewModel r : this.robots) {
             r.update();
         }
+        for (final Robot robot : tickResult.killedRobots) {
+            this.messagesTextArea.appendText(robot.name() + " got killed.\n");
+        }
         if (tickResult.winner != null) {
             this.winnerLabel.setText(tickResult.winner.name() + " has won!");
             this.winnerLabel.setTextFill(RgbConvert.toColor(tickResult.winner.rgb()));
             this.winnerOverlay.setVisible(true);
+            this.messagesTextArea.appendText(tickResult.winner.name() + " has won the game!\n");
         }
     }
 

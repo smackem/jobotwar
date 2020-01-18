@@ -15,7 +15,6 @@ import java.util.Collection;
 /**
  * JavaFX App
  */
-@SuppressWarnings("UnstableApiUsage") // for EventBus
 public class App extends Application {
 
     private final EventBus eventBus;
