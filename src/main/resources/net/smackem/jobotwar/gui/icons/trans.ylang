@@ -6,3 +6,30 @@ for p in Bounds {
     alpha := fetchAlpha(p, K) | sum($) / kernelSum
     @p = rgba(@p, alpha)
 }
+
+// ============================================================
+// try ylang as jobotwar language
+// ============================================================
+
+while true {
+    destX := random(640)
+    destY := random(480)
+    move(destX, destY)
+}
+
+move := fn(destX, destY) {
+    @SpeedX = @X - destX
+    @SpeedY = @Y - destY
+    arrived := false
+    while not arrived {
+        if abs(destX - @X) < 20 {
+            @SpeedX = 0
+        }
+        if abs(destY - @Y) < 20 {
+            @SpeedY = 0
+        }
+        if @SpeedX == 0 and @SpeedY == 0 {
+            arrived = true
+        }
+    }
+}
