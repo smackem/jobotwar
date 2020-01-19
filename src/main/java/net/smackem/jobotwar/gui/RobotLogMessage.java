@@ -2,7 +2,7 @@ package net.smackem.jobotwar.gui;
 
 import net.smackem.jobotwar.runtime.Robot;
 
-public class RobotLogMessage {
+class RobotLogMessage {
     final Robot robot;
     final String category;
     final Double value;

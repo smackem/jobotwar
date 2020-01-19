@@ -36,7 +36,6 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@SuppressWarnings("UnstableApiUsage") // for EventBus
 public class MainController {
 
     private static final Logger log = LoggerFactory.getLogger(MainController.class);
@@ -78,6 +77,7 @@ public class MainController {
         this.canvas.setWidth(board.width());
         this.canvas.setHeight(board.height());
         this.graphics.render(this.canvas.getGraphicsContext2D());
+        this.messagesTextArea.appendText("Welcome to the battle of programs!\n");
 
         for (final MainRobotViewModel robot : this.robots) {
             robotGaugesParent.getChildren().add(createRobotGauge(robot));
