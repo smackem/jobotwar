@@ -3,6 +3,8 @@ package net.smackem.jobotwar.runtime;
 import net.smackem.jobotwar.lang.Interpreter;
 import net.smackem.jobotwar.lang.Program;
 import net.smackem.jobotwar.lang.RuntimeEnvironment;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
 import java.util.Random;
@@ -10,14 +12,15 @@ import java.util.function.BiConsumer;
 
 public class CompiledProgram implements RobotProgram {
 
+    private static final Logger log = LoggerFactory.getLogger(CompiledProgram.class);
     private final Robot robot;
     private final Interpreter interpreter;
-    private final BiConsumer<String, Double> logger;
+    private final BiConsumer<String, Double> messageLogger;
 
-    public CompiledProgram(Robot robot, Program program, BiConsumer<String, Double> logger) {
+    public CompiledProgram(Robot robot, Program program, BiConsumer<String, Double> messageLogger) {
         this.robot = Objects.requireNonNull(robot);
         this.interpreter = new Interpreter(Objects.requireNonNull(program), environment());
-        this.logger = Objects.requireNonNull(logger);
+        this.messageLogger = Objects.requireNonNull(messageLogger);
     }
 
     @Override
@@ -25,7 +28,7 @@ public class CompiledProgram implements RobotProgram {
         try {
             return this.interpreter.runNext();
         } catch (Interpreter.StackException e) {
-            e.printStackTrace();
+            log.error(String.format("Interpreter error: %s @ pc=%s (%s) in program:\n%s", e.getMessage(), e.pc(), e.instruction(), this.interpreter.program()), e);
         }
         return false;
     }
@@ -124,7 +127,7 @@ public class CompiledProgram implements RobotProgram {
 
             @Override
             public void log(String category, double value) {
-                logger.accept(category, value);
+                messageLogger.accept(category, value);
             }
         };
     }

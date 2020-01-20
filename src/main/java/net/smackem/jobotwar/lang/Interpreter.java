@@ -31,7 +31,15 @@ public final class Interpreter {
     public boolean runNext() throws StackException {
         final int codeSize = this.code.size();
         while (this.pc < codeSize) {
-            final int target = executeInstruction(this.code.get(this.pc));
+            final int target;
+            final Instruction instr = this.code.get(this.pc);
+            try {
+                target = executeInstruction(instr);
+            } catch (StackException e) {
+                e.pc = this.pc;
+                e.instruction = instr;
+                throw e;
+            }
             if (target >= 0) {
                 this.pc = target;
                 return true;
@@ -231,8 +239,19 @@ public final class Interpreter {
     }
 
     public static class StackException extends Exception {
+        private int pc;
+        private Instruction instruction;
+
         private StackException(String message) {
             super(message);
+        }
+
+        public int pc() {
+            return this.pc;
+        }
+
+        public Instruction instruction() {
+            return this.instruction;
         }
     }
 }

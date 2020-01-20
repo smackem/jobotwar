@@ -24,4 +24,14 @@ public final class Program {
     Collection<Instruction> instructions() {
         return this.instructions;
     }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder();
+        for (final Instruction instr : this.instructions) {
+            sb.append(instr.toString());
+            sb.append('\n');
+        }
+        return sb.toString();
+    }
 }
