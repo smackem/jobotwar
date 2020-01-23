@@ -111,26 +111,27 @@ public class MainController {
         for (final MainRobotViewModel r : this.robots) {
             r.update();
         }
-        for (final Robot robot : tickResult.killedRobots) {
+        for (final Robot robot : tickResult.killedRobots()) {
             this.messagesTextArea.appendText(robot.name() + " got killed.\n");
         }
-        if (tickResult.winner != null) {
-            this.winnerLabel.setText(tickResult.winner.name() + " has won!");
-            this.winnerLabel.setTextFill(RgbConvert.toColor(tickResult.winner.rgb()));
+        final Robot winner = tickResult.winner();
+        if (winner != null) {
+            this.winnerLabel.setText(winner.name() + " has won!");
+            this.winnerLabel.setTextFill(RgbConvert.toColor(winner.rgb()));
             this.winnerOverlay.setVisible(true);
-            this.messagesTextArea.appendText(tickResult.winner.name() + " has won the game!\n");
+            this.messagesTextArea.appendText(winner.name() + " has won the game!\n");
         }
     }
 
     private void updateGraphics(GameEngine.TickResult tickResult) {
         this.graphics.addExplosions(Stream.concat(
-                tickResult.explodedProjectiles.stream().map(Projectile::position),
+                tickResult.explodedProjectiles().stream().map(Projectile::position),
                 Stream.concat(
-                        tickResult.collisionPositions.stream(),
-                        tickResult.killedRobots.stream().map(r -> new Vector(r.getX(), r.getY())))
+                        tickResult.collisionPositions().stream(),
+                        tickResult.killedRobots().stream().map(r -> new Vector(r.getX(), r.getY())))
         ).collect(Collectors.toList()));
-        this.graphics.addRadarBeams(tickResult.radarBeams);
-        if (tickResult.winner != null) {
+        this.graphics.addRadarBeams(tickResult.radarBeams());
+        if (tickResult.winner() != null) {
             this.graphics.createWinnerAnimation();
         }
     }

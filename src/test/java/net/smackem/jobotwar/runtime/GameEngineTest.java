@@ -21,7 +21,7 @@ public class GameEngineTest {
         final Board board = new Board(100, 100, Collections.singleton(robot));
         final GameEngine engine = new GameEngine(board);
 
-        assertThat(engine.tick().explodedProjectiles).hasSize(0);
+        assertThat(engine.tick().explodedProjectiles()).hasSize(0);
         assertThat(robot.getActualSpeedX()).isEqualTo(1);
         assertThat(robot.getX()).isEqualTo(31);
 
@@ -52,10 +52,10 @@ public class GameEngineTest {
         final Board board = new Board(100, 100, Collections.singleton(robot));
         final GameEngine engine = new GameEngine(board);
 
-        assertThat(engine.tick().explodedProjectiles).hasSize(0);
+        assertThat(engine.tick().explodedProjectiles()).hasSize(0);
         assertThat(board.projectiles()).hasSize(0);
 
-        assertThat(engine.tick().explodedProjectiles).hasSize(0);
+        assertThat(engine.tick().explodedProjectiles()).hasSize(0);
         assertThat(board.projectiles()).hasSize(1);
         final Projectile projectile = board.projectiles().iterator().next();
         assertThat(projectile.destination()).isEqualTo(new Vector(40, 30));
@@ -64,7 +64,7 @@ public class GameEngineTest {
         int count = 0;
         Collection<Projectile> explodedProjectiles;
         do {
-            explodedProjectiles = engine.tick().explodedProjectiles;
+            explodedProjectiles = engine.tick().explodedProjectiles();
             count++;
             assertThat(count).isLessThan(100); // make sure it ends!
         } while (explodedProjectiles.size() == 0);
@@ -87,10 +87,10 @@ public class GameEngineTest {
         final GameEngine engine = new GameEngine(board);
         final VectorComparator vectorComparator = new VectorComparator(VectorComparator.DEFAULT_TOLERANCE);
 
-        assertThat(engine.tick().explodedProjectiles).hasSize(0);
+        assertThat(engine.tick().explodedProjectiles()).hasSize(0);
         assertThat(board.projectiles()).hasSize(0);
 
-        assertThat(engine.tick().explodedProjectiles).hasSize(0);
+        assertThat(engine.tick().explodedProjectiles()).hasSize(0);
         assertThat(board.projectiles()).hasSize(1);
         final Projectile projectile = board.projectiles().iterator().next();
         assertThat(projectile.destination())
@@ -103,7 +103,7 @@ public class GameEngineTest {
         int count = 0;
         Collection<Projectile> explodedProjectiles;
         do {
-            explodedProjectiles = engine.tick().explodedProjectiles;
+            explodedProjectiles = engine.tick().explodedProjectiles();
             count++;
             assertThat(count).isLessThan(100); // make sure it ends!
         } while (explodedProjectiles.size() == 0);
@@ -140,8 +140,8 @@ public class GameEngineTest {
 
         // 0 degrees - hit right wall
         GameEngine.TickResult result = engine.tick();
-        assertThat(result.radarBeams).hasSize(1);
-        RadarBeam beam = result.radarBeams.iterator().next();
+        assertThat(result.radarBeams()).hasSize(1);
+        RadarBeam beam = result.radarBeams().iterator().next();
         assertThat(beam.hitKind()).isEqualTo(RadarBeamHitKind.WALL);
         assertThat(beam.sourceRobot()).isEqualTo(robot);
         assertThat(beam.hitPosition())
@@ -150,8 +150,8 @@ public class GameEngineTest {
 
         // 90 degrees - hit bottom wall
         result = engine.tick();
-        assertThat(result.radarBeams).hasSize(1);
-        beam = result.radarBeams.iterator().next();
+        assertThat(result.radarBeams()).hasSize(1);
+        beam = result.radarBeams().iterator().next();
         assertThat(beam.hitKind()).isEqualTo(RadarBeamHitKind.WALL);
         assertThat(beam.sourceRobot()).isEqualTo(robot);
         assertThat(beam.hitPosition())
@@ -160,8 +160,8 @@ public class GameEngineTest {
 
         // 180 degrees - hit left wall
         result = engine.tick();
-        assertThat(result.radarBeams).hasSize(1);
-        beam = result.radarBeams.iterator().next();
+        assertThat(result.radarBeams()).hasSize(1);
+        beam = result.radarBeams().iterator().next();
         assertThat(beam.hitKind()).isEqualTo(RadarBeamHitKind.WALL);
         assertThat(beam.sourceRobot()).isEqualTo(robot);
         assertThat(beam.hitPosition())
@@ -170,8 +170,8 @@ public class GameEngineTest {
 
         // 270 degrees - hit top wall
         result = engine.tick();
-        assertThat(result.radarBeams).hasSize(1);
-        beam = result.radarBeams.iterator().next();
+        assertThat(result.radarBeams()).hasSize(1);
+        beam = result.radarBeams().iterator().next();
         assertThat(beam.hitKind()).isEqualTo(RadarBeamHitKind.WALL);
         assertThat(beam.sourceRobot()).isEqualTo(robot);
         assertThat(beam.hitPosition())
@@ -180,8 +180,8 @@ public class GameEngineTest {
 
         // 45 degrees - hit bottom right corner
         result = engine.tick();
-        assertThat(result.radarBeams).hasSize(1);
-        beam = result.radarBeams.iterator().next();
+        assertThat(result.radarBeams()).hasSize(1);
+        beam = result.radarBeams().iterator().next();
         assertThat(beam.hitKind()).isEqualTo(RadarBeamHitKind.WALL);
         assertThat(beam.sourceRobot()).isEqualTo(robot);
         assertThat(beam.hitPosition())
@@ -206,8 +206,8 @@ public class GameEngineTest {
         final VectorComparator vectorComparator = new VectorComparator(1);
 
         GameEngine.TickResult result = engine.tick();
-        assertThat(result.radarBeams).hasSize(1);
-        RadarBeam beam = result.radarBeams.iterator().next();
+        assertThat(result.radarBeams()).hasSize(1);
+        RadarBeam beam = result.radarBeams().iterator().next();
         assertThat(beam.hitKind()).isEqualTo(RadarBeamHitKind.ROBOT);
         assertThat(beam.sourceRobot()).isEqualTo(robot1);
         assertThat(beam.hitPosition())

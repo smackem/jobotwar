@@ -36,11 +36,31 @@ public final class GameEngine {
     }
 
     public static final class TickResult {
-        public final Collection<Projectile> explodedProjectiles;
-        public final Collection<Vector> collisionPositions;
-        public final Collection<Robot> killedRobots;
-        public final Collection<RadarBeam> radarBeams;
-        public Robot winner;
+        private final Collection<Projectile> explodedProjectiles;
+        private final Collection<Vector> collisionPositions;
+        private final Collection<Robot> killedRobots;
+        private final Collection<RadarBeam> radarBeams;
+        private Robot winner;
+
+        public Collection<Projectile> explodedProjectiles() {
+            return this.explodedProjectiles;
+        }
+
+        public Collection<Vector> collisionPositions() {
+            return this.collisionPositions;
+        }
+
+        public Collection<Robot> killedRobots() {
+            return this.killedRobots;
+        }
+
+        public Collection<RadarBeam> radarBeams() {
+            return this.radarBeams;
+        }
+
+        public Robot winner() {
+            return this.winner;
+        }
 
         private TickResult() {
             this.explodedProjectiles = new ArrayList<>();
