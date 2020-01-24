@@ -13,13 +13,14 @@
     <left>
         <BorderPane style="-fx-padding: 2; -fx-spacing: 2">
             <top>
-                <VBox minWidth="250" spacing="4">
+                <VBox spacing="4">
                     <padding>
-                        <Insets bottom="8" />
+                        <Insets top="2" bottom="8" />
                     </padding>
                     <Button fx:id="playButton" minWidth="250" text="Play" onAction="#startGame" />
-                    <HBox spacing="4">
-                        <SplitMenuButton minWidth="80" text="New Robot" onAction="#newRobot">
+                    <Button fx:id="simulateButton" minWidth="250" text="Simulate" onAction="#simulateGame" />
+                    <HBox spacing="4" alignment="CENTER">
+                        <SplitMenuButton minWidth="123" text="New Robot" onAction="#newRobot">
                             <items>
                                 <MenuItem text="mover" onAction="#newRobotMover" />
                                 <MenuItem text="smart" onAction="#newRobotSmart" />
@@ -28,7 +29,7 @@
                                 <MenuItem text="bumblebee" onAction="#newRobotBumblebee" />
                             </items>
                         </SplitMenuButton>
-                        <Button minWidth="80" text="Remove Robot" onAction="#removeRobot" />
+                        <Button minWidth="123" text="Remove Robot" onAction="#removeRobot" />
                     </HBox>
                 </VBox>
             </top>
@@ -40,20 +41,14 @@
     <center>
         <BorderPane>
             <top>
-                <VBox spacing="4" style="-fx-padding: 2;">
-                    <HBox spacing="4" alignment="BASELINE_LEFT">
-                        <Label text="Name:" />
-                        <TextField fx:id="nameTextField" />
-                    </HBox>
-                    <HBox spacing="4" alignment="BASELINE_LEFT">
-                        <Label text="Color:" />
-                        <ColorPicker fx:id="colorPicker" />
-                    </HBox>
-                    <HBox spacing="4" alignment="BASELINE_LEFT">
-                        <Label text="Icon:" />
-                        <ComboBox fx:id="iconComboBox" />
-                    </HBox>
-                </VBox>
+                <GridPane style="-fx-padding: 4;" hgap="4" vgap="4">
+                    <Label text="Name:" />
+                    <TextField fx:id="nameTextField" GridPane.columnIndex="1" />
+                    <Label text="Color:" GridPane.rowIndex="1" />
+                    <ColorPicker fx:id="colorPicker" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+                    <Label text="Icon:" GridPane.rowIndex="2" />
+                    <ComboBox fx:id="iconComboBox" GridPane.rowIndex="2" GridPane.columnIndex="1" />
+                </GridPane>
             </top>
             <center>
                 <SplitPane orientation="VERTICAL" dividerPositions="0.8">

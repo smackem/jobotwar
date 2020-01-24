@@ -8,6 +8,8 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import net.smackem.jobotwar.runtime.Board;
 import net.smackem.jobotwar.runtime.Robot;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -17,6 +19,7 @@ import java.util.Collection;
  */
 public class App extends Application {
 
+    private static final Logger log = LoggerFactory.getLogger(App.class);
     private final EventBus eventBus;
     private Scene scene;
     private Board board;
@@ -49,18 +52,28 @@ public class App extends Application {
         stage.show();
     }
 
-    public void startGame(int width, int height, Collection<Robot> robots) throws IOException {
+    public void startGame(int width, int height, Collection<Robot> robots) {
         this.board = new Board(width, height, robots);
         this.board.disperseRobots();
         setRoot("main");
+    }
+
+    public void simulateGame(int width, int height, Collection<Robot> robots) {
+        this.board = new Board(width, height, robots);
+        this.board.disperseRobots();
+        setRoot("simulation");
     }
 
     public void showEditor() throws IOException {
         setRoot("edit");
     }
 
-    private void setRoot(String fxml) throws IOException {
-        this.scene.setRoot(loadFXML(fxml));
+    private void setRoot(String fxml) {
+        try {
+            this.scene.setRoot(loadFXML(fxml));
+        } catch (IOException e) {
+            log.error("error loading fxml", e);
+        }
     }
 
     private static Parent loadFXML(String fxml) throws IOException {

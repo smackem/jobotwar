@@ -22,6 +22,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Random;
+import java.util.function.BiConsumer;
 
 public class EditController {
 
@@ -45,6 +46,8 @@ public class EditController {
     private TextArea compilerOutput;
     @FXML
     private ComboBox<Image> iconComboBox;
+    @FXML
+    private Button simulateButton;
 
     @FXML
     private void initialize() {
@@ -54,6 +57,8 @@ public class EditController {
         });
         this.robotsListView.setCellFactory(listView -> new RobotViewModelCell());
         this.playButton.disableProperty().bind(
+                this.robots.sizeProperty().lessThanOrEqualTo(0));
+        this.simulateButton.disableProperty().bind(
                 this.robots.sizeProperty().lessThanOrEqualTo(0));
         this.sourceText.textProperty().addListener((prop, old, val) -> {
             this.selectedRobot.get().sourceCodeProperty().set(val);
@@ -75,15 +80,8 @@ public class EditController {
     }
 
     @FXML
-    private void startGame(ActionEvent mouseEvent) throws IOException {
-        final App app = App.instance();
-        final Collection<Robot> robots;
-        try {
-            robots = createRobotsFromViewModel();
-        } catch (Exception e) {
-            return;
-        }
-        app.startGame(BOARD_WIDTH, BOARD_HEIGHT, robots);
+    private void startGame(ActionEvent mouseEvent) {
+        initiateGame((app, robots) -> app.startGame(BOARD_WIDTH, BOARD_HEIGHT, robots));
     }
 
     @FXML
@@ -191,6 +189,22 @@ public class EditController {
     @FXML
     private void newRobotBumblebee(ActionEvent actionEvent) {
         newRobotWithProgram("Bumblebee", "robots/bumblebee.jobot");
+    }
+
+    @FXML
+    private void simulateGame(ActionEvent actionEvent) throws IOException {
+        initiateGame((app, robots) -> app.simulateGame(BOARD_WIDTH, BOARD_HEIGHT, robots));
+    }
+
+    private void initiateGame(BiConsumer<App, Collection<Robot>> gameMode) {
+        final App app = App.instance();
+        final Collection<Robot> robots;
+        try {
+            robots = createRobotsFromViewModel();
+        } catch (Exception e) {
+            return;
+        }
+        gameMode.accept(app, robots);
     }
 
     private static class RobotViewModelCell extends ListCell<EditRobotViewModel> {

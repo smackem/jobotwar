@@ -86,10 +86,10 @@ public final class GameEngine {
         final double y = position.y();
 
         // out of bounds?
-        if (x < 0 || x >= this.board.width()) {
+        if (0 >= x || x >= this.board.width()) {
             return true;
         }
-        if (y < 0 || y >= this.board.height()) {
+        if (0 >= y || y >= this.board.height()) {
             return true;
         }
 
