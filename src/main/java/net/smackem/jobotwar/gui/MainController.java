@@ -9,30 +9,22 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.util.Duration;
-import net.smackem.jobotwar.lang.Compiler;
-import net.smackem.jobotwar.lang.Interpreter;
 import net.smackem.jobotwar.runtime.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -62,7 +54,7 @@ public class MainController {
         this.robots = FXCollections.observableArrayList(board.robots().stream()
                         .map(MainRobotViewModel::new)
                         .collect(Collectors.toList()));
-        this.ticker = new Timeline(new KeyFrame(Duration.millis(40), this::tick));
+        this.ticker = new Timeline(new KeyFrame(Duration.millis(Constants.TICK_DURATION.toMillis()), this::tick));
         this.ticker.setCycleCount(Animation.INDEFINITE);
         this.engine = new GameEngine(board);
         this.graphics = new BoardGraphics(board);

@@ -1,5 +1,7 @@
 package net.smackem.jobotwar.runtime;
 
+import java.time.Duration;
+
 public class Constants {
     private Constants() {
         throw new IllegalAccessError();
@@ -19,4 +21,5 @@ public class Constants {
     public static double EXPLOSION_RADIUS = 20;
     public static int DEFAULT_COOL_DOWN_TICKS = 20;
     public static double MAX_ROBOT_GAME_SPEED = 500;
+    public static Duration TICK_DURATION = Duration.ofMillis(40);
 }

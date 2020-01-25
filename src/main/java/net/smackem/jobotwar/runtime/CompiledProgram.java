@@ -8,19 +8,26 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
 import java.util.Random;
-import java.util.function.BiConsumer;
 
 public class CompiledProgram implements RobotProgram {
 
     private static final Logger log = LoggerFactory.getLogger(CompiledProgram.class);
     private final Robot robot;
     private final Interpreter interpreter;
-    private final BiConsumer<String, Double> messageLogger;
+    private final RobotMessageLogger messageLogger;
 
-    public CompiledProgram(Robot robot, Program program, BiConsumer<String, Double> messageLogger) {
+    public CompiledProgram(Robot robot, Program program, RobotMessageLogger messageLogger) {
         this.robot = Objects.requireNonNull(robot);
         this.interpreter = new Interpreter(Objects.requireNonNull(program), environment());
         this.messageLogger = Objects.requireNonNull(messageLogger);
+    }
+
+    public Program program() {
+        return this.interpreter.program();
+    }
+
+    public RobotMessageLogger messageLogger() {
+        return this.messageLogger;
     }
 
     @Override
@@ -127,7 +134,7 @@ public class CompiledProgram implements RobotProgram {
 
             @Override
             public void log(String category, double value) {
-                messageLogger.accept(category, value);
+                messageLogger.log(robot, category, value);
             }
         };
     }

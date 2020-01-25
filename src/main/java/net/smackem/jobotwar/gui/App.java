@@ -6,13 +6,17 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import net.smackem.jobotwar.lang.Program;
 import net.smackem.jobotwar.runtime.Board;
+import net.smackem.jobotwar.runtime.CompiledProgram;
 import net.smackem.jobotwar.runtime.Robot;
+import net.smackem.jobotwar.runtime.Robots;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 /**
  * JavaFX App
@@ -52,6 +56,23 @@ public class App extends Application {
         stage.show();
     }
 
+    public Robot createRobot(Program program, String name, int rgb, String imageUrl) {
+        return new Robot.Builder(r -> new CompiledProgram(r, program, this::logRobotMessage))
+                .name(name)
+                .rgb(rgb)
+                .imageUrl(imageUrl)
+                .build();
+    }
+
+    public Board copyBoard() {
+        final Collection<Robot> newRobots = this.board.robots().stream()
+                .map(Robots::buildLike)
+                .collect(Collectors.toList());
+        final Board newBoard = new Board(this.board.width(), this.board.height(), newRobots);
+        newBoard.disperseRobots();
+        return newBoard;
+    }
+
     public void startGame(int width, int height, Collection<Robot> robots) {
         this.board = new Board(width, height, robots);
         this.board.disperseRobots();
@@ -66,6 +87,10 @@ public class App extends Application {
 
     public void showEditor() throws IOException {
         setRoot("edit");
+    }
+
+    private void logRobotMessage(Robot robot, String category, double value) {
+        this.eventBus.post(new RobotLogMessage(robot, category, value));
     }
 
     private void setRoot(String fxml) {

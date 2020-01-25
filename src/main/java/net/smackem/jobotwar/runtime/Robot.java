@@ -84,7 +84,7 @@ public class Robot {
         /**
          * The acceleration in pixels per tick^2. Must be positive.
          */
-        public Builder acceleration(int value) {
+        public Builder acceleration(double value) {
             this.acceleration = Arguments.requireRange(value, 0, Constants.MAX_ROBOT_ACCELERATION);
             return this;
         }

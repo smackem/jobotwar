@@ -5,10 +5,23 @@
 <?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
+<BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="net.smackem.jobotwar.gui.SimulationController"
-            prefHeight="400.0" prefWidth="600.0">
-
-</AnchorPane>
+            fx:controller="net.smackem.jobotwar.gui.SimulationController">
+    <padding>
+        <Insets top="4" left="4" right="4" bottom="4" />
+    </padding>
+    <top>
+        <Button text="Start" onAction="#startSimulation" />
+    </top>
+    <center>
+        <TableView fx:id="matchTable">
+            <columns>
+                <TableColumn fx:id="winnerColumn" text="Winner" />
+                <TableColumn fx:id="durationColumn" text="Duration" />
+            </columns>
+        </TableView>
+    </center>
+</BorderPane>

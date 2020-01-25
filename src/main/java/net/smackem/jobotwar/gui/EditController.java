@@ -59,7 +59,7 @@ public class EditController {
         this.playButton.disableProperty().bind(
                 this.robots.sizeProperty().lessThanOrEqualTo(0));
         this.simulateButton.disableProperty().bind(
-                this.robots.sizeProperty().lessThanOrEqualTo(0));
+                this.robots.sizeProperty().lessThanOrEqualTo(1));
         this.sourceText.textProperty().addListener((prop, old, val) -> {
             this.selectedRobot.get().sourceCodeProperty().set(val);
         });
@@ -155,15 +155,11 @@ public class EditController {
         if (result.hasErrors()) {
             throw new Exception(String.join("\n", result.errors()));
         }
-        return new Robot.Builder(r -> new CompiledProgram(r, result.program(), (category, v) -> log(r, category, v)))
-                .name(robotViewModel.nameProperty().get())
-                .rgb(rgb)
-                .imageUrl(image != null ? image.getUrl() : null)
-                .build();
-    }
-
-    private static void log(Robot robot, String category, Double value) {
-        App.instance().eventBus().post(new RobotLogMessage(robot, category, value));
+        return App.instance().createRobot(
+                result.program(),
+                robotViewModel.nameProperty().get(),
+                rgb,
+                image != null ? image.getUrl() : null);
     }
 
     @FXML
