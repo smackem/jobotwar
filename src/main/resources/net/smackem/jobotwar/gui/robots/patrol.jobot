@@ -7,7 +7,7 @@ start:
     goto moveToBottom
 
 clean:
-    RADAR -> SHOT
+    abs(RADAR) -> SHOT
     goto start
 
 moveToTop:

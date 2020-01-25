@@ -35,7 +35,7 @@ public class SimulationController {
 
     @FXML
     private void startSimulation(ActionEvent actionEvent) {
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 1000; i++) {
             final Board board = App.instance().copyBoard();
             final SimulationRunner runner = new SimulationRunner(board);
             final SimulationRunner.SimulationResult result = runner.runGame(Duration.ofMinutes(5));

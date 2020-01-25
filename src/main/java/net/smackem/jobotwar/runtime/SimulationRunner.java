@@ -12,7 +12,7 @@ public final class SimulationRunner {
         this.board = Objects.requireNonNull(board);
         this.engine = new GameEngine(board);
         if (board.robots().size() < 2) {
-            throw new IllegalArgumentException("The board must contains at least two robots!");
+            throw new IllegalArgumentException("The board must contain at least two robots!");
         }
     }
 
