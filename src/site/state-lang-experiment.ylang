@@ -1,0 +1,38 @@
+
+radarAngle := 0
+oldDamage := @damage()
+
+state main() {
+    distance := @radar(radarAngle)
+    if distance < 0 {
+        @fire(radarAngle, abs(distance))
+    }
+    radarAngle = radarAngle + 7
+    if @damage() != oldDamage {
+        return newDest
+    }
+}
+
+state newDest() {
+    destX = @random(10, 100)
+    destY = @random(10, 200)
+    @speedX(destX - @x())
+    @speedY(destY - @y())
+    return move(destX, destY)
+}
+
+state move(destX, destY) {
+    arrivedX := false
+    arrivedY := false
+    if abs(destX - @x()) < 30 {
+        @speedX(0)
+        arrivedX = true
+    }
+    if (abs(destY - @y()) < 30 {
+        @speedY(0)
+        arrivedY = true
+    }
+    if arrivedX and arrivedY {
+        return main
+    }
+}

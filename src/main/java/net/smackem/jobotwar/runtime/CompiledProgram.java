@@ -9,6 +9,10 @@ import org.slf4j.LoggerFactory;
 import java.util.Objects;
 import java.util.Random;
 
+/**
+ * A {@link RobotProgram} that has been compiled source code and executes by using a
+ * {@link Interpreter}.
+ */
 public class CompiledProgram implements RobotProgram {
 
     private static final Logger log = LoggerFactory.getLogger(CompiledProgram.class);
@@ -16,20 +20,36 @@ public class CompiledProgram implements RobotProgram {
     private final Interpreter interpreter;
     private final RobotMessageLogger messageLogger;
 
+    /**
+     * Initializes a new {@link CompiledProgram}.
+     * @param robot The {@link Robot} that is controlled by the program.
+     * @param program The {@link Program} that has been compiled from source code.
+     * @param messageLogger A callback object that receives messages written to the OUT
+     *                      register of the robot.
+     */
     public CompiledProgram(Robot robot, Program program, RobotMessageLogger messageLogger) {
         this.robot = Objects.requireNonNull(robot);
         this.interpreter = new Interpreter(Objects.requireNonNull(program), environment());
         this.messageLogger = Objects.requireNonNull(messageLogger);
     }
 
+    /**
+     * @return The {@link Program} that has been compiled from source code.
+     */
     public Program program() {
         return this.interpreter.program();
     }
 
+    /**
+     * @return A callback object that receives messages written to the OUT register of the robot.
+     */
     public RobotMessageLogger messageLogger() {
         return this.messageLogger;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean next() {
         try {

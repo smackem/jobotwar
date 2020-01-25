@@ -4,13 +4,24 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
 
+/**
+ * Runs the game.
+ */
 public final class GameEngine {
     private final Board board;
 
+    /**
+     * Initializes a new instance of {@link GameEngine}.
+     * @param board The game board.
+     */
     public GameEngine(Board board) {
         this.board = Objects.requireNonNull(board);
     }
 
+    /**
+     * Executes the next frame.
+     * @return A {@link TickResult} that holds the new state of the game.
+     */
     public TickResult tick() {
         final TickResult result = new TickResult();
         final Collection<Robot> robots = this.board.robots();
@@ -35,6 +46,9 @@ public final class GameEngine {
         return result;
     }
 
+    /**
+     * The current state of the game as changed by a call to {@link #tick()}.
+     */
     public static final class TickResult {
         private final Collection<Projectile> explodedProjectiles;
         private final Collection<Vector> collisionPositions;
@@ -42,22 +56,39 @@ public final class GameEngine {
         private final Collection<RadarBeam> radarBeams;
         private Robot winner;
 
+        /**
+         * @return an unmodifiable collection of projectiles that have exploded.
+         */
         public Collection<Projectile> explodedProjectiles() {
             return this.explodedProjectiles;
         }
 
+        /**
+         * @return an unmodifiable collection of the positions where robots collide - either
+         *      with other robots or with walls.
+         */
         public Collection<Vector> collisionPositions() {
             return this.collisionPositions;
         }
 
+        /**
+         * @return an unmodifiable collection of the robots that have been killed.
+         */
         public Collection<Robot> killedRobots() {
             return this.killedRobots;
         }
 
+        /**
+         * @return an unmodifiable collection of radar beams that have been emitted by robots.
+         */
         public Collection<RadarBeam> radarBeams() {
             return this.radarBeams;
         }
 
+        /**
+         * @return the robot that has won the game. This is only returned once, if robots have
+         *      been killed and only one robot remains.
+         */
         public Robot winner() {
             return this.winner;
         }

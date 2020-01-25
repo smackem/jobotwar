@@ -5,6 +5,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
+/**
+ * Executes a compiled {@link Program}.
+ */
 public final class Interpreter {
     private static final Logger log = LoggerFactory.getLogger(Interpreter.class);
     private final Program program;
@@ -14,20 +17,37 @@ public final class Interpreter {
     private boolean registerStored;
     private int pc;
 
+    /**
+     * Initializes a new instance of {@link Interpreter}.
+     * @param program The {@link Program} to execute.
+     * @param runtime The {@link RuntimeEnvironment} that provides access to
+     *                robot registers and sensors.
+     */
     public Interpreter(Program program, RuntimeEnvironment runtime) {
         this.program = Objects.requireNonNull(program);
         this.code = new ArrayList<>(program.instructions());
         this.runtime = Objects.requireNonNull(runtime);
     }
 
+    /**
+     * @return The {@link Program} to execute.
+     */
     public Program program() {
         return this.program;
     }
 
+    /**
+     * @return The {@link RuntimeEnvironment} that provides access to robot registers and sensors.
+     */
     public RuntimeEnvironment runtime() {
         return this.runtime;
     }
 
+    /**
+     * Executes the next program step.
+     * @return {@code true} if the program has executed completely, otherwise {@code false}.
+     * @throws StackException in the case of a stack underflow or overflow.
+     */
     public boolean runNext() throws StackException {
         final int codeSize = this.code.size();
         while (this.pc < codeSize) {

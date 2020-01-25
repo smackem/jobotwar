@@ -1,8 +1,17 @@
 package net.smackem.jobotwar.runtime;
 
+/**
+ * Non-instantiable class that provides utility methods which operate on {@link Robot}s.
+ */
 public class Robots {
     private Robots() { throw new IllegalAccessError(); }
 
+    /**
+     * Builds a {@link Robot} that has the same program and parameters as the specified {@link Robot}.
+     * The passed robot has to be controlled by a {@link CompiledProgram}.
+     * @param robot The original {@link Robot} to use as template.
+     * @return A new instance of {@link Robot}.
+     */
     public static Robot buildLike(Robot robot) {
         return new Robot.Builder(r -> cloneProgram(robot.program(), r))
                 .name(robot.name())
