@@ -14,14 +14,28 @@
         <Insets top="4" left="4" right="4" bottom="4" />
     </padding>
     <top>
-        <Button text="Start" onAction="#startSimulation" />
+        <HBox spacing="4">
+            <padding>
+                <Insets bottom="4" />
+            </padding>
+            <Button text="Start" minWidth="100" onAction="#startSimulation" />
+        </HBox>
     </top>
     <center>
-        <TableView fx:id="matchTable">
-            <columns>
-                <TableColumn fx:id="winnerColumn" text="Winner" />
-                <TableColumn fx:id="durationColumn" text="Duration" />
-            </columns>
-        </TableView>
+        <StackPane>
+            <TableView fx:id="matchTable">
+                <columns>
+                    <TableColumn fx:id="winnerColumn" text="Winner" />
+                    <TableColumn fx:id="durationColumn" text="Duration" />
+                </columns>
+            </TableView>
+            <StackPane fx:id="runningOverlay"
+                       style="-fx-background-color: rgba(0,0,0,0.5)"
+                       prefHeight="Infinity" prefWidth="Infinity">
+                <VBox spacing="12" alignment="CENTER" style="-fx-alignment: center">
+                    <Label text="Running..." style="-fx-font-size: 16pt" textAlignment="CENTER" />
+                </VBox>
+            </StackPane>
+        </StackPane>
     </center>
 </BorderPane>

@@ -1,38 +1,46 @@
 
-radarAngle := 0
-oldDamage := @damage()
+def aim
 
 state main() {
+    yield scan(@damage(), 0)
+}
+
+state scan(damage, radarAngle) {
     distance := @radar(radarAngle)
     if distance < 0 {
         @fire(radarAngle, abs(distance))
     }
     radarAngle = radarAngle + 7
-    if @damage() != oldDamage {
-        return newDest
+    if @damage() != damage {
+        yield newDest
     }
 }
 
 state newDest() {
     destX = @random(10, 100)
     destY = @random(10, 200)
-    @speedX(destX - @x())
-    @speedY(destY - @y())
-    return move(destX, destY)
+    @speedX(destX - @x)
+    @speedY(destY - @y)
+    yield move(destX, destY)
 }
 
 state move(destX, destY) {
     arrivedX := false
     arrivedY := false
-    if abs(destX - @x()) < 30 {
+    if abs(destX - @x) < 30 {
         @speedX(0)
         arrivedX = true
     }
-    if (abs(destY - @y()) < 30 {
+    if abs(destY - @y) < 30 {
         @speedY(0)
         arrivedY = true
     }
     if arrivedX and arrivedY {
-        return main
+        yield main
     }
+}
+
+function xFromAngle(angle, length) -> @x() + cos(angle) * length
+function yFromAngle(angle, length) {
+    return @y() + sin(angle) * length
 }

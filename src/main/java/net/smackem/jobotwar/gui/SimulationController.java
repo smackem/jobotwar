@@ -1,27 +1,39 @@
 package net.smackem.jobotwar.gui;
 
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import com.google.common.util.concurrent.ListenableFuture;
+import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Cursor;
+import javafx.scene.Parent;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import net.smackem.jobotwar.runtime.Board;
 import net.smackem.jobotwar.runtime.Robot;
 import net.smackem.jobotwar.runtime.SimulationRunner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.concurrent.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class SimulationController {
 
+    private static final Logger log = LoggerFactory.getLogger(SimulationController.class);
     private final ObservableList<MatchViewModel> matches = FXCollections.observableArrayList();
+    private final int numberOfMatches = 10_000;
+    private final BooleanProperty running = new SimpleBooleanProperty();
 
     @FXML
     private TableView<MatchViewModel> matchTable;
@@ -29,6 +41,8 @@ public class SimulationController {
     private TableColumn<MatchViewModel, String> winnerColumn;
     @FXML
     private TableColumn<MatchViewModel, Duration> durationColumn;
+    @FXML
+    private Parent runningOverlay;
 
     @FXML
     private void initialize() {
@@ -36,17 +50,30 @@ public class SimulationController {
         this.winnerColumn.setCellFactory(cell -> new MatchWinnerCell());
         this.durationColumn.setCellValueFactory(cell -> cell.getValue().duration);
         this.matchTable.setItems(this.matches);
+        this.runningOverlay.visibleProperty().bind(this.running);
     }
 
     @FXML
     private void startSimulation(ActionEvent actionEvent) {
-        for (int i = 0; i < 100; i++) {
-            final Board board = App.instance().copyBoard();
-            final SimulationRunner runner = new SimulationRunner(board);
-            final SimulationRunner.SimulationResult result = runner.runGame(Duration.ofMinutes(5));
-            final MatchViewModel match = new MatchViewModel(result);
-            this.matches.add(match);
-        }
+        this.matches.clear();
+        this.running.set(true);
+        final long start = System.currentTimeMillis();
+        runMatches(numberOfMatches).thenAcceptAsync(matches -> {
+            this.matches.addAll(matches);
+            log.info("Serial: Elapsed milliseconds: {}", System.currentTimeMillis() - start);
+            this.running.set(false);
+        }, PlatformExecutor.INSTANCE);
+    }
+
+    private CompletableFuture<Collection<MatchViewModel>> runMatches(int count) {
+        final App app = App.instance();
+        final Duration duration = Duration.ofMinutes(5);
+        return CompletableFuture.supplyAsync(() -> Stream.generate(app::copyBoard)
+                .limit(count)
+                .parallel()
+                .map(SimulationRunner::new)
+                .map(runner -> new MatchViewModel(runner.runGame(duration)))
+                .collect(Collectors.toList()));
     }
 
     private static class MatchViewModel {
