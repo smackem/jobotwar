@@ -70,3 +70,11 @@
 .text-area .content {
     -fx-background-color: transparent;
 }
+
+#winnerOverlay {
+    -fx-background-color: rgba(0,0,0,0.5);
+}
+
+#winnerLabel {
+    -fx-font-size: 16pt;
+}

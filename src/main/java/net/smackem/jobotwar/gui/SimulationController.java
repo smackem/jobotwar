@@ -1,30 +1,22 @@
 package net.smackem.jobotwar.gui;
 
-import com.google.common.util.concurrent.ListenableFuture;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.Cursor;
-import javafx.scene.Parent;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.control.*;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
-import net.smackem.jobotwar.runtime.Board;
 import net.smackem.jobotwar.runtime.Robot;
 import net.smackem.jobotwar.runtime.SimulationRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.concurrent.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -32,7 +24,6 @@ public class SimulationController {
 
     private static final Logger log = LoggerFactory.getLogger(SimulationController.class);
     private final ObservableList<MatchViewModel> matches = FXCollections.observableArrayList();
-    private final int numberOfMatches = 10_000;
     private final BooleanProperty running = new SimpleBooleanProperty();
 
     @FXML
@@ -42,7 +33,9 @@ public class SimulationController {
     @FXML
     private TableColumn<MatchViewModel, Duration> durationColumn;
     @FXML
-    private Parent runningOverlay;
+    private Pane runningOverlay;
+    @FXML
+    private Spinner<Integer> matchCountSpinner;
 
     @FXML
     private void initialize() {
@@ -51,6 +44,10 @@ public class SimulationController {
         this.durationColumn.setCellValueFactory(cell -> cell.getValue().duration);
         this.matchTable.setItems(this.matches);
         this.runningOverlay.visibleProperty().bind(this.running);
+        this.matchCountSpinner.setValueFactory(
+                new SpinnerValueFactory.ListSpinnerValueFactory<>(
+                        FXCollections.observableArrayList(100, 1000, 10_000, 100_000)
+                ));
     }
 
     @FXML
@@ -58,7 +55,7 @@ public class SimulationController {
         this.matches.clear();
         this.running.set(true);
         final long start = System.currentTimeMillis();
-        runMatches(numberOfMatches).thenAcceptAsync(matches -> {
+        runMatches(matchCountSpinner.getValue()).thenAcceptAsync(matches -> {
             this.matches.addAll(matches);
             log.info("Serial: Elapsed milliseconds: {}", System.currentTimeMillis() - start);
             this.running.set(false);
@@ -71,8 +68,11 @@ public class SimulationController {
         return CompletableFuture.supplyAsync(() -> Stream.generate(app::copyBoard)
                 .limit(count)
                 .parallel()
-                .map(SimulationRunner::new)
-                .map(runner -> new MatchViewModel(runner.runGame(duration)))
+                .map(board -> {
+                    final SimulationRunner runner = new SimulationRunner(board);
+                    final SimulationRunner.SimulationResult result = runner.runGame(duration);
+                    return new MatchViewModel(result);
+                })
                 .collect(Collectors.toList()));
     }
 

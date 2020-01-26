@@ -18,11 +18,10 @@
          <StackPane fx:id="canvasContainer">
             <Canvas fx:id="canvas" />
             <StackPane fx:id="winnerOverlay"
-                       style="-fx-background-color: rgba(0,0,0,0.5)"
                        prefHeight="Infinity" prefWidth="Infinity"
                        visible="false">
-               <VBox spacing="12" alignment="CENTER" style="-fx-alignment: center">
-                  <Label fx:id="winnerLabel" style="-fx-font-size: 16pt" textAlignment="CENTER" />
+               <VBox spacing="12" alignment="CENTER">
+                  <Label fx:id="winnerLabel" textAlignment="CENTER" />
                   <Button text="New Game" minWidth="100" onAction="#newGame" />
                </VBox>
             </StackPane>

@@ -1,0 +1,8 @@
+#runningOverlay {
+    -fx-background-color: rgba(0,0,0,0.7);
+}
+
+#runningOverlay .label {
+    -fx-text-fill: white;
+    -fx-font-size: 16pt;
+}
