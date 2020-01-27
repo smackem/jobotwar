@@ -13,7 +13,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
 import net.smackem.jobotwar.lang.Compiler;
-import net.smackem.jobotwar.runtime.CompiledProgram;
 import net.smackem.jobotwar.runtime.Robot;
 
 import java.io.IOException;
