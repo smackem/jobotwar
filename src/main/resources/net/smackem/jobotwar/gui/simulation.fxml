@@ -20,7 +20,7 @@
                 <Insets bottom="4" />
             </padding>
             <Label text="Number of Matches:" />
-            <Spinner fx:id="matchCountSpinner" />
+            <ChoiceBox fx:id="matchCountChoice" />
             <Button text="Start" minWidth="100" onAction="#startSimulation" />
         </HBox>
     </top>

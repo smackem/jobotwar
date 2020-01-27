@@ -5,7 +5,10 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -35,19 +38,18 @@ public class SimulationController {
     @FXML
     private Pane runningOverlay;
     @FXML
-    private Spinner<Integer> matchCountSpinner;
+    private ChoiceBox<Integer> matchCountChoice;
 
     @FXML
     private void initialize() {
         this.winnerColumn.setCellValueFactory(cell -> cell.getValue().winnerName);
         this.winnerColumn.setCellFactory(cell -> new MatchWinnerCell());
         this.durationColumn.setCellValueFactory(cell -> cell.getValue().duration);
+        this.durationColumn.setCellFactory(cell -> new MatchDurationCell());
         this.matchTable.setItems(this.matches);
         this.runningOverlay.visibleProperty().bind(this.running);
-        this.matchCountSpinner.setValueFactory(
-                new SpinnerValueFactory.ListSpinnerValueFactory<>(
-                        FXCollections.observableArrayList(100, 1000, 10_000, 100_000)
-                ));
+        this.matchCountChoice.setItems(FXCollections.observableArrayList(100, 1000, 10_000, 100_000));
+        this.matchCountChoice.setValue(1000);
     }
 
     @FXML
@@ -55,7 +57,7 @@ public class SimulationController {
         this.matches.clear();
         this.running.set(true);
         final long start = System.currentTimeMillis();
-        runMatches(matchCountSpinner.getValue()).thenAcceptAsync(matches -> {
+        runMatches(matchCountChoice.getValue()).thenAcceptAsync(matches -> {
             this.matches.addAll(matches);
             log.info("Serial: Elapsed milliseconds: {}", System.currentTimeMillis() - start);
             this.running.set(false);
@@ -105,6 +107,18 @@ public class SimulationController {
             final MatchViewModel match = getTableView().getItems().get(getIndex());
             setTextFill(match.winnerPaint != null ? match.winnerPaint : Color.BLACK);
             setText(item);
+        }
+    }
+
+    private static class MatchDurationCell extends TableCell<MatchViewModel, Duration> {
+        @Override
+        protected void updateItem(Duration item, boolean empty) {
+            super.updateItem(item, empty);
+            if (item == null || empty) {
+                setText(null);
+                return;
+            }
+            setText(String.format("%02d:%02d.%03d", item.toMinutes(), item.getSeconds() % 60, item.toMillis() % 1000));
         }
     }
 }
