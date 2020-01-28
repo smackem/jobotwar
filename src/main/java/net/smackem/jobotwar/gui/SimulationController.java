@@ -12,6 +12,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
+import net.smackem.jobotwar.runtime.Board;
 import net.smackem.jobotwar.runtime.Robot;
 import net.smackem.jobotwar.runtime.SimulationRunner;
 import org.slf4j.Logger;
@@ -21,7 +22,7 @@ import java.time.Duration;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.stream.IntStream;
 
 public class SimulationController {
 
@@ -67,10 +68,10 @@ public class SimulationController {
     private CompletableFuture<Collection<MatchViewModel>> runMatches(int count) {
         final App app = App.instance();
         final Duration duration = Duration.ofMinutes(5);
-        return CompletableFuture.supplyAsync(() -> Stream.generate(app::copyBoard)
-                .limit(count)
+        return CompletableFuture.supplyAsync(() -> IntStream.range(0, count)
                 .parallel()
-                .map(board -> {
+                .mapToObj(n -> {
+                    final Board board = app.copyBoard();
                     final SimulationRunner runner = new SimulationRunner(board);
                     final SimulationRunner.SimulationResult result = runner.runGame(duration);
                     return new MatchViewModel(result);
