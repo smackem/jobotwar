@@ -28,6 +28,7 @@
         <StackPane>
             <TableView fx:id="matchTable">
                 <columns>
+                    <TableColumn fx:id="numberColumn" text="#" />
                     <TableColumn fx:id="winnerColumn" text="Winner" />
                     <TableColumn fx:id="durationColumn" text="Duration" />
                 </columns>

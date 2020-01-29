@@ -19,7 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
-import java.util.Collection;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -33,6 +33,8 @@ public class SimulationController {
     @FXML
     private TableView<MatchViewModel> matchTable;
     @FXML
+    private TableColumn<MatchViewModel, Integer> numberColumn;
+    @FXML
     private TableColumn<MatchViewModel, String> winnerColumn;
     @FXML
     private TableColumn<MatchViewModel, Duration> durationColumn;
@@ -43,6 +45,7 @@ public class SimulationController {
 
     @FXML
     private void initialize() {
+        this.numberColumn.setCellValueFactory(cell -> cell.getValue().matchNumber.asObject());
         this.winnerColumn.setCellValueFactory(cell -> cell.getValue().winnerName);
         this.winnerColumn.setCellFactory(cell -> new MatchWinnerCell());
         this.durationColumn.setCellValueFactory(cell -> cell.getValue().duration);
@@ -61,6 +64,10 @@ public class SimulationController {
         runMatches(matchCountChoice.getValue()).thenAcceptAsync(matches -> {
             this.matches.addAll(matches);
             log.info("Serial: Elapsed milliseconds: {}", System.currentTimeMillis() - start);
+            final Collection<RobotStatisticsViewModel> stats = buildRobotStatistics(matches);
+            for (final RobotStatisticsViewModel stat : stats) {
+                log.info("{}: {} ({})", stat.robotName, stat.winRatio, stat.winCount);
+            }
             this.running.set(false);
         }, PlatformExecutor.INSTANCE);
     }
@@ -70,21 +77,40 @@ public class SimulationController {
         final Duration duration = Duration.ofMinutes(5);
         return CompletableFuture.supplyAsync(() -> IntStream.range(0, count)
                 .parallel()
-                .mapToObj(n -> {
+                .mapToObj(matchIndex -> {
                     final Board board = app.copyBoard();
                     final SimulationRunner runner = new SimulationRunner(board);
                     final SimulationRunner.SimulationResult result = runner.runGame(duration);
-                    return new MatchViewModel(result);
+                    return new MatchViewModel(result, matchIndex + 1);
                 })
                 .collect(Collectors.toList()));
     }
 
+    private Collection<RobotStatisticsViewModel> buildRobotStatistics(Collection<MatchViewModel> matches) {
+        final Map<String, RobotStatisticsViewModel> stats = new HashMap<>();
+        for (final MatchViewModel match : matches) {
+            RobotStatisticsViewModel stat = stats.get(match.winnerName.get());
+            if (stat == null) {
+                stat = new RobotStatisticsViewModel(match.winnerName.get(), match.winnerPaint);
+                stats.put(match.winnerName.get(), stat);
+            }
+            stat.winCount++;
+        }
+        for (final RobotStatisticsViewModel stat : stats.values()) {
+            stat.winRatio.set((double)stat.winCount / (double)matches.size());
+        }
+        return stats.values().stream()
+                .sorted(Comparator.comparingDouble(stat -> -stat.winRatio.get()))
+                .collect(Collectors.toList());
+    }
+
     private static class MatchViewModel {
+        private final IntegerProperty matchNumber = new SimpleIntegerProperty();
         private final StringProperty winnerName = new SimpleStringProperty();
         private final ObjectProperty<Duration> duration = new SimpleObjectProperty<>();
         private final Paint winnerPaint;
 
-        private MatchViewModel(SimulationRunner.SimulationResult result) {
+        private MatchViewModel(SimulationRunner.SimulationResult result, int matchNumber) {
             final Robot winner = result.winner();
             if (winner != null) {
                 this.winnerName.set(winner.name());
@@ -93,6 +119,7 @@ public class SimulationController {
                 this.winnerName.set("-");
                 this.winnerPaint = null;
             }
+            this.matchNumber.set(matchNumber);
             this.duration.set(result.duration());
         }
     }
@@ -120,6 +147,18 @@ public class SimulationController {
                 return;
             }
             setText(String.format("%02d:%02d.%03d", item.toMinutes(), item.getSeconds() % 60, item.toMillis() % 1000));
+        }
+    }
+
+    private static class RobotStatisticsViewModel {
+        private final String robotName;
+        private final Paint robotPaint;
+        private int winCount;
+        private final DoubleProperty winRatio = new SimpleDoubleProperty();
+
+        private RobotStatisticsViewModel(String robotName, Paint robotPaint) {
+            this.robotName = robotName;
+            this.robotPaint = robotPaint;
         }
     }
 }
