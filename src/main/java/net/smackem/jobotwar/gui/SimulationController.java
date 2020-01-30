@@ -5,13 +5,14 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
+import javafx.scene.shape.Ellipse;
 import net.smackem.jobotwar.runtime.Board;
 import net.smackem.jobotwar.runtime.Robot;
 import net.smackem.jobotwar.runtime.SimulationRunner;
@@ -42,6 +43,8 @@ public class SimulationController {
     private Pane runningOverlay;
     @FXML
     private ChoiceBox<Integer> matchCountChoice;
+    @FXML
+    private Pane robotStatsParent;
 
     @FXML
     private void initialize() {
@@ -65,9 +68,7 @@ public class SimulationController {
             this.matches.addAll(matches);
             log.info("Serial: Elapsed milliseconds: {}", System.currentTimeMillis() - start);
             final Collection<RobotStatisticsViewModel> stats = buildRobotStatistics(matches);
-            for (final RobotStatisticsViewModel stat : stats) {
-                log.info("{}: {} ({})", stat.robotName, stat.winRatio, stat.winCount);
-            }
+            createRobotStatsWidgets(stats);
             this.running.set(false);
         }, PlatformExecutor.INSTANCE);
     }
@@ -84,6 +85,23 @@ public class SimulationController {
                     return new MatchViewModel(result, matchIndex + 1);
                 })
                 .collect(Collectors.toList()));
+    }
+
+    private void createRobotStatsWidgets(Collection<RobotStatisticsViewModel> stats) {
+        this.robotStatsParent.getChildren().clear();
+        for (final RobotStatisticsViewModel stat : stats) {
+            final Paint paint = stat.robotPaint != null ? stat.robotPaint : Color.WHITE;
+            final Ellipse ellipse = new Ellipse(8, 8);
+            ellipse.setFill(paint);
+            final Label nameLabel = new Label(stat.robotName);
+            nameLabel.setTextFill(Color.WHITE);
+            final Label ratioLabel = new Label(String.format(": %.2f%%", stat.winRatio.get() * 100));
+            ratioLabel.setTextFill(Color.WHITE);
+            final HBox box = new HBox(ellipse, nameLabel, ratioLabel);
+            box.setSpacing(2);
+            this.robotStatsParent.getChildren().add(box);
+            log.info("{}: {} ({})", stat.robotName, stat.winRatio, stat.winCount);
+        }
     }
 
     private Collection<RobotStatisticsViewModel> buildRobotStatistics(Collection<MatchViewModel> matches) {

@@ -6,3 +6,7 @@
     -fx-text-fill: white;
     -fx-font-size: 16pt;
 }
+
+#robotStatsParent {
+    -fx-background-color: rgba(0, 0, 0, 0.7);
+}

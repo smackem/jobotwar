@@ -38,4 +38,11 @@
             </VBox>
         </StackPane>
     </center>
+    <bottom>
+        <HBox fx:id="robotStatsParent" spacing="10">
+            <padding>
+                <Insets left="4" top="4" right="4" bottom="4" />
+            </padding>
+        </HBox>
+    </bottom>
 </BorderPane>
