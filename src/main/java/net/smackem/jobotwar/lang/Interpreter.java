@@ -188,6 +188,7 @@ public final class Interpreter {
             case "asin":    return Math.toDegrees(Math.asin(arg));
             case "acos":    return Math.toDegrees(Math.acos(arg));
             case "sqrt":    return Math.sqrt(arg);
+            case "trunc":   return Math.floor(arg);
             default:
                 throw new IllegalArgumentException("Unknown built-in function: '" + strArg + "'");
         }

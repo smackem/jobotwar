@@ -136,6 +136,7 @@ func
     | ASIN
     | ACOS
     | SQRT
+    | TRUNC
     ;
 
 specialAssignTarget
@@ -160,6 +161,7 @@ ATAN    : 'atan';
 ASIN    : 'asin';
 ACOS    : 'acos';
 SQRT    : 'sqrt';
+TRUNC   : 'trunc';
 
 OUT     : 'OUT';
 

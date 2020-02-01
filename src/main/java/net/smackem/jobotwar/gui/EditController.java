@@ -195,6 +195,11 @@ public class EditController {
     }
 
     @FXML
+    private void newRobotFastScan(ActionEvent actionEvent) {
+        newRobotWithProgram("FastScan", "robots/fastscan.jobot");
+    }
+
+    @FXML
     private void simulateGame(ActionEvent actionEvent) throws IOException {
         initiateGame((app, robots) -> app.simulateGame(BOARD_WIDTH, BOARD_HEIGHT, robots));
     }

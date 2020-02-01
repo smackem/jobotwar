@@ -1,5 +1,7 @@
 // robot patrol
 
+def destX
+
 start:
     90 -> RADAR
     goto clean if RADAR < 0
@@ -24,13 +26,17 @@ moveToBottom:
     0 -> SPEEDY
 
 patrolLeft:
-    20 - X -> SPEEDX
+    20 + RANDOM * 13 -> destX
+patrolLeft_1:
+    destX - X -> SPEEDX
     440 -> SHOT
-    goto patrolLeft unless abs(SPEEDX) < 20
+    goto patrolLeft_1 unless abs(SPEEDX) < 20
     0 -> SPEEDY
 patrolRight:
-    620 - X -> SPEEDX
+    620 - RANDOM * 13 -> destX
+patrolRight_1:
+    destX - X -> SPEEDX
     440 -> SHOT
-    goto patrolRight unless abs(SPEEDX) < 20
+    goto patrolRight_1 unless abs(SPEEDX) < 20
     0 -> SPEEDY
     goto patrolLeft

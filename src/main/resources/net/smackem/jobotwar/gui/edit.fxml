@@ -27,6 +27,7 @@
                                 <MenuItem text="dumbshooter" onAction="#newRobotDumbShooter" />
                                 <MenuItem text="patrol" onAction="#newRobotPatrol" />
                                 <MenuItem text="bumblebee" onAction="#newRobotBumblebee" />
+                                <MenuItem text="fastscan" onAction="#newRobotFastScan" />
                             </items>
                         </SplitMenuButton>
                         <Button minWidth="123" text="Remove Robot" onAction="#removeRobot" />
