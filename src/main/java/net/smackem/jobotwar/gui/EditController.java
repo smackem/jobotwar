@@ -48,6 +48,10 @@ public class EditController {
     @FXML
     private Button simulateButton;
 
+    public EditController() {
+        this.robots.addAll(App.instance().getCachedRobotViewModels());
+    }
+
     @FXML
     private void initialize() {
         this.robotsListView.setItems(this.robots);
@@ -71,7 +75,11 @@ public class EditController {
         this.iconComboBox.getSelectionModel().selectedItemProperty().addListener((prop, old, val) -> {
             this.selectedRobot.get().imageProperty().set(val);
         });
-        newRobot(null);
+        if (this.robots.size() == 0) {
+            newRobot(null);
+        } else {
+            selectRobot(this.robots.iterator().next());
+        }
     }
 
     private Image getResourceImage(String resourceName) {
@@ -196,6 +204,7 @@ public class EditController {
         final Collection<Robot> robots;
         try {
             robots = createRobotsFromViewModel();
+            app.cacheRobotViewModels(this.robots);
         } catch (Exception e) {
             return;
         }

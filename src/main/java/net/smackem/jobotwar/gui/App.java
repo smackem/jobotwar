@@ -15,7 +15,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.stream.Collectors;
 
 /**
@@ -25,6 +27,7 @@ public class App extends Application {
 
     private static final Logger log = LoggerFactory.getLogger(App.class);
     private final EventBus eventBus;
+    private final Collection<EditRobotViewModel> cachedRobotViewModels = new ArrayList<>();
     private Scene scene;
     private Board board;
     private static App INSTANCE;
@@ -64,6 +67,15 @@ public class App extends Application {
                 .build();
     }
 
+    public void cacheRobotViewModels(Collection<EditRobotViewModel> robotViewModels) {
+        this.cachedRobotViewModels.clear();
+        this.cachedRobotViewModels.addAll(robotViewModels);
+    }
+
+    public Collection<EditRobotViewModel> getCachedRobotViewModels() {
+        return Collections.unmodifiableCollection(this.cachedRobotViewModels);
+    }
+
     public Board copyBoard() {
         final Collection<Robot> newRobots = this.board.robots().stream()
                 .map(Robots::buildLike)
@@ -81,7 +93,6 @@ public class App extends Application {
 
     public void simulateGame(int width, int height, Collection<Robot> robots) {
         this.board = new Board(width, height, robots);
-        this.board.disperseRobots();
         setRoot("simulation");
     }
 

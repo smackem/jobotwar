@@ -19,6 +19,7 @@ import net.smackem.jobotwar.runtime.SimulationRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -120,6 +121,11 @@ public class SimulationController {
         return stats.values().stream()
                 .sorted(Comparator.comparingDouble(stat -> -stat.winRatio.get()))
                 .collect(Collectors.toList());
+    }
+
+    @FXML
+    private void newGame(ActionEvent actionEvent) throws IOException {
+        App.instance().showEditor();
     }
 
     private static class MatchViewModel {
