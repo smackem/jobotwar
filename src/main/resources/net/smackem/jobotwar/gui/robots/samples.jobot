@@ -176,7 +176,6 @@ move:
 
 
 // =====================================
-
 // robot corner
 
 def destX, destY
@@ -187,7 +186,7 @@ def damage
 -1 -> corner
 
 changeCorner:
-    RANDOM * 4 -> newCorner -> OUT
+    trunc(RANDOM * 4) -> newCorner -> OUT
     goto changeCorner if newCorner = corner
     newCorner -> corner
     goto topLeft if corner = 3
@@ -200,7 +199,7 @@ topLeft:
     20 -> destY
     0 -> angleBase -> OUT
     goto move
-    
+
 topRight:
     620 -> destX
     20 -> destY
@@ -222,8 +221,10 @@ bottomRight:
 move:
     destX - X -> SPEEDX
     destY - Y -> SPEEDY
-    goto move unless abs(destX - X) < 20 and abs(destY - Y) < 20
-    0 -> SPEEDX -> SPEEDY
+move_1:
+    0 -> SPEEDX if abs(destX - X) < 50
+    0 -> SPEEDY if abs(destY - Y) < 50
+    goto move_1 unless SPEEDX = 0 and SPEEDY = 0
     DAMAGE -> damage -> OUT
 
 scan:

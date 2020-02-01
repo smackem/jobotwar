@@ -22,7 +22,7 @@ shoot:
 
 flee:
     50 + RANDOM * 500 -> destX -> OUT
-    50 + RANDOM * 400 -> destY -> )UT
+    50 + RANDOM * 400 -> destY -> OUT
     destX - X -> SPEEDX
     destY - Y -> SPEEDY
 move:
