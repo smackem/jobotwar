@@ -63,4 +63,11 @@ public class VectorTest {
         assertThat(Vector.distance(new Vector(-50, 0), new Vector(50, 0)))
                 .isEqualTo(100, offset(DELTA));
     }
+
+    @Test
+    public void fromAngleAndLength() {
+        final Vector a = new Vector(100, 100);
+        assertThat(a.add(Vector.fromAngleAndLength(0, 100))).isEqualTo(
+                new Vector(200, 100));
+    }
 }

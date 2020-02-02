@@ -64,7 +64,7 @@ public class Projectile {
         }
 
         double tolerance = this.speed / 2;
-        if (Vector.distance(this.position, this.destination) < tolerance) {
+        if (Vector.distance(this.position, this.destination) <= tolerance) {
             this.position = this.destination;
             return;
         }
