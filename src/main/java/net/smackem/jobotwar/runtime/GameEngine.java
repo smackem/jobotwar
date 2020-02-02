@@ -23,6 +23,8 @@ public final class GameEngine {
      * @return A {@link TickResult} that holds the new state of the game.
      */
     public TickResult tick() {
+        // handle robots
+        //
         final TickResult result = new TickResult();
         final Collection<Robot> robots = this.board.robots();
         for (final Robot robot : robots) {
@@ -33,9 +35,17 @@ public final class GameEngine {
             }
         }
         robots.removeAll(result.killedRobots);
-        if (result.killedRobots.isEmpty() == false && robots.size() == 1) {
+
+        // win condition
+        //
+        if (result.killedRobots.size() > 0 && robots.size() == 1) {
             result.winner = robots.iterator().next();
+        } else if (result.killedRobots.size() > 1 && robots.size() == 0) {
+            result.draw = true;
         }
+
+        // handle projectiles
+        //
         final Collection<Projectile> projectiles = this.board.projectiles();
         for (final Projectile projectile : projectiles) {
             if (tickProjectile(projectile)) {
@@ -55,6 +65,7 @@ public final class GameEngine {
         private final Collection<Robot> killedRobots;
         private final Collection<RadarBeam> radarBeams;
         private Robot winner;
+        private boolean draw;
 
         /**
          * @return an unmodifiable collection of projectiles that have exploded.
@@ -91,6 +102,18 @@ public final class GameEngine {
          */
         public Robot winner() {
             return this.winner;
+        }
+
+        /**
+         * @return {@code true} if the game ended with a draw. {@link #winner()} is {@code null}
+         *      in this case.
+         */
+        public boolean isDraw() {
+            return this.draw;
+        }
+
+        public boolean hasEnded() {
+            return this.draw || this.winner != null;
         }
 
         private TickResult() {

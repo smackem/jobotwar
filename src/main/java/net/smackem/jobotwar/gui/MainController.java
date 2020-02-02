@@ -18,6 +18,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.util.Duration;
 import net.smackem.jobotwar.runtime.*;
 import org.slf4j.Logger;
@@ -106,12 +107,25 @@ public class MainController {
         for (final Robot robot : tickResult.killedRobots()) {
             this.messagesTextArea.appendText(robot.name() + " got killed.\n");
         }
+        if (tickResult.hasEnded()) {
+            showGameResult(tickResult);
+        }
+    }
+
+    private void showGameResult(GameEngine.TickResult tickResult) {
         final Robot winner = tickResult.winner();
         if (winner != null) {
             this.winnerLabel.setText(winner.name() + " has won!");
             this.winnerLabel.setTextFill(RgbConvert.toColor(winner.rgb()));
             this.winnerOverlay.setVisible(true);
             this.messagesTextArea.appendText(winner.name() + " has won the game!\n");
+            return;
+        }
+        if (tickResult.isDraw()) {
+            this.winnerLabel.setText("Draw!");
+            this.winnerLabel.setTextFill(Color.WHITE);
+            this.winnerOverlay.setVisible(true);
+            this.messagesTextArea.appendText("The game has ended with a draw!\n");
         }
     }
 

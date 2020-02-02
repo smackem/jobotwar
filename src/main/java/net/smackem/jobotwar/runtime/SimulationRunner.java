@@ -38,7 +38,7 @@ public final class SimulationRunner {
         do {
             result = this.engine.tick();
             millis += tickMillis;
-        } while (result.winner() == null && millis < maxMillis);
+        } while (result.hasEnded() == false && millis < maxMillis);
 
         return new SimulationResult(result.winner(), Duration.ofMillis(millis));
     }
