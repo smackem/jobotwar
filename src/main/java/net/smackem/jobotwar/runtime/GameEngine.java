@@ -1,5 +1,8 @@
 package net.smackem.jobotwar.runtime;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
@@ -8,6 +11,7 @@ import java.util.Objects;
  * Runs the game.
  */
 public final class GameEngine {
+    private static final Logger log = LoggerFactory.getLogger(GameEngine.class);
     private final Board board;
 
     /**
@@ -112,6 +116,9 @@ public final class GameEngine {
             return this.draw;
         }
 
+        /**
+         * @return {@code true} if the game has ended with either a {@link #winner()} or a {@link #isDraw()}.
+         */
         public boolean hasEnded() {
             return this.draw || this.winner != null;
         }
@@ -152,10 +159,14 @@ public final class GameEngine {
     }
 
     private void explodeProjectile(Projectile projectile) {
-        final Collection<Robot> damagedRobots = hitTestRobots(projectile.position(),
-                null,Constants.EXPLOSION_RADIUS);
+        final Vector projectilePos = projectile.position();
+        final Collection<Robot> damagedRobots = hitTestRobots(projectilePos,null,
+                Constants.EXPLOSION_RADIUS);
         for (final Robot robot : damagedRobots) {
-            robot.setHealth(Math.max(0, robot.getHealth() - 30));
+            final double distance = Vector.distance(robot.position(), projectilePos);
+            final int damage = (int)(30.0 - 20.0 * distance / (Constants.EXPLOSION_RADIUS + Constants.ROBOT_RADIUS));
+            log.info("damage: {}", damage);
+            robot.setHealth(Math.max(0, robot.getHealth() - damage));
         }
     }
 
@@ -166,7 +177,7 @@ public final class GameEngine {
             if (robot == excludeRobot) {
                 continue;
             }
-            final Vector robotPosition = robot.getPosition();
+            final Vector robotPosition = robot.position();
             if (Vector.distance(position, robotPosition) < Constants.ROBOT_RADIUS + tolerance) {
                 hitRobots.add(robot);
             }
@@ -199,7 +210,7 @@ public final class GameEngine {
 
     private RadarBeam calcRadarBeam(Robot robot, double radarAngle) {
         final double radarAngleRadians = Math.toRadians(radarAngle);
-        final Vector position = robot.getPosition();
+        final Vector position = robot.position();
         final Line line = new Line(position,
                 Vector.fromAngleAndLength(radarAngleRadians, Constants.MAX_RADAR_RANGE));
 
@@ -210,7 +221,7 @@ public final class GameEngine {
             if (r == robot) {
                 continue;
             }
-            final Vector p = r.getPosition();
+            final Vector p = r.position();
             final double distanceFromBeam = line.distanceFromPoint(p);
             if (distanceFromBeam >= Constants.ROBOT_RADIUS) {
                 continue;
@@ -286,7 +297,7 @@ public final class GameEngine {
         if (collidingRobots.isEmpty() == false) {
             hasCollision = true;
             for (final Robot collidingRobot : collidingRobots) {
-                final Vector p = collidingRobot.getPosition();
+                final Vector p = collidingRobot.position();
                 final Vector center = position.add(p.subtract(position).divide(2));
                 collisions.add(center);
             }
@@ -307,7 +318,7 @@ public final class GameEngine {
         final int shot = robot.getShot();
         if (shot > 0) {
             final double angle = Math.toRadians(robot.getAimAngle());
-            final Vector position = robot.getPosition();
+            final Vector position = robot.position();
             final Vector dest = Vector.fromAngleAndLength(angle, shot);
             final Projectile projectile = new Projectile(robot, position.add(dest), Constants.PROJECTILE_SPEED);
             this.board.projectiles().add(projectile);

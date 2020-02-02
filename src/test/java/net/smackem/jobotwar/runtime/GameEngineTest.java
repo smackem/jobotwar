@@ -212,6 +212,6 @@ public class GameEngineTest {
         assertThat(beam.sourceRobot()).isEqualTo(robot1);
         assertThat(beam.hitPosition())
                 .usingComparator(vectorComparator)
-                .isEqualTo(robot2.getPosition());
+                .isEqualTo(robot2.position());
     }
 }

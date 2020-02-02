@@ -318,7 +318,7 @@ public class Robot {
     /**
      * @return The position of the robot as a {@link Vector}.
      */
-    public Vector getPosition() {
+    public Vector position() {
         if (this.cachedPosition == null) {
             this.cachedPosition = new Vector(this.x, this.y);
         }

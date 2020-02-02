@@ -18,7 +18,7 @@ public class Constants {
     public static double MAX_ROBOT_SPEED = 8;
     public static double PROJECTILE_SPEED = 12;
     public static double ROBOT_RADIUS = 18;
-    public static double EXPLOSION_RADIUS = 20;
+    public static double EXPLOSION_RADIUS = 25;
     public static int DEFAULT_COOL_DOWN_TICKS = 20;
     public static double MAX_ROBOT_GAME_SPEED = 500;
     public static Duration TICK_DURATION = Duration.ofMillis(40);

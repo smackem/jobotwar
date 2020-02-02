@@ -83,9 +83,9 @@ public class CompiledProgram implements RobotProgram {
                     return 0;
                 }
                 if (beam.hitKind() == RadarBeamHitKind.ROBOT) {
-                    return -(Vector.distance(beam.hitPosition(), robot.getPosition()));
+                    return -(Vector.distance(beam.hitPosition(), robot.position()));
                 }
-                return Vector.distance(beam.hitPosition(), robot.getPosition());
+                return Vector.distance(beam.hitPosition(), robot.position());
             }
 
             @Override

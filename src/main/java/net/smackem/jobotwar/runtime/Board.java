@@ -69,7 +69,7 @@ public class Board {
     private Robot getCloseRobot(Robot robot) {
         return this.robots.stream()
                 .filter(r -> r != robot)
-                .filter(r -> Vector.distance(r.getPosition(), robot.getPosition()) < Constants.ROBOT_RADIUS * 2)
+                .filter(r -> Vector.distance(r.position(), robot.position()) < Constants.ROBOT_RADIUS * 2)
                 .findFirst()
                 .orElse(null);
     }
