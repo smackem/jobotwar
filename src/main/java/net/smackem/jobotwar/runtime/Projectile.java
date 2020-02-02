@@ -6,9 +6,10 @@ package net.smackem.jobotwar.runtime;
 public class Projectile {
     private final Robot sourceRobot;
     private final Vector destination;
-    private final Vector directionUnit;
+    private final Vector increment;
     private final double speed;
     private Vector position;
+    private double remainingDistance;
 
     /**
      * Initializes a new instance of {@link Projectile}.
@@ -21,7 +22,9 @@ public class Projectile {
         this.destination = destination;
         this.speed = speed;
         this.position = new Vector(sourceRobot.getX(), sourceRobot.getY());
-        this.directionUnit = destination.subtract(this.position).normalize();
+        final Vector difference = destination.subtract(this.position);
+        this.increment = difference.normalize().multiply(speed);
+        this.remainingDistance = difference.length();
     }
 
     /**
@@ -64,11 +67,12 @@ public class Projectile {
         }
 
         double tolerance = this.speed / 2;
-        if (Vector.distance(this.position, this.destination) <= tolerance) {
+        if (remainingDistance <= tolerance) {
             this.position = this.destination;
             return;
         }
 
-        this.position = this.position.add(this.directionUnit.multiply(this.speed));
+        this.position = this.position.add(this.increment);
+        this.remainingDistance -= this.speed;
     }
 }

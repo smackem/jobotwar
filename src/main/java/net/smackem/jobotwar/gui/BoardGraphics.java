@@ -1,6 +1,7 @@
 package net.smackem.jobotwar.gui;
 
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -53,6 +54,7 @@ class BoardGraphics {
     private void renderRadarBeams(GraphicsContext gc) {
         gc.save();
         gc.setLineWidth(1);
+        gc.setEffect(new GaussianBlur(2));
         for (final RenderedRadarBeam b : this.radarBeams) {
             final Robot robot = b.beam.sourceRobot();
             final Paint paint = RgbConvert.toColor(robot.rgb(), b.opacity);
@@ -143,9 +145,18 @@ class BoardGraphics {
     }
 
     private void renderExplosions(GraphicsContext gc) {
+        gc.save();
         gc.setLineWidth(5.0);
+        gc.setEffect(new GaussianBlur(2));
         for (final Explosion explosion : this.explosions) {
-            final Paint paint = Color.rgb(0xff,0x40,0x40,1.0 - explosion.radius / (Constants.EXPLOSION_RADIUS * 1.5));
+            Paint paint = Color.rgb(0xff,0xc0,0x40,1.0 - explosion.radius / (Constants.EXPLOSION_RADIUS));
+            gc.setStroke(paint);
+            gc.strokeOval(
+                    explosion.position.x() - explosion.radius + 4,
+                    explosion.position.y() - explosion.radius + 4,
+                    explosion.radius * 2 - 8,
+                    explosion.radius * 2 - 8);
+            paint = Color.rgb(0xff,0x40,0x40,1.0 - explosion.radius / (Constants.EXPLOSION_RADIUS * 1.5));
             gc.setStroke(paint);
             gc.strokeOval(
                     explosion.position.x() - explosion.radius,
@@ -154,6 +165,7 @@ class BoardGraphics {
                     explosion.radius * 2);
             explosion.radius += 2.5;
         }
+        gc.restore();
         this.explosions.removeIf(e -> e.radius > Constants.EXPLOSION_RADIUS);
     }
 
