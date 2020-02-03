@@ -149,7 +149,7 @@ class BoardGraphics {
         gc.setLineWidth(5.0);
         gc.setEffect(new GaussianBlur(2));
         for (final Explosion explosion : this.explosions) {
-            Paint paint = Color.rgb(0xff,0xc0,0x40,1.0 - explosion.radius / (Constants.EXPLOSION_RADIUS));
+            Paint paint = Color.rgb(0xff,0xc0,0x40,1.0 - explosion.radius / Constants.EXPLOSION_RADIUS);
             gc.setStroke(paint);
             gc.strokeOval(
                     explosion.position.x() - explosion.radius + 4,

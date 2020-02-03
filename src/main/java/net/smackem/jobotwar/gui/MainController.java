@@ -92,8 +92,9 @@ public class MainController {
     @FXML
     private void newGame(ActionEvent actionEvent) throws IOException {
         this.ticker.stop();
-        App.instance().eventBus().unregister(this);
-        App.instance().showEditor();
+        final App app = App.instance();
+        app.eventBus().unregister(this);
+        app.showEditor();
     }
 
     private void tick(ActionEvent actionEvent) {
@@ -143,6 +144,7 @@ public class MainController {
     }
 
     private Parent createRobotGauge(MainRobotViewModel robot) {
+        //return new RobotGauge(robot);
         final Label nameLabel = new Label();
         nameLabel.textProperty().bind(robot.nameProperty());
         nameLabel.textFillProperty().set(robot.colorProperty().get());
