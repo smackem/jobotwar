@@ -1,4 +1,4 @@
-package net.smackem.jobotwar.gui;
+package net.smackem.jobotwar.gui.main;
 
 import com.google.common.eventbus.Subscribe;
 import javafx.animation.Animation;
@@ -19,6 +19,9 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
+import net.smackem.jobotwar.gui.App;
+import net.smackem.jobotwar.gui.RgbConvert;
+import net.smackem.jobotwar.gui.RobotLogMessage;
 import net.smackem.jobotwar.runtime.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -149,14 +152,12 @@ public class MainController {
                 Bindings.when(robot.healthProperty().greaterThan(0.0))
                         .then(1.0)
                         .otherwise(0.3));
-//        robotGauge.getChildren().stream()
-//                .filter(node -> node != nameLabel && node instanceof Label)
-//                .forEach(node -> node.getStyleClass().add("robotGaugeLabel"));
         return robotGauge;
     }
 
     @Subscribe
     private void onRobotLogMessage(RobotLogMessage message) {
-        this.messagesTextArea.appendText(String.format("[%s] %s: %f\n", message.robot.name(), message.category, message.value));
+        this.messagesTextArea.appendText(String.format("[%s] %s: %f\n",
+                message.robot().name(), message.category(), message.value()));
     }
 }

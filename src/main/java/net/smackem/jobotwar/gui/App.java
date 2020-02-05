@@ -15,9 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.stream.Collectors;
 
 /**
@@ -27,7 +25,6 @@ public class App extends Application {
 
     private static final Logger log = LoggerFactory.getLogger(App.class);
     private final EventBus eventBus;
-    private final Collection<EditRobotViewModel> cachedRobotViewModels = new ArrayList<>();
     private Scene scene;
     private Board board;
     private static App INSTANCE;
@@ -54,7 +51,7 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-        this.scene = new Scene(loadFXML("edit"), 850, 650);
+        this.scene = new Scene(loadFXML("edit/edit.fxml"), 850, 650);
         stage.setScene(this.scene);
         stage.show();
     }
@@ -65,15 +62,6 @@ public class App extends Application {
                 .rgb(rgb)
                 .imageUrl(imageUrl)
                 .build();
-    }
-
-    public void cacheRobotViewModels(Collection<EditRobotViewModel> robotViewModels) {
-        this.cachedRobotViewModels.clear();
-        this.cachedRobotViewModels.addAll(robotViewModels);
-    }
-
-    public Collection<EditRobotViewModel> getCachedRobotViewModels() {
-        return Collections.unmodifiableCollection(this.cachedRobotViewModels);
     }
 
     public Board copyBoard() {
@@ -88,16 +76,16 @@ public class App extends Application {
     public void startGame(int width, int height, Collection<Robot> robots) {
         this.board = new Board(width, height, robots);
         this.board.disperseRobots();
-        setRoot("main");
+        setRoot("main/main.fxml");
     }
 
     public void simulateGame(int width, int height, Collection<Robot> robots) {
         this.board = new Board(width, height, robots);
-        setRoot("simulation");
+        setRoot("simulation/simulation.fxml");
     }
 
     public void showEditor() throws IOException {
-        setRoot("edit");
+        setRoot("edit/edit.fxml");
     }
 
     private void logRobotMessage(Robot robot, String category, double value) {
@@ -112,8 +100,8 @@ public class App extends Application {
         }
     }
 
-    private static Parent loadFXML(String fxml) throws IOException {
-        final FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource(fxml + ".fxml"));
+    private static Parent loadFXML(String fxmlFile) throws IOException {
+        final FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource(fxmlFile));
         return fxmlLoader.load();
     }
 

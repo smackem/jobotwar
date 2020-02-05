@@ -1,4 +1,4 @@
-package net.smackem.jobotwar.gui;
+package net.smackem.jobotwar.gui.main;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.effect.GaussianBlur;
@@ -6,8 +6,9 @@ import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.ArcType;
-import net.smackem.jobotwar.runtime.*;
+import net.smackem.jobotwar.gui.RgbConvert;
 import net.smackem.jobotwar.runtime.Vector;
+import net.smackem.jobotwar.runtime.*;
 
 import java.util.*;
 

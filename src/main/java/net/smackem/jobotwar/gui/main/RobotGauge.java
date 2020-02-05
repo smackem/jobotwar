@@ -1,4 +1,4 @@
-package net.smackem.jobotwar.gui;
+package net.smackem.jobotwar.gui.main;
 
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;

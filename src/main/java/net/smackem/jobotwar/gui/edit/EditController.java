@@ -1,4 +1,4 @@
-package net.smackem.jobotwar.gui;
+package net.smackem.jobotwar.gui.edit;
 
 import com.google.common.io.CharStreams;
 import javafx.beans.property.ListProperty;
@@ -12,6 +12,8 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
+import net.smackem.jobotwar.gui.App;
+import net.smackem.jobotwar.gui.CodeEditor;
 import net.smackem.jobotwar.lang.Compiler;
 import net.smackem.jobotwar.runtime.Robot;
 
@@ -30,6 +32,7 @@ public class EditController {
     private final Random random = new Random();
     private static final int BOARD_WIDTH = 640;
     private static final int BOARD_HEIGHT = 480;
+    private static Collection<EditRobotViewModel> cachedRobotViewModels;
 
     @FXML
     private TextField nameTextField;
@@ -49,7 +52,9 @@ public class EditController {
     private Button simulateButton;
 
     public EditController() {
-        this.robots.addAll(App.instance().getCachedRobotViewModels());
+        if (cachedRobotViewModels != null) {
+            this.robots.addAll(cachedRobotViewModels);
+        }
     }
 
     @FXML
@@ -83,7 +88,7 @@ public class EditController {
     }
 
     private Image getResourceImage(String resourceName) {
-        return new Image(String.valueOf(getClass().getResource(resourceName)));
+        return new Image(String.valueOf(getClass().getResource("../" + resourceName)));
     }
 
     @FXML
@@ -209,7 +214,7 @@ public class EditController {
         final Collection<Robot> robots;
         try {
             robots = createRobotsFromViewModel();
-            app.cacheRobotViewModels(this.robots);
+            cachedRobotViewModels = new ArrayList<>(this.robots);
         } catch (Exception e) {
             return;
         }

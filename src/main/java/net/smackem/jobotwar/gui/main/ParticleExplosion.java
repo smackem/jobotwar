@@ -1,4 +1,4 @@
-package net.smackem.jobotwar.gui;
+package net.smackem.jobotwar.gui.main;
 
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;

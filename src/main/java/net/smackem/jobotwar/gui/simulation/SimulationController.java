@@ -1,18 +1,19 @@
-package net.smackem.jobotwar.gui;
+package net.smackem.jobotwar.gui.simulation;
 
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Ellipse;
+import net.smackem.jobotwar.gui.App;
+import net.smackem.jobotwar.gui.PlatformExecutor;
+import net.smackem.jobotwar.gui.RgbConvert;
 import net.smackem.jobotwar.runtime.Board;
 import net.smackem.jobotwar.runtime.Robot;
 import net.smackem.jobotwar.runtime.SimulationRunner;
@@ -21,7 +22,10 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.util.*;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
