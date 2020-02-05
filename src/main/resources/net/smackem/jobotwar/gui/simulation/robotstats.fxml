@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.shape.Ellipse?>
+<fx:root type="HBox" xmlns="http://javafx.com/javafx"
+         xmlns:fx="http://javafx.com/fxml"
+         spacing="2">
+    <Ellipse fx:id="paintElement" radiusX="8" radiusY="8" fill="WHITE" />
+    <Label fx:id="nameLabel" />
+    <Label fx:id="ratioLabel" />
+</fx:root>

@@ -9,7 +9,7 @@ import net.smackem.jobotwar.runtime.Constants;
 
 import java.io.IOException;
 
-public class RobotGauge extends VBox {
+class RobotGauge extends VBox {
 
     private final MainRobotViewModel robot;
 

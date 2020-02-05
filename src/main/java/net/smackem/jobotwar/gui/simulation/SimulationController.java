@@ -5,12 +5,13 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
-import javafx.scene.shape.Ellipse;
 import net.smackem.jobotwar.gui.App;
 import net.smackem.jobotwar.gui.PlatformExecutor;
 import net.smackem.jobotwar.gui.RgbConvert;
@@ -95,17 +96,9 @@ public class SimulationController {
     private void createRobotStatsWidgets(Collection<RobotStatisticsViewModel> stats) {
         this.robotStatsParent.getChildren().clear();
         for (final RobotStatisticsViewModel stat : stats) {
-            final Paint paint = stat.robotPaint != null ? stat.robotPaint : Color.WHITE;
-            final Ellipse ellipse = new Ellipse(8, 8);
-            ellipse.setFill(paint);
-            final Label nameLabel = new Label(stat.robotName);
-            nameLabel.setTextFill(Color.WHITE);
-            final Label ratioLabel = new Label(String.format(": %.2f%%", stat.winRatio.get() * 100));
-            ratioLabel.setTextFill(Color.WHITE);
-            final HBox box = new HBox(ellipse, nameLabel, ratioLabel);
-            box.setSpacing(2);
-            this.robotStatsParent.getChildren().add(box);
-            log.info("{}: {} ({})", stat.robotName, stat.winRatio, stat.winCount);
+            final RobotStats node = new RobotStats(stat);
+            this.robotStatsParent.getChildren().add(node);
+            log.info("{}: {} ({})", stat.robotName(), stat.winRatioProperty().get(), stat.winCount);
         }
     }
 
@@ -120,10 +113,10 @@ public class SimulationController {
             stat.winCount++;
         }
         for (final RobotStatisticsViewModel stat : stats.values()) {
-            stat.winRatio.set((double)stat.winCount / (double)matches.size());
+            stat.winRatioProperty().set((double)stat.winCount / (double)matches.size());
         }
         return stats.values().stream()
-                .sorted(Comparator.comparingDouble(stat -> -stat.winRatio.get()))
+                .sorted(Comparator.comparingDouble(stat -> -stat.winRatioProperty().get()))
                 .collect(Collectors.toList());
     }
 
@@ -175,18 +168,6 @@ public class SimulationController {
                 return;
             }
             setText(String.format("%02d:%02d.%03d", item.toMinutes(), item.getSeconds() % 60, item.toMillis() % 1000));
-        }
-    }
-
-    private static class RobotStatisticsViewModel {
-        private final String robotName;
-        private final Paint robotPaint;
-        private int winCount;
-        private final DoubleProperty winRatio = new SimpleDoubleProperty();
-
-        private RobotStatisticsViewModel(String robotName, Paint robotPaint) {
-            this.robotName = robotName;
-            this.robotPaint = robotPaint;
         }
     }
 }

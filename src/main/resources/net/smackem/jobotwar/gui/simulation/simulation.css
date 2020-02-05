@@ -10,3 +10,7 @@
 #robotStatsParent {
     -fx-background-color: rgba(0, 0, 0, 0.7);
 }
+
+#robotStatsParent .label {
+    -fx-text-fill: white;
+}
