@@ -38,10 +38,6 @@
     -fx-padding: 2;
 }
 
-.robotGaugeLabel {
-    -fx-text-fill: #c0c0c0;
-}
-
 .scroll-pane{
     -fx-background-color:transparent;
 }

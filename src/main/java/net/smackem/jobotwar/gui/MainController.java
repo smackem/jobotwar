@@ -17,7 +17,6 @@ import javafx.scene.control.TextArea;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
 import net.smackem.jobotwar.runtime.*;
@@ -144,30 +143,16 @@ public class MainController {
     }
 
     private Parent createRobotGauge(MainRobotViewModel robot) {
-        //return new RobotGauge(robot);
-        final Label nameLabel = new Label();
-        nameLabel.textProperty().bind(robot.nameProperty());
-        nameLabel.textFillProperty().set(robot.colorProperty().get());
-        final Label healthLabel = new Label();
-        healthLabel.textProperty().bind(robot.healthProperty().asString().concat("%"));
-        final Label speedXLabel = new Label();
-        speedXLabel.textProperty().bind(Bindings.format(
-                "Speed X: %.1f",
-                robot.speedXProperty().multiply(Constants.MAX_ROBOT_GAME_SPEED / Constants.MAX_ROBOT_SPEED)));
-        final Label speedYLabel = new Label();
-        speedYLabel.textProperty().bind(Bindings.format(
-                "Speed Y: %.1f",
-                robot.speedYProperty().multiply(Constants.MAX_ROBOT_GAME_SPEED / Constants.MAX_ROBOT_SPEED)));
-        final VBox vbox = new VBox(nameLabel, healthLabel, speedXLabel, speedYLabel);
-        vbox.getStyleClass().add("robotGauge");
-        vbox.opacityProperty().bind(
+        final RobotGauge robotGauge = new RobotGauge(robot);
+        robotGauge.getStyleClass().add("robotGauge");
+        robotGauge.opacityProperty().bind(
                 Bindings.when(robot.healthProperty().greaterThan(0.0))
                         .then(1.0)
                         .otherwise(0.3));
-        vbox.getChildren().stream()
-                .filter(node -> node != nameLabel && node instanceof Label)
-                .forEach(node -> node.getStyleClass().add("robotGaugeLabel"));
-        return vbox;
+//        robotGauge.getChildren().stream()
+//                .filter(node -> node != nameLabel && node instanceof Label)
+//                .forEach(node -> node.getStyleClass().add("robotGaugeLabel"));
+        return robotGauge;
     }
 
     @Subscribe
