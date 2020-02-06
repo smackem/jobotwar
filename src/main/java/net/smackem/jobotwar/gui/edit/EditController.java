@@ -11,6 +11,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import net.smackem.jobotwar.gui.App;
 import net.smackem.jobotwar.gui.CodeEditor;
@@ -50,6 +51,8 @@ public class EditController {
     private ComboBox<Image> iconComboBox;
     @FXML
     private Button simulateButton;
+    @FXML
+    private Pane detailsPane;
 
     public EditController() {
         if (cachedRobotViewModels != null) {
@@ -85,6 +88,7 @@ public class EditController {
         } else {
             selectRobot(this.robots.iterator().next());
         }
+        this.detailsPane.visibleProperty().bind(this.selectedRobot.isNotNull());
     }
 
     private Image getResourceImage(String resourceName) {

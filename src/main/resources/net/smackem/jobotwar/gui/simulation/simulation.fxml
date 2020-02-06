@@ -23,13 +23,21 @@
     </top>
     <center>
         <StackPane>
-            <TableView fx:id="matchTable">
-                <columns>
-                    <TableColumn fx:id="numberColumn" text="#" />
-                    <TableColumn fx:id="winnerColumn" text="Winner" />
-                    <TableColumn fx:id="durationColumn" text="Duration" />
-                </columns>
-            </TableView>
+            <SplitPane>
+                <TableView fx:id="matchTable">
+                    <columns>
+                        <TableColumn fx:id="numberColumn" text="#" />
+                        <TableColumn fx:id="winnerColumn" text="Winner" />
+                        <TableColumn fx:id="durationColumn" text="Duration" />
+                    </columns>
+                </TableView>
+                <VBox fx:id="detailsPane" spacing="2">
+                    <padding>
+                        <Insets left="2" top="2" right="2" bottom="2" />
+                    </padding>
+                    <Button text="Replay" onAction="#replay" />
+                </VBox>
+            </SplitPane>
             <VBox fx:id="runningOverlay" alignment="CENTER">
                 <Label text="Simulation Running..." />
             </VBox>

@@ -1,0 +1,248 @@
+// ==========================
+Loop:
+	AIM + 3 -> AIM
+	200 -> SHOT
+    50 - RANDOM * 100 -> SPEEDX if AIM % 45 = 0
+	goto Loop
+
+// ==========================
+def radar
+Loop:
+    radar + 5 -> radar
+    radar -> RADAR
+    goto Loop
+
+// ==========================
+loop:
+    AIM + 7 -> AIM -> RADAR
+    goto loop unless RADAR < 0
+shoot:
+    0 - RADAR -> SHOT
+    AIM -> RADAR
+    goto shoot if RADAR < 0
+    goto loop
+
+
+// ==========================
+def radar
+Loop:
+    radar + 5 -> radar -> RADAR
+    goto Loop
+
+// ==========================
+def destX, destY
+
+newloc:
+50 + RANDOM * 540 -> destX
+50 + RANDOM * 380 -> destY
+destX - X -> SPEEDX
+destY - Y -> SPEEDY
+
+move:
+0 -> SPEEDX if abs(destX - X) < 30
+0 -> SPEEDY if abs(destY - Y) < 30
+goto move unless SPEEDX = 0 and SPEEDY = 0
+
+goto newloc
+
+// ==========================
+def destX, destY
+def radar, angle, inc
+
+begin:
+AIM -> RADAR
+15 -> inc
+
+scan:
+RADAR -> radar
+goto seek if radar < 0
+AIM + inc -> angle -> RADAR -> AIM
+goto shift if angle > 350
+goto scan
+
+shift:
+7 -> inc
+(320 - radar) / 20 -> SPEEDX
+goto scan
+
+seek:
+X + (0 - radar) * cos(AIM) -> destX
+Y + (0 - radar) * sin(AIM) -> destY
+destX - X -> SPEEDX
+destY - Y -> SPEEDY
+(0 - radar) -> SHOT
+
+move:
+0 -> SPEEDX if abs(destX - X) < 20
+0 -> SPEEDY if abs(destY - Y) < 20
+(0 - radar) -> SHOT
+goto move unless SPEEDX = 0 and SPEEDY = 0
+
+goto begin
+
+// ============================
+
+300 -> SPEEDX
+
+nochmal:
+-400 -> SPEEDX if X > 512
+0-> SPEEDX if X < 120
+goto nochmal
+
+// ============================
+
+def damage, destX, destY
+
+loop:
+    gosub scan
+    gosub flee if DAMAGE != damage
+    gosub shoot if RADAR < 0
+    RADAR -> OUT
+    goto loop
+
+scan:
+    DAMAGE -> damage
+    AIM + 7 -> AIM -> RADAR
+    goto scan unless RADAR < 0 or DAMAGE != damage
+    endsub
+
+shoot:
+    DAMAGE -> damage
+    0 - RADAR -> SHOT
+    AIM -> RADAR
+    goto shoot unless RADAR >= 0 or DAMAGE != damage
+    endsub
+
+flee:
+    50 + RANDOM * 500 -> destX
+    50 + RANDOM * 400 -> destY
+    destX - X -> SPEEDX
+    destY - Y -> SPEEDY
+move:
+    goto move unless abs(destX - X) < 30 and abs(destY - Y) < 30
+    0 -> SPEEDX -> SPEEDY
+    endsub
+
+// ===============================
+
+def zielX, zielY, feind, hatSchaden
+def damage
+
+loop:
+    gosub suchen
+    gosub schiessen if feind != 0
+    gosub randomZiel if hatSchaden
+    gosub move if hatSchaden
+    goto loop
+
+randomZiel:
+    30 + RANDOM * 590 -> zielX -> OUT
+    30 + RANDOM * 430 -> zielY -> OUT
+    endsub
+
+suchen:
+    0 -> feind
+    DAMAGE - damage -> hatSchaden
+    DAMAGE -> damage
+    goto suchen_1 if hatSchaden
+    AIM + 7 -> AIM -> RADAR
+    goto suchen unless RADAR < 0
+    RADAR -> feind -> OUT
+suchen_1:
+    endsub
+
+schiessen:
+    0 - feind -> SHOT -> OUT
+    endsub
+
+move:
+    zielX - X -> SPEEDX -> OUT
+    zielY - Y -> SPEEDY -> OUT
+move_1:
+    0 -> SPEEDX if abs(zielX - X) <= 30
+    0 -> SPEEDY if abs(zielY - Y) <= 30
+    goto move_1 unless SPEEDX = 0 and SPEEDY = 0
+    endsub
+
+
+// =====================================
+
+// robot bumblebee
+
+def destX, destY
+
+newloc:
+    50 + RANDOM * 540 -> destX
+    50 + RANDOM * 380 -> destY
+    destX - X -> SPEEDX
+    destY - Y -> SPEEDY
+
+move:
+    0 -> SPEEDX if abs(destX - X) < 50
+    0 -> SPEEDY if abs(destY - Y) < 50
+    AIM + 7 -> AIM
+    1000 -> SHOT
+    goto move unless SPEEDX = 0 and SPEEDY = 0
+    goto newloc
+
+ 
+// =====================================
+// robot corner
+
+def destX, destY
+def corner, newCorner
+def angleBase, angle
+def damage
+
+-1 -> corner
+
+changeCorner:
+    trunc(RANDOM * 4) -> newCorner -> OUT
+    goto changeCorner if newCorner = corner
+    newCorner -> corner
+    goto topLeft if corner = 3
+    goto topRight if corner = 2
+    goto bottomLeft if corner = 1
+    goto bottomRight
+
+topLeft:
+    20 -> destX
+    20 -> destY
+    0 -> angleBase -> OUT
+    goto move
+
+topRight:
+    620 -> destX
+    20 -> destY
+    90 -> angleBase -> OUT
+    goto move
+
+bottomLeft:
+    0 -> destX
+    460 -> destY
+    270 -> angleBase -> OUT
+    goto move
+
+bottomRight:
+    620 -> destX
+    460 -> destY
+    180 -> angleBase -> OUT
+    goto move
+
+move:
+    destX - X -> SPEEDX
+    destY - Y -> SPEEDY
+move_1:
+    0 -> SPEEDX if abs(destX - X) < 50
+    0 -> SPEEDY if abs(destY - Y) < 50
+    goto move_1 unless SPEEDX = 0 and SPEEDY = 0
+    DAMAGE -> damage -> OUT
+
+scan:
+    angle + 1 -> angle
+nextShot:
+    angleBase + angle % 90 -> AIM -> RADAR
+    goto scan unless RADAR < 0
+    0 - RADAR -> SHOT
+    goto nextShot unless DAMAGE != damage
+    goto changeCorner

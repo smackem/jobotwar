@@ -39,7 +39,7 @@
         </BorderPane>
     </left>
     <center>
-        <BorderPane>
+        <BorderPane fx:id="detailsPane">
             <top>
                 <GridPane style="-fx-padding: 4;" hgap="4" vgap="4">
                     <Label text="Name:" />

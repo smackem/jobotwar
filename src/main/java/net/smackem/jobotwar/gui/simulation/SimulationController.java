@@ -15,19 +15,13 @@ import javafx.scene.paint.Paint;
 import net.smackem.jobotwar.gui.App;
 import net.smackem.jobotwar.gui.PlatformExecutor;
 import net.smackem.jobotwar.gui.RgbConvert;
-import net.smackem.jobotwar.runtime.Board;
-import net.smackem.jobotwar.runtime.Robot;
-import net.smackem.jobotwar.runtime.SimulationResult;
-import net.smackem.jobotwar.runtime.SimulationRunner;
+import net.smackem.jobotwar.runtime.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -37,6 +31,7 @@ public class SimulationController {
     private static final Logger log = LoggerFactory.getLogger(SimulationController.class);
     private final ObservableList<MatchViewModel> matches = FXCollections.observableArrayList();
     private final BooleanProperty running = new SimpleBooleanProperty();
+    private final Random random = new Random();
 
     @FXML
     private TableView<MatchViewModel> matchTable;
@@ -52,6 +47,8 @@ public class SimulationController {
     private ChoiceBox<Integer> matchCountChoice;
     @FXML
     private Pane robotStatsParent;
+    @FXML
+    private Pane detailsPane;
 
     @FXML
     private void initialize() {
@@ -64,6 +61,8 @@ public class SimulationController {
         this.runningOverlay.visibleProperty().bind(this.running);
         this.matchCountChoice.setItems(FXCollections.observableArrayList(100, 1000, 10_000, 100_000));
         this.matchCountChoice.setValue(1000);
+        this.detailsPane.visibleProperty().bind(
+                this.matchTable.getSelectionModel().selectedItemProperty().isNotNull());
     }
 
     @FXML
@@ -86,9 +85,12 @@ public class SimulationController {
         return CompletableFuture.supplyAsync(() -> IntStream.range(0, count)
                 .parallel()
                 .mapToObj(matchIndex -> {
-                    final Board board = Board.fromTemplate(app.board(), null);
-                    board.disperseRobots();
-                    final SimulationRunner runner = new SimulationRunner(board);
+                    final GameRecorder recorder = new GameRecorder(this.random, ctx -> {
+                        final Board board = Board.fromTemplate(app.board(), ctx);
+                        board.disperseRobots();
+                        return board;
+                    });
+                    final SimulationRunner runner = new SimulationRunner(recorder.board());
                     final SimulationResult result = runner.runGame(duration);
                     return new MatchViewModel(result, matchIndex + 1);
                 })
@@ -125,6 +127,11 @@ public class SimulationController {
     @FXML
     private void newGame(ActionEvent actionEvent) throws IOException {
         App.instance().showEditor();
+    }
+
+    @FXML
+    private void replay(ActionEvent actionEvent) {
+
     }
 
     private static class MatchViewModel {
