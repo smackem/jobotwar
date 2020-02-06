@@ -10,7 +10,7 @@ import java.util.Objects;
 import java.util.Random;
 
 /**
- * A {@link RobotProgram} that has been compiled source code and executes by using a
+ * A {@link RobotProgram} that has been compiled from source code and executes by using a
  * {@link Interpreter}.
  */
 public class CompiledProgram implements RobotProgram {
@@ -18,19 +18,18 @@ public class CompiledProgram implements RobotProgram {
     private static final Logger log = LoggerFactory.getLogger(CompiledProgram.class);
     private final Robot robot;
     private final Interpreter interpreter;
-    private final RobotMessageLogger messageLogger;
+    private final RobotProgramContext context;
 
     /**
      * Initializes a new {@link CompiledProgram}.
      * @param robot The {@link Robot} that is controlled by the program.
      * @param program The {@link Program} that has been compiled from source code.
-     * @param messageLogger A callback object that receives messages written to the OUT
-     *                      register of the robot.
+     * @param ctx The {@link RobotProgramContext} to hook in.
      */
-    public CompiledProgram(Robot robot, Program program, RobotMessageLogger messageLogger) {
+    public CompiledProgram(Robot robot, Program program, RobotProgramContext ctx) {
         this.robot = Objects.requireNonNull(robot);
         this.interpreter = new Interpreter(Objects.requireNonNull(program), environment());
-        this.messageLogger = Objects.requireNonNull(messageLogger);
+        this.context = Objects.requireNonNull(ctx);
     }
 
     /**
@@ -41,10 +40,10 @@ public class CompiledProgram implements RobotProgram {
     }
 
     /**
-     * @return A callback object that receives messages written to the OUT register of the robot.
+     * @return The {@link RobotProgramContext} to hook in.
      */
-    public RobotMessageLogger messageLogger() {
-        return this.messageLogger;
+    public RobotProgramContext context() {
+        return this.context;
     }
 
     /**
@@ -149,12 +148,12 @@ public class CompiledProgram implements RobotProgram {
 
             @Override
             public double getRandom() {
-                return random.nextDouble();
+                return context.nextRandomDouble(robot);
             }
 
             @Override
             public void log(String category, double value) {
-                messageLogger.log(robot, category, value);
+                context.logMessage(robot, category, value);
             }
         };
     }

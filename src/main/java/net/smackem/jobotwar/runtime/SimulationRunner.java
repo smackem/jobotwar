@@ -43,7 +43,7 @@ public final class SimulationRunner {
         return new SimulationResult(result.winner(), Duration.ofMillis(millis));
     }
 
-    public static class SimulationResult {
+    public static final class SimulationResult {
         private final Robot winner;
         private final Duration duration;
 

@@ -7,15 +7,13 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import net.smackem.jobotwar.lang.Program;
-import net.smackem.jobotwar.runtime.Board;
-import net.smackem.jobotwar.runtime.CompiledProgram;
-import net.smackem.jobotwar.runtime.Robot;
-import net.smackem.jobotwar.runtime.Robots;
+import net.smackem.jobotwar.runtime.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 /**
@@ -28,6 +26,18 @@ public class App extends Application {
     private Scene scene;
     private Board board;
     private static App INSTANCE;
+    private final Random random = new Random();
+    private final RobotProgramContext defaultRobotContext = new RobotProgramContext() {
+        @Override
+        public void logMessage(Robot robot, String category, double value) {
+            eventBus.post(new RobotLogMessage(robot, category, value));
+        }
+
+        @Override
+        public double nextRandomDouble(Robot robot) {
+            return random.nextDouble();
+        }
+    };
 
     public App() {
         if (INSTANCE != null) {
@@ -57,16 +67,16 @@ public class App extends Application {
     }
 
     public Robot createRobot(Program program, String name, int rgb, String imageUrl) {
-        return new Robot.Builder(r -> new CompiledProgram(r, program, this::logRobotMessage))
+        return new Robot.Builder(r -> new CompiledProgram(r, program, this.defaultRobotContext))
                 .name(name)
                 .rgb(rgb)
                 .imageUrl(imageUrl)
                 .build();
     }
 
-    public Board copyBoard() {
+    public Board copyBoard(RobotProgramContext ctx) {
         final Collection<Robot> newRobots = this.board.robots().stream()
-                .map(Robots::buildLike)
+                .map(r -> Robots.buildLike(r, ctx))
                 .collect(Collectors.toList());
         final Board newBoard = new Board(this.board.width(), this.board.height(), newRobots);
         newBoard.disperseRobots();
@@ -86,10 +96,6 @@ public class App extends Application {
 
     public void showEditor() throws IOException {
         setRoot("edit/edit.fxml");
-    }
-
-    private void logRobotMessage(Robot robot, String category, double value) {
-        this.eventBus.post(new RobotLogMessage(robot, category, value));
     }
 
     private void setRoot(String fxml) {

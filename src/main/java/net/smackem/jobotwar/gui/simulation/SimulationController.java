@@ -72,7 +72,7 @@ public class SimulationController {
         final long start = System.currentTimeMillis();
         runMatches(matchCountChoice.getValue()).thenAcceptAsync(matches -> {
             this.matches.addAll(matches);
-            log.info("Serial: Elapsed milliseconds: {}", System.currentTimeMillis() - start);
+            log.info("Simulation: Elapsed milliseconds: {}", System.currentTimeMillis() - start);
             final Collection<RobotStatisticsViewModel> stats = buildRobotStatistics(matches);
             createRobotStatsWidgets(stats);
             this.running.set(false);
@@ -85,7 +85,7 @@ public class SimulationController {
         return CompletableFuture.supplyAsync(() -> IntStream.range(0, count)
                 .parallel()
                 .mapToObj(matchIndex -> {
-                    final Board board = app.copyBoard();
+                    final Board board = app.copyBoard(null);
                     final SimulationRunner runner = new SimulationRunner(board);
                     final SimulationRunner.SimulationResult result = runner.runGame(duration);
                     return new MatchViewModel(result, matchIndex + 1);

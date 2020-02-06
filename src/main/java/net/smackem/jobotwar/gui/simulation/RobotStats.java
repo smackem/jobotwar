@@ -36,7 +36,8 @@ class RobotStats extends HBox {
     @FXML
     private void initialize() {
         this.nameLabel.setText(this.stats.robotName() + ":");
-        this.ratioLabel.textProperty().bind(Bindings.format("%.2f %%", this.stats.winRatioProperty()));
+        this.ratioLabel.textProperty().bind(
+                Bindings.format("%.2f %%", this.stats.winRatioProperty().multiply(100)));
 
         final Paint paint = this.stats.robotPaint();
         if (paint != null) {

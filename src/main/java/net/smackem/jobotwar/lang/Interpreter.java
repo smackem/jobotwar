@@ -3,7 +3,9 @@ package net.smackem.jobotwar.lang;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * Executes a compiled {@link Program}.
@@ -212,11 +214,21 @@ public final class Interpreter {
 
     private void storeRegister(String strArg, double d) {
         switch (strArg) {
-            case "AIM":     this.runtime.writeAim(d); break;
-            case "RADAR":   this.runtime.writeRadar(d); break;
-            case "SPEEDX":  this.runtime.writeSpeedX(d); break;
-            case "SPEEDY":  this.runtime.writeSpeedY(d); break;
-            case "SHOT":    this.runtime.writeShot(d); break;
+            case "AIM":
+                this.runtime.writeAim(d);
+                break;
+            case "RADAR":
+                this.runtime.writeRadar(d);
+                break;
+            case "SPEEDX":
+                this.runtime.writeSpeedX(d);
+                break;
+            case "SPEEDY":
+                this.runtime.writeSpeedY(d);
+                break;
+            case "SHOT":
+                this.runtime.writeShot(d);
+                break;
             default:
                 throw new IllegalArgumentException("Unknown register: '" + strArg + "'");
         }
