@@ -24,7 +24,6 @@ import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class SimulationController {
 
@@ -82,19 +81,11 @@ public class SimulationController {
     private CompletableFuture<Collection<MatchViewModel>> runMatches(int count) {
         final App app = App.instance();
         final Duration duration = Duration.ofMinutes(5);
-        return CompletableFuture.supplyAsync(() -> IntStream.range(0, count)
-                .parallel()
-                .mapToObj(matchIndex -> {
-                    final GameRecorder recorder = new GameRecorder(this.random, ctx -> {
-                        final Board board = Board.fromTemplate(app.board(), ctx);
-                        board.disperseRobots();
-                        return board;
-                    });
-                    final SimulationRunner runner = new SimulationRunner(recorder.board());
-                    final SimulationResult result = runner.runGame(duration);
-                    return new MatchViewModel(result, matchIndex + 1);
-                })
-                .collect(Collectors.toList()));
+        return SimulationRunner.runBatchParallel(app.board(), count, this.random, duration)
+                .thenApply(batchResults ->
+                        batchResults.stream()
+                                .map(br -> new MatchViewModel(br, br.matchNumber(), br.recorder()))
+                                .collect(Collectors.toList()));
     }
 
     private void createRobotStatsWidgets(Collection<RobotStatisticsViewModel> stats) {
@@ -131,16 +122,22 @@ public class SimulationController {
 
     @FXML
     private void replay(ActionEvent actionEvent) {
-
+        final MatchViewModel match = this.matchTable.getSelectionModel().getSelectedItem();
+        if (match == null) {
+            return;
+        }
+        final Board replayBoard = match.recorder.replay();
+        App.instance().startReplay(replayBoard);
     }
 
     private static class MatchViewModel {
-        private final IntegerProperty matchNumber = new SimpleIntegerProperty();
-        private final StringProperty winnerName = new SimpleStringProperty();
-        private final ObjectProperty<Duration> duration = new SimpleObjectProperty<>();
-        private final Paint winnerPaint;
+        final IntegerProperty matchNumber = new SimpleIntegerProperty();
+        final StringProperty winnerName = new SimpleStringProperty();
+        final ObjectProperty<Duration> duration = new SimpleObjectProperty<>();
+        final Paint winnerPaint;
+        final GameRecorder recorder;
 
-        private MatchViewModel(SimulationResult result, int matchNumber) {
+        MatchViewModel(SimulationResult result, int matchNumber, GameRecorder recorder) {
             final Robot winner = result.winner();
             if (winner != null) {
                 this.winnerName.set(winner.name());
@@ -151,6 +148,7 @@ public class SimulationController {
             }
             this.matchNumber.set(matchNumber);
             this.duration.set(result.duration());
+            this.recorder = recorder;
         }
     }
 

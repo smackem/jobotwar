@@ -68,8 +68,9 @@ public final class GameRecorder implements RobotProgramContext {
     private double playRandomDouble(Robot r) {
         final RobotRecord record = this.robotRecords.get(r.name());
         assert record != null;
-        assert record.randomNumberIterator.hasNext();
-        return record.randomNumberIterator.next();
+        return record.randomNumberIterator.hasNext()
+                ? record.randomNumberIterator.next()
+                : 0; // occurs when game has ended, but winner keeps on drawing random numbers
     }
 
     private static class RobotRecord {

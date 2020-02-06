@@ -2,7 +2,7 @@ package net.smackem.jobotwar.runtime;
 
 import java.time.Duration;
 
-public final class SimulationResult {
+public class SimulationResult {
     private final Robot winner;
     private final Duration duration;
 

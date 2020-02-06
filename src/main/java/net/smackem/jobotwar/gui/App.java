@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Random;
 
 /**
@@ -25,9 +26,10 @@ public class App extends Application {
 
     private static final Logger log = LoggerFactory.getLogger(App.class);
     private final EventBus eventBus;
+    private static App INSTANCE;
     private Scene scene;
     private Board board;
-    private static App INSTANCE;
+    private boolean replay;
     private final Random random = new Random();
     private final RobotProgramContext defaultRobotContext = new RobotProgramContext() {
         @Override
@@ -61,6 +63,10 @@ public class App extends Application {
         return this.eventBus;
     }
 
+    public boolean isReplay() {
+        return this.replay;
+    }
+
     @Override
     public void start(Stage stage) throws IOException {
         this.scene = new Scene(loadFXML("edit/edit.fxml"), 850, 650);
@@ -79,6 +85,13 @@ public class App extends Application {
     public void startGame(int width, int height, Collection<Robot> robots) {
         this.board = new Board(width, height, robots);
         this.board.disperseRobots();
+        this.replay = false;
+        setRoot("main/main.fxml");
+    }
+
+    public void startReplay(Board board) {
+        this.board = Objects.requireNonNull(board);
+        this.replay = true;
         setRoot("main/main.fxml");
     }
 

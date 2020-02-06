@@ -57,7 +57,7 @@ public class GameRecorderTest {
                 "shoot:\n" +
                 "    0 - RADAR -> SHOT\n" +
                 "    AIM -> RADAR\n" +
-                "    goto shoot if RADAR < 0\n" +
+                "    goto shoot if RADAR < 0 or RANDOM < 0.5\n" +
                 "    goto loop\n";
         final Compiler compiler = new Compiler();
         final Compiler.Result result = compiler.compile(source);

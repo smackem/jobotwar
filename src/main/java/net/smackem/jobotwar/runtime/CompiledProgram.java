@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
-import java.util.Random;
 
 /**
  * A {@link RobotProgram} that has been compiled from source code and executes by using a
@@ -60,7 +59,6 @@ public class CompiledProgram implements RobotProgram {
     }
 
     private RuntimeEnvironment environment() {
-        final Random random = new Random();
         return new RuntimeEnvironment() {
             @Override
             public double readAim() {
@@ -69,7 +67,7 @@ public class CompiledProgram implements RobotProgram {
 
             @Override
             public void writeAim(double value) {
-                if (value < 0) {
+                while (value < 0) {
                     value += 360;
                 }
                 robot.setAimAngle(value % 360);
@@ -89,7 +87,7 @@ public class CompiledProgram implements RobotProgram {
 
             @Override
             public void writeRadar(double value) {
-                if (value < 0) {
+                while (value < 0) {
                     value += 360;
                 }
                 robot.setRadarAngle(value % 360);
@@ -143,7 +141,10 @@ public class CompiledProgram implements RobotProgram {
 
             @Override
             public void writeShot(double value) {
-                robot.setShot((int)(value + 0.5));
+                final int shot = (int)(value + 0.5);
+                if (shot >= 0) {
+                    robot.setShot(shot);
+                }
             }
 
             @Override
