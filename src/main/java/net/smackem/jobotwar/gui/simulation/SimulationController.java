@@ -17,6 +17,7 @@ import net.smackem.jobotwar.gui.PlatformExecutor;
 import net.smackem.jobotwar.gui.RgbConvert;
 import net.smackem.jobotwar.runtime.Board;
 import net.smackem.jobotwar.runtime.Robot;
+import net.smackem.jobotwar.runtime.SimulationResult;
 import net.smackem.jobotwar.runtime.SimulationRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,9 +86,10 @@ public class SimulationController {
         return CompletableFuture.supplyAsync(() -> IntStream.range(0, count)
                 .parallel()
                 .mapToObj(matchIndex -> {
-                    final Board board = app.copyBoard(null);
+                    final Board board = Board.fromTemplate(app.board(), null);
+                    board.disperseRobots();
                     final SimulationRunner runner = new SimulationRunner(board);
-                    final SimulationRunner.SimulationResult result = runner.runGame(duration);
+                    final SimulationResult result = runner.runGame(duration);
                     return new MatchViewModel(result, matchIndex + 1);
                 })
                 .collect(Collectors.toList()));
@@ -131,7 +133,7 @@ public class SimulationController {
         private final ObjectProperty<Duration> duration = new SimpleObjectProperty<>();
         private final Paint winnerPaint;
 
-        private MatchViewModel(SimulationRunner.SimulationResult result, int matchNumber) {
+        private MatchViewModel(SimulationResult result, int matchNumber) {
             final Robot winner = result.winner();
             if (winner != null) {
                 this.winnerName.set(winner.name());

@@ -2,7 +2,11 @@ package net.smackem.jobotwar.runtime;
 
 import net.smackem.jobotwar.util.Arguments;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Objects;
+import java.util.Random;
+import java.util.stream.Collectors;
 
 /**
  * The game board.
@@ -64,6 +68,20 @@ public class Board {
                 robot.setY(Constants.ROBOT_RADIUS + random.nextDouble() * (this.height - Constants.ROBOT_RADIUS * 2));
             } while (getCloseRobot(robot) != null);
         }
+    }
+
+    /**
+     * Creates a new {@link Board} with the same dimensions and {@link Robot}s that
+     * have the same programs as the ones on the specified template board.
+     * @param template The template board.
+     * @param ctx The new {@link RobotProgramContext}.
+     * @return A new {@link Board}.
+     */
+    public static Board fromTemplate(Board template, RobotProgramContext ctx) {
+        final Collection<Robot> newRobots = template.robots().stream()
+                .map(r -> Robots.fromTemplate(r, ctx))
+                .collect(Collectors.toList());
+        return new Board(template.width(), template.height(), newRobots);
     }
 
     private Robot getCloseRobot(Robot robot) {

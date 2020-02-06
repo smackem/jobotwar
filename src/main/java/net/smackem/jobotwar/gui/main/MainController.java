@@ -66,7 +66,7 @@ public class MainController {
 
     @FXML
     private void initialize() {
-        final Board board = App.instance().board();
+        final Board board = this.engine.board();
         this.canvasContainer.maxWidthProperty().bind(this.canvas.widthProperty());
         this.canvasContainer.maxHeightProperty().bind(this.canvas.heightProperty());
         this.canvas.setWidth(board.width());

@@ -23,6 +23,13 @@ public final class GameEngine {
     }
 
     /**
+     * @return The game board.
+     */
+    public Board board() {
+        return this.board;
+    }
+
+    /**
      * Executes the next frame.
      * @return A {@link TickResult} that holds the new state of the game.
      */
@@ -165,7 +172,7 @@ public final class GameEngine {
         for (final Robot robot : damagedRobots) {
             final double distance = Vector.distance(robot.position(), projectilePos);
             final int damage = (int)(30.0 - 20.0 * distance / (Constants.EXPLOSION_RADIUS + Constants.ROBOT_RADIUS));
-            log.info("damage: {}", damage);
+            log.debug("damage: {}", damage);
             robot.setHealth(Math.max(0, robot.getHealth() - damage));
         }
     }

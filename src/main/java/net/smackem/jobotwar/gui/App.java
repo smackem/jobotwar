@@ -7,14 +7,16 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import net.smackem.jobotwar.lang.Program;
-import net.smackem.jobotwar.runtime.*;
+import net.smackem.jobotwar.runtime.Board;
+import net.smackem.jobotwar.runtime.CompiledProgram;
+import net.smackem.jobotwar.runtime.Robot;
+import net.smackem.jobotwar.runtime.RobotProgramContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Random;
-import java.util.stream.Collectors;
 
 /**
  * JavaFX App
@@ -72,15 +74,6 @@ public class App extends Application {
                 .rgb(rgb)
                 .imageUrl(imageUrl)
                 .build();
-    }
-
-    public Board copyBoard(RobotProgramContext ctx) {
-        final Collection<Robot> newRobots = this.board.robots().stream()
-                .map(r -> Robots.buildLike(r, ctx))
-                .collect(Collectors.toList());
-        final Board newBoard = new Board(this.board.width(), this.board.height(), newRobots);
-        newBoard.disperseRobots();
-        return newBoard;
     }
 
     public void startGame(int width, int height, Collection<Robot> robots) {

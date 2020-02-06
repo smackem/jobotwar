@@ -42,22 +42,4 @@ public final class SimulationRunner {
 
         return new SimulationResult(result.winner(), Duration.ofMillis(millis));
     }
-
-    public static final class SimulationResult {
-        private final Robot winner;
-        private final Duration duration;
-
-        private SimulationResult(Robot winner, Duration duration) {
-            this.winner = winner;
-            this.duration = duration;
-        }
-
-        public Robot winner() {
-            return winner;
-        }
-
-        public Duration duration() {
-            return duration;
-        }
-    }
 }
