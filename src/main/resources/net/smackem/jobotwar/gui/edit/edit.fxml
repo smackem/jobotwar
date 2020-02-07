@@ -21,7 +21,9 @@
                     <HBox spacing="4" alignment="CENTER">
                         <SplitMenuButton minWidth="123" text="New Robot" onAction="#newRobot">
                             <items>
+                                <MenuItem text="shooter" onAction="#newRobotShooter" />
                                 <MenuItem text="mover" onAction="#newRobotMover" />
+                                <MenuItem text="corner" onAction="#newRobotCorner" />
                                 <MenuItem text="smart" onAction="#newRobotSmart" />
                                 <MenuItem text="dumbshooter" onAction="#newRobotDumbShooter" />
                                 <MenuItem text="patrol" onAction="#newRobotPatrol" />

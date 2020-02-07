@@ -1,0 +1,9 @@
+// ==========================
+loop:
+    AIM + 7 -> AIM -> RADAR
+    goto loop unless RADAR < 0
+shoot:
+    0 - RADAR -> SHOT
+    AIM -> RADAR
+    goto shoot if RADAR < 0
+    goto loop

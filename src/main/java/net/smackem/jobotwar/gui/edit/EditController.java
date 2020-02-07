@@ -78,8 +78,8 @@ public class EditController {
         this.iconComboBox.setButtonCell(new IconCell());
         this.iconComboBox.getItems().addAll(
                 null,
-                getResourceImage("icons/icon-rebelalliance.png"),
-                getResourceImage("icons/icon-empire.png"));
+                getResourceImage("icon-rebelalliance.png"),
+                getResourceImage("icon-empire.png"));
         this.iconComboBox.getSelectionModel().selectedItemProperty().addListener((prop, old, val) -> {
             this.selectedRobot.get().imageProperty().set(val);
         });
@@ -92,7 +92,7 @@ public class EditController {
     }
 
     private Image getResourceImage(String resourceName) {
-        return new Image(String.valueOf(getClass().getResource("../" + resourceName)));
+        return new Image(String.valueOf(getClass().getResource("/net/smackem/jobotwar/gui/icons/" + resourceName)));
     }
 
     @FXML
@@ -206,6 +206,16 @@ public class EditController {
     @FXML
     private void newRobotFastScan(ActionEvent actionEvent) {
         newRobotWithProgram("FastScan", "robots/fastscan.jobot");
+    }
+
+    @FXML
+    private void newRobotShooter(ActionEvent actionEvent) {
+        newRobotWithProgram("Shooter", "robots/shooter.jobot");
+    }
+
+    @FXML
+    private void newRobotCorner(ActionEvent actionEvent) {
+        newRobotWithProgram("Corner", "robots/corner.jobot");
     }
 
     @FXML

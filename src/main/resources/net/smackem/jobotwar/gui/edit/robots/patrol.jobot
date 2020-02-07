@@ -9,6 +9,7 @@ start:
     goto moveToBottom
 
 clean:
+    90 -> AIM
     abs(RADAR) -> SHOT
     goto start
 
