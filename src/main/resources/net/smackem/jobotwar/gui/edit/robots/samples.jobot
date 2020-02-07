@@ -13,6 +13,17 @@ Loop:
     goto Loop
 
 // ==========================
+loop:
+    AIM + 7 -> AIM -> RADAR
+    goto loop unless RADAR < 0
+shoot:
+    0 - RADAR -> SHOT
+    AIM -> RADAR
+    goto shoot if RADAR < 0 or RANDOM <= 0.5
+    goto loop
+
+
+// ==========================
 def radar
 Loop:
     radar + 5 -> radar -> RADAR
@@ -174,7 +185,7 @@ move:
     goto move unless SPEEDX = 0 and SPEEDY = 0
     goto newloc
 
-
+ 
 // =====================================
 // robot corner
 

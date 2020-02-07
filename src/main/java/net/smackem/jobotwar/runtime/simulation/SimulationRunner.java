@@ -10,6 +10,10 @@ import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+/**
+ * Runs simulation games, which differ from real-time games in that frames are executed
+ * as fast as possible in a loop instead of with a fixed frame rate.
+ */
 public final class SimulationRunner {
 
     private final Board board;
