@@ -6,12 +6,12 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class GameEngineTest {
 
     @Test
-    public void movement() {
+    public void movement() throws RobotProgramException {
         final Robot robot = new Robot.Builder(
             rob -> new RuntimeProgram(rob,
                 RuntimeProgram.instruction(null, r -> {
@@ -39,7 +39,7 @@ public class GameEngineTest {
     }
 
     @Test
-    public void shot() {
+    public void shot() throws RobotProgramException {
         final Robot robot = new Robot.Builder(
             rob -> new RuntimeProgram(rob,
                 RuntimeProgram.instruction(null, r -> {
@@ -73,7 +73,7 @@ public class GameEngineTest {
     }
 
     @Test
-    public void shotAngle() {
+    public void shotAngle() throws RobotProgramException {
         final Robot robot = new Robot.Builder(
             rob -> new RuntimeProgram(rob,
                 RuntimeProgram.instruction(null, r -> {
@@ -114,7 +114,7 @@ public class GameEngineTest {
     }
 
     @Test
-    public void radarWall() {
+    public void radarWall() throws RobotProgramException {
         final int width = 100, height = 100;
         final Robot robot = new Robot.Builder(
             rob -> new RuntimeProgram(rob,
@@ -190,7 +190,7 @@ public class GameEngineTest {
     }
 
     @Test
-    public void radarRobot() {
+    public void radarRobot() throws RobotProgramException {
         final Robot robot1 = new Robot.Builder(
             rob -> new RuntimeProgram(rob,
                 RuntimeProgram.instruction(null, r -> {

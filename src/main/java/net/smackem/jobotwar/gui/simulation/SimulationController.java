@@ -81,7 +81,8 @@ public class SimulationController {
     private CompletableFuture<Collection<MatchViewModel>> runMatches(int count) {
         final App app = App.instance();
         final Duration duration = Duration.ofMinutes(5);
-        return SimulationRunner.runBatchParallel(app.board(), count, this.random, duration)
+        return CompletableFuture.supplyAsync(() ->
+                SimulationRunner.runBatchParallel(app.board(), count, this.random, duration))
                 .thenApply(batchResults ->
                         batchResults.stream()
                                 .map(br -> new MatchViewModel(br, br.matchNumber(), br.recorder()))

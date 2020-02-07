@@ -4,7 +4,6 @@ import java.time.Duration;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.Random;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -41,18 +40,22 @@ public final class SimulationRunner {
         long millis = 0;
 
         do {
-            result = this.engine.tick();
+            try {
+                result = this.engine.tick();
+            } catch (RobotProgramException e) {
+                return new SimulationResult(null, Duration.ofMillis(millis));
+            }
             millis += tickMillis;
         } while (result.hasEnded() == false && millis < maxMillis);
 
         return new SimulationResult(result.winner(), Duration.ofMillis(millis));
     }
 
-    public static CompletableFuture<Collection<BatchSimulationResult>> runBatchParallel(Board templateBoard,
-                                                                                        int batchSize,
-                                                                                        Random random,
-                                                                                        Duration maxDuration) {
-        return CompletableFuture.supplyAsync(() -> IntStream.rangeClosed(1, batchSize)
+    public static Collection<BatchSimulationResult> runBatchParallel(Board templateBoard,
+                                                                     int batchSize,
+                                                                     Random random,
+                                                                     Duration maxDuration) {
+        return IntStream.rangeClosed(1, batchSize)
                 .parallel()
                 .mapToObj(matchNumber -> {
                     final GameRecorder recorder = new GameRecorder(random, ctx -> {
@@ -64,6 +67,6 @@ public final class SimulationRunner {
                     final SimulationResult result = runner.runGame(maxDuration);
                     return new BatchSimulationResult(result.winner(), result.duration(), matchNumber, recorder);
                 })
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList());
     }
 }

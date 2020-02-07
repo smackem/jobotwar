@@ -100,10 +100,19 @@ public class MainController {
     }
 
     private void tick(ActionEvent actionEvent) {
-        final GameEngine.TickResult tickResult = this.engine.tick();
+        final GameEngine.TickResult tickResult;
+        try {
+            tickResult = this.engine.tick();
+        } catch (RobotProgramException e) {
+            this.ticker.stop();
+            this.messagesTextArea.appendText(String.format("ERROR @ Robot '%s': %s", e.robotName(), e.getMessage()));
+            return;
+        }
+
         final GraphicsContext gc = this.canvas.getGraphicsContext2D();
         updateGraphics(tickResult);
         this.graphics.render(gc);
+
         for (final MainRobotViewModel r : this.robots) {
             r.update();
         }

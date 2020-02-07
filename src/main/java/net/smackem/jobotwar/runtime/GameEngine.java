@@ -32,8 +32,9 @@ public final class GameEngine {
     /**
      * Executes the next frame.
      * @return A {@link TickResult} that holds the new state of the game.
+     * @throws RobotProgramException A robot has encountered an error upon executing its control program.
      */
-    public TickResult tick() {
+    public TickResult tick() throws RobotProgramException {
         // handle robots
         //
         final TickResult result = new TickResult();
@@ -192,7 +193,7 @@ public final class GameEngine {
         return hitRobots;
     }
 
-    private void tickRobot(Robot robot, TickResult result) {
+    private void tickRobot(Robot robot, TickResult result) throws RobotProgramException {
         // execute next program statement
         robot.program().next();
 

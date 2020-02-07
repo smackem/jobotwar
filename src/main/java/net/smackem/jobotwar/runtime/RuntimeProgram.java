@@ -47,6 +47,7 @@ public class RuntimeProgram implements RobotProgram {
         return new Instruction(label, function);
     }
 
+    @SuppressWarnings("WeakerAccess") // used in unit tests
     public static class Instruction {
         private final String label;
         private final Function<Robot, String> function;

@@ -49,13 +49,15 @@ public class CompiledProgram implements RobotProgram {
      * {@inheritDoc}
      */
     @Override
-    public boolean next() {
+    public boolean next() throws RobotProgramException {
         try {
             return this.interpreter.runNext();
         } catch (Interpreter.StackException e) {
-            log.error(String.format("Interpreter error: %s @ pc=%s (%s) in program:\n%s", e.getMessage(), e.pc(), e.instruction(), this.interpreter.program()), e);
+            final String message = String.format("interpreter error: %s @ pc=%s (%s) in program:\n%s",
+                    e.getMessage(), e.pc(), e.instruction(), this.interpreter.program());
+            log.error(message, e);
+            throw new RobotProgramException(this.robot.name(), message, e);
         }
-        return false;
     }
 
     private RuntimeEnvironment environment() {
