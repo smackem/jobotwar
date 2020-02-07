@@ -5,6 +5,8 @@ import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -38,6 +40,7 @@ public class MainController {
     private final BoardGraphics graphics;
     private final GameEngine engine;
     private final ObservableList<MainRobotViewModel> robots;
+    private final BooleanProperty replay = new SimpleBooleanProperty();
 
     @FXML
     private StackPane canvasContainer;
@@ -51,9 +54,12 @@ public class MainController {
     private Label winnerLabel;
     @FXML
     private TextArea messagesTextArea;
+    @FXML
+    private Label replayLabel;
 
     public MainController() {
-        final Board board = App.instance().board();
+        final App app = App.instance();
+        final Board board = app.board();
         this.robots = FXCollections.observableArrayList(board.robots().stream()
                         .map(MainRobotViewModel::new)
                         .collect(Collectors.toList()));
@@ -61,7 +67,8 @@ public class MainController {
         this.ticker.setCycleCount(Animation.INDEFINITE);
         this.engine = new GameEngine(board);
         this.graphics = new BoardGraphics(board);
-        App.instance().eventBus().register(this);
+        this.replay.set(app.isReplay());
+        app.eventBus().register(this);
     }
 
     @FXML
@@ -73,6 +80,7 @@ public class MainController {
         this.canvas.setHeight(board.height());
         this.graphics.render(this.canvas.getGraphicsContext2D());
         this.messagesTextArea.appendText("Welcome to the battle of programs!\n");
+        this.replayLabel.visibleProperty().bind(this.replay);
 
         for (final MainRobotViewModel robot : this.robots) {
             robotGaugesParent.getChildren().add(createRobotGauge(robot));

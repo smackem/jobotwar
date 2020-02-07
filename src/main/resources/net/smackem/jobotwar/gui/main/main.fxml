@@ -14,8 +14,9 @@
    </padding>
    <left>
       <VBox spacing="6">
-         <StackPane fx:id="canvasContainer">
+         <StackPane fx:id="canvasContainer" alignment="TOP_CENTER">
             <Canvas fx:id="canvas" />
+            <Label fx:id="replayLabel" text="REPLAY" />
             <StackPane fx:id="winnerOverlay"
                        prefHeight="Infinity" prefWidth="Infinity"
                        visible="false">

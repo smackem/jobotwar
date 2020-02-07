@@ -74,3 +74,8 @@
 #winnerLabel {
     -fx-font-size: 16pt;
 }
+
+#replayLabel {
+    -fx-font-size: 14pt;
+    -fx-text-fill: yellow;
+}
