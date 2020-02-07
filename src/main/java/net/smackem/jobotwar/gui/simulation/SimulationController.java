@@ -15,7 +15,11 @@ import javafx.scene.paint.Paint;
 import net.smackem.jobotwar.gui.App;
 import net.smackem.jobotwar.gui.PlatformExecutor;
 import net.smackem.jobotwar.gui.RgbConvert;
-import net.smackem.jobotwar.runtime.*;
+import net.smackem.jobotwar.runtime.Board;
+import net.smackem.jobotwar.runtime.GameRecorder;
+import net.smackem.jobotwar.runtime.Robot;
+import net.smackem.jobotwar.runtime.simulation.SimulationResult;
+import net.smackem.jobotwar.runtime.simulation.SimulationRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

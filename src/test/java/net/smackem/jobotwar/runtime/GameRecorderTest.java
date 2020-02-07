@@ -2,6 +2,9 @@ package net.smackem.jobotwar.runtime;
 
 import net.smackem.jobotwar.lang.Compiler;
 import net.smackem.jobotwar.lang.Program;
+import net.smackem.jobotwar.runtime.simulation.SimulationEvent;
+import net.smackem.jobotwar.runtime.simulation.SimulationResult;
+import net.smackem.jobotwar.runtime.simulation.SimulationRunner;
 import org.junit.Test;
 
 import java.time.Duration;
@@ -41,6 +44,9 @@ public class GameRecorderTest {
         final SimulationRunner replayRunner = new SimulationRunner(replayBoard);
         final SimulationResult replayResult = replayRunner.runGame(duration);
 
+        assertThat(replayResult.outcome()).isEqualTo(firstResult.outcome());
+        assertThat(replayResult.eventLog()).containsExactly(
+                firstResult.eventLog().toArray(new SimulationEvent[0]));
         if (replayResult.winner() == null) {
             assertThat(firstResult.winner()).isNull();
         } else {

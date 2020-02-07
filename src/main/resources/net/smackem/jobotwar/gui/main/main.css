@@ -77,5 +77,6 @@
 
 #replayLabel {
     -fx-font-size: 14pt;
-    -fx-text-fill: yellow;
+    -fx-font-weight: bold;
+    -fx-text-fill: #c0c0c0;
 }

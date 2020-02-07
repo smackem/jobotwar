@@ -1,6 +1,9 @@
-package net.smackem.jobotwar.runtime;
+package net.smackem.jobotwar.runtime.simulation;
+
+import net.smackem.jobotwar.runtime.*;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.Random;
@@ -34,8 +37,9 @@ public final class SimulationRunner {
      *         specified {@code maxDuration}.
      */
     public SimulationResult runGame(Duration maxDuration) {
-        final long maxMillis = Objects.requireNonNull(maxDuration).toMillis();
         final long tickMillis = Constants.TICK_DURATION.toMillis();
+        final long maxMillis = Objects.requireNonNull(maxDuration).toMillis();
+        final Collection<SimulationEvent> eventLog = new ArrayList<>();
         GameEngine.TickResult result;
         long millis = 0;
 
@@ -43,14 +47,33 @@ public final class SimulationRunner {
             try {
                 result = this.engine.tick();
             } catch (RobotProgramException e) {
-                return new SimulationResult(null, Duration.ofMillis(millis));
+                return new SimulationResult(SimulationResult.Outcome.ERROR, null, Duration.ofMillis(millis), eventLog);
             }
+
+            for (final Robot r : result.killedRobots()) {
+                eventLog.add(new SimulationEvent(millis, String.format("%s got killed", r.name())));
+            }
+
             millis += tickMillis;
         } while (result.hasEnded() == false && millis < maxMillis);
 
-        return new SimulationResult(result.winner(), Duration.ofMillis(millis));
+        final SimulationResult.Outcome outcome = result.isDraw()
+                ? SimulationResult.Outcome.DRAW
+                : SimulationResult.Outcome.WIN;
+
+        return new SimulationResult(outcome, result.winner(), Duration.ofMillis(millis), eventLog);
     }
 
+    /**
+     * Runs multiple recorded simulations in parallel.
+     * @param templateBoard The board that serves as a template for the simulation matches. The template
+     *                      is not mutated during the simulation.
+     * @param batchSize The number of matches to run.
+     * @param random The random number generator to use.
+     * @param maxDuration The maximum duration of a match. If this duration is exceeded, the match counts
+     *                    as draw.
+     * @return The {@link BatchSimulationResult}s of the simulation, in arbitrary order.
+     */
     public static Collection<BatchSimulationResult> runBatchParallel(Board templateBoard,
                                                                      int batchSize,
                                                                      Random random,
@@ -65,7 +88,8 @@ public final class SimulationRunner {
                     });
                     final SimulationRunner runner = new SimulationRunner(recorder.board());
                     final SimulationResult result = runner.runGame(maxDuration);
-                    return new BatchSimulationResult(result.winner(), result.duration(), matchNumber, recorder);
+                    return new BatchSimulationResult(result.outcome(), result.winner(), result.duration(),
+                            result.eventLog(), matchNumber, recorder);
                 })
                 .collect(Collectors.toList());
     }
