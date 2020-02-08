@@ -5,10 +5,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.*;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -16,8 +15,11 @@ import net.smackem.jobotwar.gui.App;
 import net.smackem.jobotwar.gui.PlatformExecutor;
 import net.smackem.jobotwar.gui.RgbConvert;
 import net.smackem.jobotwar.runtime.Board;
+import net.smackem.jobotwar.runtime.Constants;
 import net.smackem.jobotwar.runtime.GameRecorder;
 import net.smackem.jobotwar.runtime.Robot;
+import net.smackem.jobotwar.runtime.simulation.BatchSimulationResult;
+import net.smackem.jobotwar.runtime.simulation.SimulationEvent;
 import net.smackem.jobotwar.runtime.simulation.SimulationResult;
 import net.smackem.jobotwar.runtime.simulation.SimulationRunner;
 import org.slf4j.Logger;
@@ -52,6 +54,14 @@ public class SimulationController {
     private Pane robotStatsParent;
     @FXML
     private Pane detailsPane;
+    @FXML
+    private Label outcomeLabel;
+    @FXML
+    private Label winnerLabel;
+    @FXML
+    private Label durationLabel;
+    @FXML
+    private Canvas boardCanvas;
 
     @FXML
     private void initialize() {
@@ -66,6 +76,33 @@ public class SimulationController {
         this.matchCountChoice.setValue(1000);
         this.detailsPane.visibleProperty().bind(
                 this.matchTable.getSelectionModel().selectedItemProperty().isNotNull());
+        this.matchTable.getSelectionModel().selectedItemProperty().addListener((prop, old, val) -> {
+            selectMatch(val);
+        });
+    }
+
+    private void selectMatch(MatchViewModel match) {
+        this.outcomeLabel.setText(String.valueOf(match.outcome));
+        this.winnerLabel.setText(match.winnerName.get());
+        this.durationLabel.setText(MatchViewModel.formatDuration(match.duration.get()));
+        drawBoard(match.recorder.replayBoard());
+    }
+
+    private void drawBoard(Board board) {
+        final double scale = 0.5;
+        final double width = board.width() * scale, height = board.height() * scale;
+        final double robotRadius = Constants.ROBOT_RADIUS * scale;
+        this.boardCanvas.setWidth(width);
+        this.boardCanvas.setHeight(height);
+        final GraphicsContext gc = this.boardCanvas.getGraphicsContext2D();
+        gc.clearRect(0, 0, width, height);
+        gc.setFill(Color.BLACK);
+        gc.fillRect(0, 0, width, height);
+        for (final Robot r : board.robots()) {
+            gc.setFill(RgbConvert.toColor(r.rgb()));
+            gc.fillOval(r.getX() * scale - robotRadius, r.getY() * scale - robotRadius,
+                    robotRadius * 2.0, robotRadius * 2.0);
+        }
     }
 
     @FXML
@@ -89,7 +126,7 @@ public class SimulationController {
                 SimulationRunner.runBatchParallel(app.board(), count, this.random, duration))
                 .thenApply(batchResults ->
                         batchResults.stream()
-                                .map(br -> new MatchViewModel(br, br.matchNumber(), br.recorder()))
+                                .map(MatchViewModel::new)
                                 .collect(Collectors.toList()));
     }
 
@@ -141,8 +178,10 @@ public class SimulationController {
         final ObjectProperty<Duration> duration = new SimpleObjectProperty<>();
         final Paint winnerPaint;
         final GameRecorder recorder;
+        final SimulationResult.Outcome outcome;
+        final Collection<SimulationEvent> eventLog;
 
-        MatchViewModel(SimulationResult result, int matchNumber, GameRecorder recorder) {
+        MatchViewModel(BatchSimulationResult result) {
             final Robot winner = result.winner();
             if (winner != null) {
                 this.winnerName.set(winner.name());
@@ -151,9 +190,15 @@ public class SimulationController {
                 this.winnerName.set("-");
                 this.winnerPaint = null;
             }
-            this.matchNumber.set(matchNumber);
+            this.matchNumber.set(result.matchNumber());
             this.duration.set(result.duration());
-            this.recorder = recorder;
+            this.recorder = result.recorder();
+            this.outcome = result.outcome();
+            this.eventLog = result.eventLog();
+        }
+
+        static String formatDuration(Duration d) {
+            return String.format("%02d:%02d.%03d", d.toMinutes(), d.getSeconds() % 60, d.toMillis() % 1000);
         }
     }
 
@@ -179,7 +224,7 @@ public class SimulationController {
                 setText(null);
                 return;
             }
-            setText(String.format("%02d:%02d.%03d", item.toMinutes(), item.getSeconds() % 60, item.toMillis() % 1000));
+            setText(MatchViewModel.formatDuration(item));
         }
     }
 }

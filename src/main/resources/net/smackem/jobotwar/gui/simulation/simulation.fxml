@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <BorderPane xmlns="http://javafx.com/javafx"
@@ -35,7 +36,16 @@
                     <padding>
                         <Insets left="2" top="2" right="2" bottom="2" />
                     </padding>
-                    <Button text="Replay" onAction="#replay" />
+                    <Button text="Replay" onAction="#replay" prefWidth="Infinity" />
+                    <GridPane>
+                        <Label text="Outcome:" GridPane.rowIndex="0" GridPane.columnIndex="0" />
+                        <Label fx:id="outcomeLabel" GridPane.rowIndex="0" GridPane.columnIndex="1" />
+                        <Label text="Winner:" GridPane.rowIndex="1" GridPane.columnIndex="0" />
+                        <Label fx:id="winnerLabel" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+                        <Label text="Duration:" GridPane.rowIndex="2" GridPane.columnIndex="0" />
+                        <Label fx:id="durationLabel" GridPane.rowIndex="2" GridPane.columnIndex="1" />
+                    </GridPane>
+                    <Canvas fx:id="boardCanvas" />
                 </VBox>
             </SplitPane>
             <VBox fx:id="runningOverlay" alignment="CENTER">

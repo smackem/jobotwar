@@ -26,6 +26,10 @@ public final class GameRecorder implements RobotProgramContext {
         return this.mode;
     }
 
+    public Board replayBoard() {
+        return this.replayBoard;
+    }
+
     public Board replay() {
         this.mode = Mode.PLAY;
         for (final RobotRecord record : this.robotRecords.values()) {

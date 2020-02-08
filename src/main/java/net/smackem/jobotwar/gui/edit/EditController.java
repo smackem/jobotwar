@@ -113,8 +113,7 @@ public class EditController {
             try (final InputStream stream = getClass().getResourceAsStream(resourceName);
                  final InputStreamReader reader = new InputStreamReader(stream)) {
                 robot.sourceCodeProperty().set(CharStreams.toString(reader));
-            } catch (Exception ignored) {
-            }
+            } catch (Exception ignored) { }
         } else {
             robot.sourceCodeProperty().set("");
         }
