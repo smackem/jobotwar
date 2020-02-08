@@ -194,6 +194,16 @@ public final class GameEngine {
     }
 
     private void tickRobot(Robot robot, TickResult result) throws RobotProgramException {
+        try {
+            tickRobotInternal(robot, result);
+        } catch (RobotProgramException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RobotProgramException(robot.name(), e.getMessage(), e);
+        }
+    }
+
+    private void tickRobotInternal(Robot robot, TickResult result) throws RobotProgramException {
         // execute next program statement
         robot.program().next();
 

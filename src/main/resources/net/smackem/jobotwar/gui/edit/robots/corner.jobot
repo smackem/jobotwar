@@ -3,11 +3,14 @@ def corner, newCorner
 def angleBase, angle
 def damage
 
+// current corner. -1: none
 -1 -> corner
 
 changeCorner:
+    // pick a new random corner, make sure it is not the current one
     trunc(RANDOM * 4) -> newCorner -> OUT
     goto changeCorner if newCorner = corner
+    // set destination to the new corner
     newCorner -> corner
     goto topLeft if corner = 3
     goto topRight if corner = 2
@@ -27,7 +30,7 @@ topRight:
     goto move
 
 bottomLeft:
-    0 -> destX
+    20 -> destX
     460 -> destY
     270 -> angleBase -> OUT
     goto move
@@ -38,19 +41,27 @@ bottomRight:
     180 -> angleBase -> OUT
     goto move
 
+// move to new destination, tailgunning
 move:
     destX - X -> SPEEDX
     destY - Y -> SPEEDY
+    atan(SPEEDY / SPEEDX) -> AIM -> OUT
+    180 + AIM -> AIM if SPEEDX > 0
+    1000 -> SHOT
     0 -> SPEEDX if abs(destX - X) < 20
     0 -> SPEEDY if abs(destY - Y) < 20
     goto move unless SPEEDX = 0 and SPEEDY = 0
+    // save current damage
     DAMAGE -> damage -> OUT
 
+// scan the board, monitoring the damage
 scan:
-    angle + 7 -> angle
+    (angle + 7) % 120 -> angle
 nextShot:
-    angleBase + angle % 90 -> AIM -> RADAR
+    (angleBase - 15) + angle -> AIM -> RADAR
+    // change corner if damage taken
+    goto changeCorner if DAMAGE != damage
+    // scan on, or shoot if robot detected
     goto scan unless RADAR < 0
     0 - RADAR -> SHOT
-    goto nextShot unless DAMAGE != damage
-    goto changeCorner
+    goto nextShot

@@ -235,7 +235,7 @@ move:
 move_1:
     0 -> SPEEDX if abs(destX - X) < 50
     0 -> SPEEDY if abs(destY - Y) < 50
-    goto move_1 unless SPEEDX = 0 and SPEEDY = 0
+    goto move unless SPEEDX = 0 and SPEEDY = 0
     DAMAGE -> damage -> OUT
 
 scan:
@@ -246,3 +246,87 @@ nextShot:
     0 - RADAR -> SHOT
     goto nextShot unless DAMAGE != damage
     goto changeCorner
+
+// ===============================
+// robot random
+def destX, destY
+
+newDest:
+    70 + RANDOM * 500 -> destX
+    70 + RANDOM * 340 -> destY
+loop:
+    destX - X -> SPEEDX
+    30 -> SPEEDX unless SPEEDX <= 30
+    destY - Y -> SPEEDY
+    30 -> SPEEDY unless SPEEDY <= 30
+    goto newDest if abs(SPEEDX) < 10 and abs(SPEEDY) < 10
+    goto loop unless SHOT = 0
+    RANDOM * 360 -> AIM
+    100 + RANDOM * 900 -> SHOT
+    goto loop
+
+// ===============================
+// robot corner2
+def destX, destY
+def corner, newCorner
+def angleBase, angle
+def damage
+
+// current corner. -1: none
+-1 -> corner
+
+changeCorner:
+    // pick a new random corner, make sure it is not the current one
+    trunc(RANDOM * 4) -> newCorner -> OUT
+    goto changeCorner if newCorner = corner
+    // set destination to the new corner
+    newCorner -> corner
+    goto topLeft if corner = 3
+    goto topRight if corner = 2
+    goto bottomLeft if corner = 1
+    goto bottomRight
+
+topLeft:
+    20 -> destX
+    20 -> destY
+    0 -> angleBase -> OUT
+    goto move
+
+topRight:
+    620 -> destX
+    20 -> destY
+    90 -> angleBase -> OUT
+    goto move
+
+bottomLeft:
+    0 -> destX
+    460 -> destY
+    270 -> angleBase -> OUT
+    goto move
+
+bottomRight:
+    620 -> destX
+    460 -> destY
+    180 -> angleBase -> OUT
+    goto move
+
+// move to new destination
+move:
+    destX - X -> SPEEDX
+    destY - Y -> SPEEDY
+    0 -> SPEEDX if abs(destX - X) < 20
+    0 -> SPEEDY if abs(destY - Y) < 20
+    goto move unless SPEEDX = 0 and SPEEDY = 0
+    // save current damage
+    DAMAGE -> damage -> OUT
+
+// scan the board, monitoring the damage
+scan:
+    angle + 7 -> angle
+nextShot:
+    angleBase + angle % 90 -> AIM -> RADAR
+    // change corner if damage taken
+    goto changeCorner if DAMAGE != null
+    goto scan unless RADAR < 0
+    0 - RADAR -> SHOT
+    goto nextShot
