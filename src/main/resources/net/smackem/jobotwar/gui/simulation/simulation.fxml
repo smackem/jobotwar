@@ -32,12 +32,12 @@
                         <TableColumn fx:id="durationColumn" text="Duration" />
                     </columns>
                 </TableView>
-                <VBox fx:id="detailsPane" spacing="2">
+                <VBox fx:id="detailsPane" spacing="2" SplitPane.resizableWithParent="false">
                     <padding>
                         <Insets left="2" top="2" right="2" bottom="2" />
                     </padding>
                     <Button text="Replay" onAction="#replay" prefWidth="Infinity" />
-                    <GridPane>
+                    <GridPane vgap="2" hgap="2">
                         <Label text="Outcome:" GridPane.rowIndex="0" GridPane.columnIndex="0" />
                         <Label fx:id="outcomeLabel" GridPane.rowIndex="0" GridPane.columnIndex="1" />
                         <Label text="Winner:" GridPane.rowIndex="1" GridPane.columnIndex="0" />
@@ -46,6 +46,7 @@
                         <Label fx:id="durationLabel" GridPane.rowIndex="2" GridPane.columnIndex="1" />
                     </GridPane>
                     <Canvas fx:id="boardCanvas" />
+                    <TextArea fx:id="eventArea" editable="false" />
                 </VBox>
             </SplitPane>
             <VBox fx:id="runningOverlay" alignment="CENTER">

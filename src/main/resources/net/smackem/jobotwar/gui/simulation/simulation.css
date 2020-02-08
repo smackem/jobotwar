@@ -14,3 +14,7 @@
 #robotStatsParent .label {
     -fx-text-fill: white;
 }
+
+#eventArea {
+    -fx-font-family: 'Cascadia Code', 'DejaVu Sans Mono', 'Consolas', monospace;
+}

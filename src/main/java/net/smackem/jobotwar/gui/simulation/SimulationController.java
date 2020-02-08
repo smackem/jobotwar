@@ -62,6 +62,8 @@ public class SimulationController {
     private Label durationLabel;
     @FXML
     private Canvas boardCanvas;
+    @FXML
+    private TextArea eventArea;
 
     @FXML
     private void initialize() {
@@ -84,25 +86,37 @@ public class SimulationController {
     private void selectMatch(MatchViewModel match) {
         this.outcomeLabel.setText(String.valueOf(match.outcome));
         this.winnerLabel.setText(match.winnerName.get());
-        this.durationLabel.setText(MatchViewModel.formatDuration(match.duration.get()));
+        this.durationLabel.setText(formatDuration(match.duration.get()));
         drawBoard(match.recorder.replayBoard());
+        this.eventArea.setText(renderEventLogText(match.eventLog));
+    }
+
+    private static String renderEventLogText(Collection<SimulationEvent> eventLog) {
+        final StringBuilder sb = new StringBuilder();
+        for (final SimulationEvent event : eventLog) {
+            sb.append(String.format("@%s: %s\n", formatDuration(event.gameTime()), event.event()));
+        }
+        return sb.toString();
     }
 
     private void drawBoard(Board board) {
         final double scale = 0.5;
-        final double width = board.width() * scale, height = board.height() * scale;
-        final double robotRadius = Constants.ROBOT_RADIUS * scale;
-        this.boardCanvas.setWidth(width);
-        this.boardCanvas.setHeight(height);
+        final double width = board.width(), height = board.height();
+        final double robotRadius = Constants.ROBOT_RADIUS;
+        this.boardCanvas.setWidth(width * scale);
+        this.boardCanvas.setHeight(height * scale);
         final GraphicsContext gc = this.boardCanvas.getGraphicsContext2D();
+        gc.save();
+        gc.scale(scale, scale);
         gc.clearRect(0, 0, width, height);
         gc.setFill(Color.BLACK);
         gc.fillRect(0, 0, width, height);
         for (final Robot r : board.robots()) {
             gc.setFill(RgbConvert.toColor(r.rgb()));
-            gc.fillOval(r.getX() * scale - robotRadius, r.getY() * scale - robotRadius,
+            gc.fillOval(r.getX() - robotRadius, r.getY() - robotRadius,
                     robotRadius * 2.0, robotRadius * 2.0);
         }
+        gc.restore();
     }
 
     @FXML
@@ -196,10 +210,10 @@ public class SimulationController {
             this.outcome = result.outcome();
             this.eventLog = result.eventLog();
         }
+    }
 
-        static String formatDuration(Duration d) {
-            return String.format("%02d:%02d.%03d", d.toMinutes(), d.getSeconds() % 60, d.toMillis() % 1000);
-        }
+    private static String formatDuration(Duration d) {
+        return String.format("%02d:%02d.%03d", d.toMinutes(), d.getSeconds() % 60, d.toMillis() % 1000);
     }
 
     private static class MatchWinnerCell extends TableCell<MatchViewModel, String> {
@@ -224,7 +238,7 @@ public class SimulationController {
                 setText(null);
                 return;
             }
-            setText(MatchViewModel.formatDuration(item));
+            setText(formatDuration(item));
         }
     }
 }
