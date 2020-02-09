@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class CompilerTest {
 
@@ -169,7 +169,8 @@ public class CompilerTest {
         final String source = "" +
                 "1 + 5 / 2 -> SHOT\n" +
                 "2 * 5 - 1 -> SPEEDX\n" +
-                "1 + 5 * 3 -> AIM\n";
+                "1 + 5 * 3 -> AIM\n" +
+                "10 - 5 + 3 -> SPEEDY\n";
 
         final Program program = compile(source);
         final TestEnvironment env = new TestEnvironment();
@@ -180,6 +181,7 @@ public class CompilerTest {
         assertThat(env.readShot()).isEqualTo(3.5);
         assertThat(env.readSpeedX()).isEqualTo(9);
         assertThat(env.readAim()).isEqualTo(16);
+        assertThat(env.readSpeedY()).isEqualTo(8);
     }
 
     @Test

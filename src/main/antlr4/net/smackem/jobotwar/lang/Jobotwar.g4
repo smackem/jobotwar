@@ -58,7 +58,7 @@ unlessClause
     ;
 
 condition
-    : comparison conditionOperator condition
+    : condition conditionOperator comparison
     | comparison
     ;
 
@@ -73,7 +73,7 @@ comparison
     ;
 
 term
-    : product termOperator term
+    : term termOperator product
     | product
     ;
 
@@ -83,7 +83,7 @@ termOperator
     ;
 
 product
-    : molecule productOperator product
+    : product productOperator molecule
     | molecule
     ;
 
