@@ -19,7 +19,7 @@
             <Label text="Number of Matches:" />
             <ChoiceBox fx:id="matchCountChoice" />
             <Button text="Start" minWidth="100" onAction="#startSimulation" />
-            <Button text="New Game" minWidth="100" onAction="#newGame" />
+            <Button text="Back" minWidth="100" onAction="#newGame" />
         </HBox>
     </top>
     <center>

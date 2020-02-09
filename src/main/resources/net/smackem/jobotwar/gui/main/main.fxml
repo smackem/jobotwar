@@ -39,8 +39,8 @@
                <padding>
                   <Insets bottom="8" />
                </padding>
-               <Button minWidth="80" onMouseClicked="#startGame" text="Start" />
-               <Button minWidth="80" onMouseClicked="#stopGame" text="Stop" />
+               <Button fx:id="playbackButton" minWidth="80" onMouseClicked="#startGame" text="Play" />
+               <Button minWidth="80" onMouseClicked="#newGame" text="Back" />
             </HBox>
          </top>
          <center>

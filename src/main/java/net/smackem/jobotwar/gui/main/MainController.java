@@ -10,10 +10,12 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.MouseEvent;
@@ -56,6 +58,8 @@ public class MainController {
     private TextArea messagesTextArea;
     @FXML
     private Label replayLabel;
+    @FXML
+    private Button playbackButton;
 
     public MainController() {
         final App app = App.instance();
@@ -81,6 +85,10 @@ public class MainController {
         this.graphics.render(this.canvas.getGraphicsContext2D());
         this.messagesTextArea.appendText("Welcome to the battle of programs!\n");
         this.replayLabel.visibleProperty().bind(this.replay);
+        this.playbackButton.textProperty().bind(
+                Bindings.when(this.ticker.statusProperty().isEqualTo(Animation.Status.RUNNING))
+                        .then("Pause")
+                        .otherwise("Play"));
 
         for (final MainRobotViewModel robot : this.robots) {
             robotGaugesParent.getChildren().add(createRobotGauge(robot));
@@ -89,18 +97,17 @@ public class MainController {
 
     @FXML
     private void startGame(MouseEvent mouseEvent) {
-        this.ticker.play();
-        this.messagesTextArea.appendText("Game started at " + LocalDateTime.now() + "\n");
+        if (this.ticker.getStatus() == Animation.Status.RUNNING) {
+            this.ticker.stop();
+            this.messagesTextArea.appendText("Game paused at " + LocalDateTime.now() + "\n");
+        } else {
+            this.ticker.play();
+            this.messagesTextArea.appendText("Game started at " + LocalDateTime.now() + "\n");
+        }
     }
 
     @FXML
-    private void stopGame(MouseEvent mouseEvent) {
-        this.ticker.stop();
-        this.messagesTextArea.appendText("Game paused at " + LocalDateTime.now() + "\n");
-    }
-
-    @FXML
-    private void newGame(ActionEvent actionEvent) throws IOException {
+    private void newGame(Event actionEvent) throws IOException {
         this.ticker.stop();
         final App app = App.instance();
         app.eventBus().unregister(this);
