@@ -6,6 +6,11 @@ def damage
 // current corner. -1: none
 -1 -> corner
 
+goto topLeft if X < 320 and Y < 240
+goto topRight if X >= 320 and Y < 240
+goto bottomLeft if X < 320 and Y > 240
+goto bottomRight if X > 320 and Y > 240
+
 changeCorner:
     // pick a new random corner, make sure it is not the current one
     trunc(RANDOM * 4) -> newCorner -> OUT
@@ -18,24 +23,28 @@ changeCorner:
     goto bottomRight
 
 topLeft:
+    3 -> corner
     20 -> destX
     20 -> destY
     0 -> angleBase -> OUT
     goto move
 
 topRight:
+    2 -> corner
     620 -> destX
     20 -> destY
     90 -> angleBase -> OUT
     goto move
 
 bottomLeft:
+    1 -> corner
     20 -> destX
     460 -> destY
     270 -> angleBase -> OUT
     goto move
 
 bottomRight:
+    0 -> corner
     620 -> destX
     460 -> destY
     180 -> angleBase -> OUT
@@ -46,8 +55,8 @@ move:
     destX - X -> SPEEDX
     destY - Y -> SPEEDY
     atan(SPEEDY / SPEEDX) -> tailGunAngle -> OUT
-    180 + tailGunAngle -> tailGunAngle if SPEEDX > 0
-    tailGunAngle -> AIM
+    180 + tailGunAngle -> tailGunAngle if destX > X
+    tailGunAngle + (RANDOM * 60 - 30) -> AIM
     1000 -> SHOT
     0 -> SPEEDX if abs(destX - X) < 20
     0 -> SPEEDY if abs(destY - Y) < 20
