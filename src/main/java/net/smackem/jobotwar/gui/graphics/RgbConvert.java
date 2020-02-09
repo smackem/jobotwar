@@ -29,7 +29,7 @@ public class RgbConvert {
     }
 
     /**
-     * Converts an 0x00RRGGBB integer to a {@link Color} with the specified {@code opacity}.
+     * Converts an 0x00RRGGBB integer to a {@link Color} with the specified {@code opacity} in the range 0..1.
      */
     public static Color toColor(int rgb, double opacity) {
         return Color.rgb(rgb >> 16 & 0xff, rgb >> 8 & 0xff, rgb & 0xff, opacity);

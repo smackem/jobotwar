@@ -17,7 +17,9 @@ public final class GameRecorder implements RobotProgramContext {
         this.board = Objects.requireNonNull(boardFactory).apply(this);
         this.mode = Mode.RECORD;
         for (final Robot r : this.board.robots()) {
-            this.robotRecords.put(r.name(), new RobotRecord());
+            if (this.robotRecords.putIfAbsent(r.name(), new RobotRecord()) != null) {
+                throw new IllegalArgumentException(String.format("robot name '%s' is not unique in board", r.name()));
+            }
         }
         this.replayBoard = Board.fromTemplate(this.board, this);
     }

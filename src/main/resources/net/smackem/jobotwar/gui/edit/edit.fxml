@@ -7,8 +7,7 @@
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="net.smackem.jobotwar.gui.edit.EditController"
-            stylesheets="@edit.css"
-            snapToPixel="false">
+            stylesheets="@edit.css">
     <left>
         <BorderPane style="-fx-padding: 2; -fx-spacing: 2">
             <top>
@@ -19,7 +18,7 @@
                     <Button fx:id="playButton" minWidth="250" text="Play" onAction="#startGame" />
                     <Button fx:id="simulateButton" minWidth="250" text="Simulate" onAction="#simulateGame" />
                     <HBox spacing="4" alignment="CENTER">
-                        <SplitMenuButton minWidth="123" text="New Robot" onAction="#newRobot">
+                        <SplitMenuButton fx:id="newRobotButton" minWidth="123" text="New Robot" onAction="#newRobot">
                             <items>
                                 <MenuItem text="shooter" onAction="#newRobotShooter" />
                                 <MenuItem text="mover" onAction="#newRobotMover" />

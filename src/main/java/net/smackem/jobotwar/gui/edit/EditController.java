@@ -14,15 +14,14 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import net.smackem.jobotwar.gui.App;
+import net.smackem.jobotwar.gui.graphics.RgbConvert;
 import net.smackem.jobotwar.lang.Compiler;
 import net.smackem.jobotwar.runtime.Robot;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Random;
+import java.util.*;
 import java.util.function.BiConsumer;
 
 public class EditController {
@@ -52,6 +51,8 @@ public class EditController {
     private Button simulateButton;
     @FXML
     private Pane detailsPane;
+    @FXML
+    private SplitMenuButton newRobotButton;
 
     public EditController() {
         if (cachedRobotViewModels != null) {
@@ -61,6 +62,7 @@ public class EditController {
 
     @FXML
     private void initialize() {
+        this.newRobotButton.disableProperty().bind(this.robots.sizeProperty().greaterThanOrEqualTo(64));
         this.robotsListView.setItems(this.robots);
         this.robotsListView.getSelectionModel().selectedItemProperty().addListener((prop, old, val) -> {
             selectRobot(val);
@@ -157,8 +159,12 @@ public class EditController {
 
     private Collection<Robot> createRobotsFromViewModel() throws Exception {
         final Collection<Robot> robots = new ArrayList<>();
+        final Set<String> robotNames = new HashSet<>();
         for (final EditRobotViewModel rvm : this.robots) {
             try {
+                if (robotNames.add(rvm.nameProperty().get()) == false) {
+                    throw new Exception(String.format("Robot name '%s' is not unique!", rvm.nameProperty().get()));
+                }
                 final Robot robot = createRobotFromViewModel(rvm);
                 robots.add(robot);
             } catch (Exception e) {
@@ -172,9 +178,7 @@ public class EditController {
 
     private Robot createRobotFromViewModel(EditRobotViewModel robotViewModel) throws Exception {
         final Color color = robotViewModel.colorProperty().get();
-        final int rgb = (int)(color.getRed() * 0xff) << 16 |
-                (int)(color.getGreen() * 0xff) << 8 |
-                (int)(color.getBlue() * 0xff);
+        final int rgb = RgbConvert.toRgb(color);
         final Image image = robotViewModel.imageProperty().get();
         final Compiler compiler = new Compiler();
         final Compiler.Result result = compiler.compile(robotViewModel.sourceCodeProperty().get());
