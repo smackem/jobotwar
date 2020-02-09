@@ -2,7 +2,8 @@ package net.smackem.jobotwar.runtime;
 
 import org.junit.Test;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.offset;
 
 public class VectorTest {
 

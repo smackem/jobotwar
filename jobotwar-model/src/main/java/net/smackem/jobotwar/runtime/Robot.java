@@ -2,7 +2,6 @@ package net.smackem.jobotwar.runtime;
 
 import net.smackem.jobotwar.util.Arguments;
 
-import java.util.Objects;
 import java.util.function.Function;
 
 /**

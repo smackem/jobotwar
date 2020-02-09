@@ -1,5 +1,6 @@
 package net.smackem.jobotwar.runtime;
 
+import org.assertj.core.api.Assertions;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -68,7 +69,7 @@ public class GameEngineTest {
             count++;
             assertThat(count).isLessThan(100); // make sure it ends!
         } while (explodedProjectiles.size() == 0);
-        assertThat(explodedProjectiles).containsOnly(projectile);
+        Assertions.assertThat(explodedProjectiles).containsOnly(projectile);
         assertThat(projectile.position()).isEqualTo(new Vector(40, 30));
     }
 
@@ -107,7 +108,7 @@ public class GameEngineTest {
             count++;
             assertThat(count).isLessThan(100); // make sure it ends!
         } while (explodedProjectiles.size() == 0);
-        assertThat(explodedProjectiles).containsOnly(projectile);
+        Assertions.assertThat(explodedProjectiles).containsOnly(projectile);
         assertThat(projectile.position())
                 .usingComparator(vectorComparator)
                 .isEqualTo(new Vector(30, 80));

@@ -3,6 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/jobotwar.iml" filepath="$PROJECT_DIR$/jobotwar.iml" />
+      <module fileurl="file://$PROJECT_DIR$/jobotwar-gui/jobotwar-gui.iml" filepath="$PROJECT_DIR$/jobotwar-gui/jobotwar-gui.iml" />
+      <module fileurl="file://$PROJECT_DIR$/jobotwar-model/jobotwar-model.iml" filepath="$PROJECT_DIR$/jobotwar-model/jobotwar-model.iml" />
     </modules>
   </component>
 </project>

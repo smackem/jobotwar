@@ -1,5 +1,6 @@
 package net.smackem.jobotwar.runtime;
 
+import org.assertj.core.api.Assertions;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -35,7 +36,7 @@ public class BoardTest {
                     .map(Robot::position)
                     .distinct()
                     .collect(Collectors.toList());
-            assertThat(positions).hasSameSizeAs(board.robots());
+            Assertions.assertThat(positions).hasSameSizeAs(board.robots());
         }
     }
 
