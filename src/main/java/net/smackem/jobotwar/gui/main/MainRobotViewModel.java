@@ -2,7 +2,7 @@ package net.smackem.jobotwar.gui.main;
 
 import javafx.beans.property.*;
 import javafx.scene.paint.Color;
-import net.smackem.jobotwar.gui.RgbConvert;
+import net.smackem.jobotwar.gui.graphics.RgbConvert;
 import net.smackem.jobotwar.runtime.Robot;
 
 import java.util.Objects;

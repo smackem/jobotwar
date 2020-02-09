@@ -30,7 +30,7 @@
 }
 
 .button:focused {
-    -fx-border-width: 2px;
+    -fx-border-color: #fff;
 }
 
 .robotGauge {

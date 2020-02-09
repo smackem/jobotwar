@@ -22,8 +22,8 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
 import net.smackem.jobotwar.gui.App;
-import net.smackem.jobotwar.gui.RgbConvert;
-import net.smackem.jobotwar.gui.RobotLogMessage;
+import net.smackem.jobotwar.gui.graphics.BoardGraphics;
+import net.smackem.jobotwar.gui.graphics.RgbConvert;
 import net.smackem.jobotwar.runtime.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -175,6 +175,6 @@ public class MainController {
     @Subscribe
     private void onRobotLogMessage(RobotLogMessage message) {
         this.messagesTextArea.appendText(String.format("[%s] %s: %f\n",
-                message.robot().name(), message.category(), message.value()));
+                message.robotName(), message.category(), message.value()));
     }
 }

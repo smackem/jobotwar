@@ -1,4 +1,4 @@
-package net.smackem.jobotwar.gui.main;
+package net.smackem.jobotwar.gui.graphics;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.effect.GaussianBlur;
@@ -6,13 +6,12 @@ import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.ArcType;
-import net.smackem.jobotwar.gui.RgbConvert;
 import net.smackem.jobotwar.runtime.Vector;
 import net.smackem.jobotwar.runtime.*;
 
 import java.util.*;
 
-class BoardGraphics {
+public class BoardGraphics {
     private final Board board;
     private final Collection<Explosion> explosions = new ArrayList<>();
     private final Collection<RenderedRadarBeam> radarBeams = new ArrayList<>();

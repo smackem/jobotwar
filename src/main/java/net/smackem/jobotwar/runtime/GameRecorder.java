@@ -1,6 +1,7 @@
 package net.smackem.jobotwar.runtime;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public final class GameRecorder implements RobotProgramContext {
@@ -8,6 +9,7 @@ public final class GameRecorder implements RobotProgramContext {
     private final Board board;
     private final Board replayBoard;
     private final Map<String, RobotRecord> robotRecords = new HashMap<>();
+    private Consumer<RobotLogMessage> robotMessageLogger;
     private Mode mode;
 
     public GameRecorder(Random random, Function<RobotProgramContext, Board> boardFactory) {
@@ -30,8 +32,9 @@ public final class GameRecorder implements RobotProgramContext {
         return this.replayBoard;
     }
 
-    public Board replay() {
+    public Board replay(Consumer<RobotLogMessage> robotMessageLogger) {
         this.mode = Mode.PLAY;
+        this.robotMessageLogger = robotMessageLogger;
         for (final RobotRecord record : this.robotRecords.values()) {
             record.reset();
         }
@@ -46,9 +49,12 @@ public final class GameRecorder implements RobotProgramContext {
     public void logMessage(Robot robot, String category, double value) {
         switch (this.mode) {
             case RECORD:
-                this.robotRecords.get(robot.name()).logMessages.add(new RobotLogMessage(category, value));
+                this.robotRecords.get(robot.name()).logMessages.add(new RobotLogMessage(robot.name(), category, value));
                 break;
             case PLAY:
+                if (this.robotMessageLogger != null) {
+                    this.robotMessageLogger.accept(new RobotLogMessage(robot.name(), category, value));
+                }
                 break;
         }
     }
@@ -84,16 +90,6 @@ public final class GameRecorder implements RobotProgramContext {
 
         void reset() {
             this.randomNumberIterator = this.randomNumbers.iterator();
-        }
-    }
-
-    private static class RobotLogMessage {
-        final String category;
-        final double value;
-
-        RobotLogMessage(String category, double value) {
-            this.category = category;
-            this.value = value;
         }
     }
 }

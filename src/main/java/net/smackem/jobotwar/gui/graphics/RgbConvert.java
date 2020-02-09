@@ -1,4 +1,4 @@
-package net.smackem.jobotwar.gui;
+package net.smackem.jobotwar.gui.graphics;
 
 import javafx.scene.paint.Color;
 

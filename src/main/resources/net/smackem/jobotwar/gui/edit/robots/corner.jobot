@@ -1,6 +1,6 @@
 def destX, destY
 def corner, newCorner
-def angleBase, angle
+def angleBase, angle, tailGunAngle
 def damage
 
 // current corner. -1: none
@@ -45,14 +45,16 @@ bottomRight:
 move:
     destX - X -> SPEEDX
     destY - Y -> SPEEDY
-    atan(SPEEDY / SPEEDX) -> AIM -> OUT
-    180 + AIM -> AIM if SPEEDX > 0
+    atan(SPEEDY / SPEEDX) -> tailGunAngle -> OUT
+    180 + tailGunAngle -> tailGunAngle if SPEEDX > 0
+    tailGunAngle -> AIM
     1000 -> SHOT
     0 -> SPEEDX if abs(destX - X) < 20
     0 -> SPEEDY if abs(destY - Y) < 20
     goto move unless SPEEDX = 0 and SPEEDY = 0
     // save current damage
     DAMAGE -> damage -> OUT
+    0 -> angle
 
 // scan the board, monitoring the damage
 scan:

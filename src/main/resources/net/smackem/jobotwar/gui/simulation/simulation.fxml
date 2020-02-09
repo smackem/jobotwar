@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
+<?import javafx.geometry.*?>
 <?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
@@ -45,7 +45,14 @@
                         <Label text="Duration:" GridPane.rowIndex="2" GridPane.columnIndex="0" />
                         <Label fx:id="durationLabel" GridPane.rowIndex="2" GridPane.columnIndex="1" />
                     </GridPane>
-                    <Canvas fx:id="boardCanvas" />
+                    <VBox style="-fx-background-color: #303030" alignment="CENTER" fillWidth="false">
+                        <padding>
+                            <Insets topRightBottomLeft="8" />
+                        </padding>
+                        <StackPane style="-fx-background-color: BLACK; -fx-border-color: #fff; -fx-border-width: 1px" prefWidth="1" prefHeight="1">
+                            <Canvas fx:id="boardCanvas" />
+                        </StackPane>
+                    </VBox>
                     <TextArea fx:id="eventArea" editable="false" />
                 </VBox>
             </SplitPane>

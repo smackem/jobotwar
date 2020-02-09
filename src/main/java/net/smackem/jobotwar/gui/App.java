@@ -7,10 +7,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import net.smackem.jobotwar.lang.Program;
-import net.smackem.jobotwar.runtime.Board;
-import net.smackem.jobotwar.runtime.CompiledProgram;
-import net.smackem.jobotwar.runtime.Robot;
-import net.smackem.jobotwar.runtime.RobotProgramContext;
+import net.smackem.jobotwar.runtime.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +31,7 @@ public class App extends Application {
     private final RobotProgramContext defaultRobotContext = new RobotProgramContext() {
         @Override
         public void logMessage(Robot robot, String category, double value) {
-            eventBus.post(new RobotLogMessage(robot, category, value));
+            eventBus.post(new RobotLogMessage(robot.name(), category, value));
         }
 
         @Override

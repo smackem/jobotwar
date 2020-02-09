@@ -13,9 +13,9 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import net.smackem.jobotwar.gui.App;
 import net.smackem.jobotwar.gui.PlatformExecutor;
-import net.smackem.jobotwar.gui.RgbConvert;
+import net.smackem.jobotwar.gui.graphics.BoardGraphics;
+import net.smackem.jobotwar.gui.graphics.RgbConvert;
 import net.smackem.jobotwar.runtime.Board;
-import net.smackem.jobotwar.runtime.Constants;
 import net.smackem.jobotwar.runtime.GameRecorder;
 import net.smackem.jobotwar.runtime.Robot;
 import net.smackem.jobotwar.runtime.simulation.BatchSimulationResult;
@@ -102,20 +102,13 @@ public class SimulationController {
     private void drawBoard(Board board) {
         final double scale = 0.5;
         final double width = board.width(), height = board.height();
-        final double robotRadius = Constants.ROBOT_RADIUS;
         this.boardCanvas.setWidth(width * scale);
         this.boardCanvas.setHeight(height * scale);
         final GraphicsContext gc = this.boardCanvas.getGraphicsContext2D();
+        final BoardGraphics bg = new BoardGraphics(board);
         gc.save();
         gc.scale(scale, scale);
-        gc.clearRect(0, 0, width, height);
-        gc.setFill(Color.BLACK);
-        gc.fillRect(0, 0, width, height);
-        for (final Robot r : board.robots()) {
-            gc.setFill(RgbConvert.toColor(r.rgb()));
-            gc.fillOval(r.getX() - robotRadius, r.getY() - robotRadius,
-                    robotRadius * 2.0, robotRadius * 2.0);
-        }
+        bg.render(gc);
         gc.restore();
     }
 
@@ -182,7 +175,7 @@ public class SimulationController {
         if (match == null) {
             return;
         }
-        final Board replayBoard = match.recorder.replay();
+        final Board replayBoard = match.recorder.replay(msg -> App.instance().eventBus().post(msg));
         App.instance().startReplay(replayBoard);
     }
 

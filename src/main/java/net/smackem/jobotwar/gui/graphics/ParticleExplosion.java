@@ -1,4 +1,4 @@
-package net.smackem.jobotwar.gui.main;
+package net.smackem.jobotwar.gui.graphics;
 
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
@@ -12,15 +12,17 @@ import java.util.Random;
 class ParticleExplosion {
     private final Collection<Dot> dots;
     private final double width, height;
+    private static final int OPACITY_STEPS = 20;
     private static final List<Color[]> PRECOMPUTED_COLORS;
 
     static {
         PRECOMPUTED_COLORS = new ArrayList<>(360);
         for (int hue = 0; hue < 360; hue++) {
             final Color hsb = Color.hsb(hue, 1, 1);
-            final Color[] colors = new Color[101];
-            for (int opacity = 0; opacity <= 100; opacity++) {
-                colors[opacity] = Color.color(hsb.getRed(), hsb.getGreen(), hsb.getBlue(), opacity / 100.0);
+            final Color[] colors = new Color[OPACITY_STEPS + 1];
+            for (int opacity = 0; opacity <= OPACITY_STEPS; opacity++) {
+                colors[opacity] = Color.color(hsb.getRed(), hsb.getGreen(), hsb.getBlue(),
+                        opacity / (double)OPACITY_STEPS);
             }
             PRECOMPUTED_COLORS.add(colors);
         }
@@ -52,7 +54,7 @@ class ParticleExplosion {
             if (dot.finished) {
                 continue;
             }
-            final Color color = PRECOMPUTED_COLORS.get(dot.hue)[(int)(dot.distance * 100 / dot.initialDistance)];
+            final Color color = PRECOMPUTED_COLORS.get(dot.hue)[(int)(dot.distance * OPACITY_STEPS / dot.initialDistance)];
             gc.setFill(color);
             gc.fillOval(dot.pos.getX(), dot.pos.getY(), 3, 3);
             finished &= dot.move();

@@ -241,7 +241,7 @@ public final class GameEngine {
             }
             final Vector p = r.position();
             final double distanceFromBeam = line.distanceFromPoint(p);
-            if (distanceFromBeam >= Constants.ROBOT_RADIUS) {
+            if (distanceFromBeam > Constants.ROBOT_RADIUS) {
                 continue;
             }
             final double robotDistance = Vector.distance(position, p);

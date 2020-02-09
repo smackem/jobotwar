@@ -35,7 +35,7 @@ public class GameRecorderTest {
         final SimulationRunner runner = new SimulationRunner(recorder.board());
         final SimulationResult firstResult = runner.runGame(duration);
 
-        final Board replayBoard = recorder.replay();
+        final Board replayBoard = recorder.replay(null);
         final SimulationRunner replayRunner = new SimulationRunner(replayBoard);
         final SimulationResult replayResult = replayRunner.runGame(duration);
 

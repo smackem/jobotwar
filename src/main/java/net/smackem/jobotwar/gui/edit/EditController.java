@@ -14,7 +14,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import net.smackem.jobotwar.gui.App;
-import net.smackem.jobotwar.gui.CodeEditor;
 import net.smackem.jobotwar.lang.Compiler;
 import net.smackem.jobotwar.runtime.Robot;
 
@@ -108,7 +107,7 @@ public class EditController {
     private void newRobotWithProgram(String robotBaseName, String resourceName) {
         final EditRobotViewModel robot = new EditRobotViewModel();
         robot.nameProperty().set(robotBaseName + " " + (this.robots.size() + 1));
-        robot.colorProperty().set(Color.hsb(this.random.nextDouble() * 360, 1.0, 1.0));
+        robot.colorProperty().set(getNextRandomColor());
         if (resourceName != null) {
             try (final InputStream stream = getClass().getResourceAsStream(resourceName);
                  final InputStreamReader reader = new InputStreamReader(stream)) {
@@ -119,6 +118,18 @@ public class EditController {
         }
         this.robots.add(robot);
         this.robotsListView.getSelectionModel().select(robot);
+    }
+
+    private Color getNextRandomColor() {
+        for (int i = 0; i < 12; i++) {
+            final int newHue = this.random.nextInt(12);
+            final boolean isUnique = this.robots.stream()
+                    .noneMatch(r -> (int)(r.colorProperty().get().getHue() / 30.0) == newHue);
+            if (isUnique) {
+                return Color.hsb(newHue * 30, 1.0, 1.0);
+            }
+        }
+        return Color.BLACK;
     }
 
     @FXML

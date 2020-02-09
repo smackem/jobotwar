@@ -1,4 +1,4 @@
-package net.smackem.jobotwar.gui;
+package net.smackem.jobotwar.gui.edit;
 
 import javafx.application.Platform;
 import javafx.scene.input.KeyCode;
