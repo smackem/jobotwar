@@ -40,7 +40,8 @@ state move(destX, destY) {
     }
 }
 
-function xFromAngle(angle, length) -> @x() + cos(angle) * length
-function yFromAngle(angle, length) {
+def xFromAngle(angle, length) ->
+    @x() + cos(angle) * length
+def yFromAngle(angle, length) {
     return @y() + sin(angle) * length
 }

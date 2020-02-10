@@ -344,3 +344,41 @@ nextShot:
     goto scan unless RADAR < 0
     0 - RADAR -> SHOT
     goto nextShot
+
+// ==========================
+// robot patrol 2
+def speedy
+def radar
+
+start:
+    goto moveToLeft if X < 320
+    goto moveToRight
+
+moveToLeft:
+    -200 -> SPEEDX
+    0 -> AIM
+moveToLeft_1:
+    1000 -> SHOT
+    goto moveToLeft_1 unless X < 50
+    0 -> SPEEDX
+    goto patrol
+
+moveToRight:
+    200 -> SPEEDX
+    180 -> AIM
+moveToRight_1:
+    1000 -> SHOT
+    goto moveToRight_1 unless X > 590
+    0 -> SPEEDX
+
+patrol:
+    200 -> speedy
+    90 -> radar
+loop:
+    speedy -> SPEEDY
+    radar -> RADAR
+    1000 -> SHOT
+    goto loop if abs(RADAR >= 50)
+    0 - (speedy + (RANDOM * 50 - 25)) -> speedy
+    180 + radar -> radar
+    goto loop
