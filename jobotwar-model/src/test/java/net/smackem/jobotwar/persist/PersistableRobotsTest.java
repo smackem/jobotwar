@@ -33,6 +33,20 @@ public class PersistableRobotsTest {
         assertThat(json).isEqualTo("{\"name\":\"robot1\",\"source\":\"100->SPEEDX\"}");
     }
 
+    @Test
+    public void testClone() throws IOException {
+        final PersistableRobot r = new DummyPersistableRobot();
+        r.setBaseName("robot1");
+        r.setSourceCode("100->SPEEDX");
+        final ByteArrayOutputStream os = new ByteArrayOutputStream();
+        PersistableRobots.save(r, os);
+
+        final InputStream is = new ByteArrayInputStream(os.toByteArray());
+        final PersistableRobot loaded = PersistableRobots.load(DummyPersistableRobot::new, is);
+        assertThat(loaded.getBaseName()).isEqualTo(r.getBaseName());
+        assertThat(loaded.getSourceCode()).isEqualTo(r.getSourceCode());
+    }
+
     private static class DummyPersistableRobot implements PersistableRobot {
         private String sourceCode;
         private String baseName;
