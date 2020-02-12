@@ -1,24 +1,24 @@
 package net.smackem.jobotwar.persist;
 
-import com.google.common.base.Charsets;
-
 import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
 import javax.json.stream.JsonGenerator;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.function.Supplier;
 
 public class PersistableRobots {
     private PersistableRobots() { throw new IllegalAccessError(); }
 
     public static void save(PersistableRobot pr, OutputStream os) throws IOException {
-        try (final OutputStreamWriter writer = new OutputStreamWriter(os, Charsets.UTF_8)) {
+        try (final OutputStreamWriter writer = new OutputStreamWriter(os, StandardCharsets.UTF_8)) {
             final JsonGenerator json = Json.createGenerator(writer);
             json.writeStartObject()
                     .write("name", pr.getBaseName())
                     .write("source", pr.getSourceCode())
-                    .writeEnd();
+                    .writeEnd()
+                    .close();
         }
     }
 
