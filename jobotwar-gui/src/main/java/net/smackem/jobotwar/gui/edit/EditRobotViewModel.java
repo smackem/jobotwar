@@ -6,8 +6,9 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
+import net.smackem.jobotwar.persist.PersistableRobot;
 
-class EditRobotViewModel {
+class EditRobotViewModel implements PersistableRobot {
     private final StringProperty name = new SimpleStringProperty();
     private final StringProperty sourceCode = new SimpleStringProperty();
     private final ObjectProperty<Color> color = new SimpleObjectProperty<>();
@@ -27,5 +28,25 @@ class EditRobotViewModel {
 
     public ObjectProperty<Image> imageProperty() {
         return this.image;
+    }
+
+    @Override
+    public String getSourceCode() {
+        return this.sourceCodeProperty().get();
+    }
+
+    @Override
+    public void setSourceCode(String value) {
+        this.sourceCodeProperty().set(value);
+    }
+
+    @Override
+    public String getBaseName() {
+        return this.nameProperty().get();
+    }
+
+    @Override
+    public void setBaseName(String value) {
+        this.nameProperty().set(value);
     }
 }

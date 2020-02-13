@@ -28,6 +28,8 @@
                                 <MenuItem text="patrol" onAction="#newRobotPatrol" />
                                 <MenuItem text="bumblebee" onAction="#newRobotBumblebee" />
                                 <MenuItem text="fastscan" onAction="#newRobotFastScan" />
+                                <SeparatorMenuItem />
+                                <MenuItem text="Open..." onAction="#openRobotFile" />
                             </items>
                         </SplitMenuButton>
                         <Button minWidth="123" text="Remove Robot" onAction="#removeRobot" />

@@ -22,8 +22,8 @@ public class PersistableRobots {
         }
     }
 
-    public static PersistableRobot load(Supplier<PersistableRobot> factory, InputStream is) throws IOException {
-        final PersistableRobot pr = factory.get();
+    public static <T extends PersistableRobot> T load(Supplier<T> factory, InputStream is) throws IOException {
+        final T pr = factory.get();
         try (final InputStreamReader reader = new InputStreamReader(is)) {
             final JsonReader json = Json.createReader(reader);
             final JsonObject obj = json.readObject();

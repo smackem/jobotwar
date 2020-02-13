@@ -13,19 +13,23 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.stage.FileChooser;
+import javafx.stage.Window;
 import net.smackem.jobotwar.gui.App;
 import net.smackem.jobotwar.gui.graphics.RgbConvert;
 import net.smackem.jobotwar.lang.Compiler;
+import net.smackem.jobotwar.persist.PersistableRobots;
 import net.smackem.jobotwar.runtime.Robot;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.*;
 import java.util.function.BiConsumer;
 
 public class EditController {
 
+    private static final Logger log = LoggerFactory.getLogger(EditController.class);
     private final ListProperty<EditRobotViewModel> robots = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ObjectProperty<EditRobotViewModel> selectedRobot = new SimpleObjectProperty<>();
     private final Random random = new Random();
@@ -247,6 +251,27 @@ public class EditController {
             return;
         }
         gameMode.accept(app, robots);
+    }
+
+    @FXML
+    private void openRobotFile(ActionEvent actionEvent) {
+        final FileChooser dialog = new FileChooser();
+        final Window window = this.sourceText.getScene().getWindow();
+        final File file = dialog.showOpenDialog(window);
+        if (file == null) {
+            return;
+        }
+        final EditRobotViewModel robot;
+        try (final InputStream is = new FileInputStream(file)) {
+            robot =PersistableRobots.load(EditRobotViewModel::new, is);
+        } catch (IOException e) {
+            log.error("error opening file " + file.getPath(), e);
+            new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.CLOSE).show();
+            return;
+        }
+        robot.colorProperty().set(getNextRandomColor());
+        this.robots.add(robot);
+        this.robotsListView.getSelectionModel().select(robot);
     }
 
     private static class RobotViewModelCell extends ListCell<EditRobotViewModel> {
