@@ -32,7 +32,11 @@
                                 <MenuItem text="Open..." onAction="#openRobotFile" />
                             </items>
                         </SplitMenuButton>
-                        <Button minWidth="123" text="Remove Robot" onAction="#removeRobot" />
+                        <SplitMenuButton minWidth="123" text="Remove Robot" onAction="#removeRobot">
+                            <items>
+                                <MenuItem text="Save As..." onAction="#saveRobotFile" />
+                            </items>
+                        </SplitMenuButton>
                     </HBox>
                 </VBox>
             </top>

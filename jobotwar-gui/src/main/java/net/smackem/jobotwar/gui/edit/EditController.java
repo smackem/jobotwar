@@ -68,26 +68,23 @@ public class EditController {
     private void initialize() {
         this.newRobotButton.disableProperty().bind(this.robots.sizeProperty().greaterThanOrEqualTo(64));
         this.robotsListView.setItems(this.robots);
-        this.robotsListView.getSelectionModel().selectedItemProperty().addListener((prop, old, val) -> {
-            selectRobot(val);
-        });
+        this.robotsListView.getSelectionModel().selectedItemProperty().addListener(
+                (prop, old, val) -> selectRobot(val));
         this.robotsListView.setCellFactory(listView -> new RobotViewModelCell());
         this.playButton.disableProperty().bind(
                 this.robots.sizeProperty().lessThanOrEqualTo(0));
         this.simulateButton.disableProperty().bind(
                 this.robots.sizeProperty().lessThanOrEqualTo(1));
-        this.sourceText.textProperty().addListener((prop, old, val) -> {
-            this.selectedRobot.get().sourceCodeProperty().set(val);
-        });
+        this.sourceText.textProperty().addListener(
+                (prop, old, val) -> this.selectedRobot.get().sourceCodeProperty().set(val));
         this.iconComboBox.setCellFactory(listView -> new IconCell());
         this.iconComboBox.setButtonCell(new IconCell());
         this.iconComboBox.getItems().addAll(
                 null,
                 getResourceImage("icon-rebelalliance.png"),
                 getResourceImage("icon-empire.png"));
-        this.iconComboBox.getSelectionModel().selectedItemProperty().addListener((prop, old, val) -> {
-            this.selectedRobot.get().imageProperty().set(val);
-        });
+        this.iconComboBox.getSelectionModel().selectedItemProperty().addListener(
+                (prop, old, val) -> this.selectedRobot.get().imageProperty().set(val));
         if (this.robots.size() == 0) {
             newRobot(null);
         } else {
@@ -237,7 +234,7 @@ public class EditController {
     }
 
     @FXML
-    private void simulateGame(ActionEvent actionEvent) throws IOException {
+    private void simulateGame(ActionEvent actionEvent) {
         initiateGame((app, robots) -> app.simulateGame(BOARD_WIDTH, BOARD_HEIGHT, robots));
     }
 
@@ -263,15 +260,36 @@ public class EditController {
         }
         final EditRobotViewModel robot;
         try (final InputStream is = new FileInputStream(file)) {
-            robot =PersistableRobots.load(EditRobotViewModel::new, is);
+            robot = PersistableRobots.load(EditRobotViewModel::new, is);
         } catch (IOException e) {
             log.error("error opening file " + file.getPath(), e);
             new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.CLOSE).show();
             return;
         }
         robot.colorProperty().set(getNextRandomColor());
+        robot.nameProperty().set(robot.getBaseName() + " " + (this.robots.size() + 1));
         this.robots.add(robot);
         this.robotsListView.getSelectionModel().select(robot);
+    }
+
+    @FXML
+    private void saveRobotFile(ActionEvent actionEvent) {
+        final EditRobotViewModel robot = selectedRobot.get();
+        if (robot == null) {
+            return;
+        }
+        final FileChooser dialog = new FileChooser();
+        final Window window = this.sourceText.getScene().getWindow();
+        final File file = dialog.showOpenDialog(window);
+        if (file == null) {
+            return;
+        }
+        try (final OutputStream os = new FileOutputStream(file)) {
+            PersistableRobots.save(robot, os);
+        } catch (IOException e) {
+            log.error("error saving file " + file.getPath(), e);
+            new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.CLOSE).show();
+        }
     }
 
     private static class RobotViewModelCell extends ListCell<EditRobotViewModel> {
