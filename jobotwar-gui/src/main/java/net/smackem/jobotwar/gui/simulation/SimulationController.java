@@ -25,7 +25,6 @@ import net.smackem.jobotwar.runtime.simulation.SimulationRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -78,9 +77,8 @@ public class SimulationController {
         this.matchCountChoice.setValue(1000);
         this.detailsPane.visibleProperty().bind(
                 this.matchTable.getSelectionModel().selectedItemProperty().isNotNull());
-        this.matchTable.getSelectionModel().selectedItemProperty().addListener((prop, old, val) -> {
-            selectMatch(val);
-        });
+        this.matchTable.getSelectionModel().selectedItemProperty().addListener(
+                (prop, old, val) -> selectMatch(val));
     }
 
     private void selectMatch(MatchViewModel match) {
@@ -165,7 +163,7 @@ public class SimulationController {
     }
 
     @FXML
-    private void newGame(ActionEvent actionEvent) throws IOException {
+    private void newGame(ActionEvent actionEvent) {
         App.instance().showEditor();
     }
 

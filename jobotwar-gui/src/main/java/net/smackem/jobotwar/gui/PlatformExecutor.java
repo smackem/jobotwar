@@ -15,7 +15,7 @@ public enum PlatformExecutor implements Executor {
     INSTANCE;
 
     @Override
-    public void execute(Runnable runnable) {
+    public void execute(@SuppressWarnings("NullableProblems") Runnable runnable) {
         if (Platform.isFxApplicationThread()) {
             runnable.run();
             return;

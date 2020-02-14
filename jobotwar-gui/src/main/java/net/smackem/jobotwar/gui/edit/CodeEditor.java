@@ -10,7 +10,6 @@ import org.fxmisc.richtext.model.StyleSpansBuilder;
 import org.fxmisc.wellbehaved.event.EventPattern;
 import org.fxmisc.wellbehaved.event.InputMap;
 import org.fxmisc.wellbehaved.event.Nodes;
-import org.reactfx.Subscription;
 
 import java.time.Duration;
 import java.util.Collection;
@@ -57,11 +56,10 @@ public class CodeEditor extends CodeArea {
         Nodes.addInputMap(this, im);
 
         // recompute the syntax highlighting 500 ms after user stops editing area
-        final Subscription cleanupWhenNoLongerNeedIt = this
-                // plain changes = ignore style changes that are emitted when syntax highlighting is reapplied
-                // multi plain changes = save computation by not rerunning the code multiple times
-                //   when making multiple changes (e.g. renaming a method at multiple parts in file)
-                .multiPlainChanges()
+        // plain changes = ignore style changes that are emitted when syntax highlighting is reapplied
+        // multi plain changes = save computation by not rerunning the code multiple times
+        //   when making multiple changes (e.g. renaming a method at multiple parts in file)
+        multiPlainChanges()
                 // do not emit an event until 500 ms have passed since the last emission of previous stream
                 .successionEnds(Duration.ofMillis(500))
                 // run the following code block when previous stream emits an event

@@ -30,7 +30,6 @@ import net.smackem.jobotwar.runtime.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -107,7 +106,7 @@ public class MainController {
     }
 
     @FXML
-    private void newGame(Event actionEvent) throws IOException {
+    private void newGame(Event actionEvent) {
         this.ticker.stop();
         final App app = App.instance();
         app.eventBus().unregister(this);

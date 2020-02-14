@@ -97,7 +97,7 @@ public class App extends Application {
         setRoot("simulation/simulation.fxml");
     }
 
-    public void showEditor() throws IOException {
+    public void showEditor() {
         setRoot("edit/edit.fxml");
     }
 

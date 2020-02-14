@@ -3,7 +3,7 @@ package net.smackem.jobotwar.runtime;
 /**
  * Non-instantiable class that provides utility methods which operate on {@link Robot}s.
  */
-public class Robots {
+class Robots {
     private Robots() { throw new IllegalAccessError(); }
 
     /**

@@ -312,6 +312,7 @@ public class CompilerTest {
 
     private void runComplete(Interpreter interpreter) {
         try {
+            //noinspection StatementWithEmptyBody
             while (interpreter.runNext()) {
                 // proceed until program has finished
             }
@@ -408,23 +409,23 @@ public class CompilerTest {
             this.loggedValues.add(value);
         }
 
-        public void setX(double value) {
+        void setX(double value) {
             this.x = value;
         }
 
-        public void setY(double value) {
+        void setY(double value) {
             this.y = value;
         }
 
-        public void setDamage(double value) {
+        void setDamage(double value) {
             this.damage = value;
         }
 
-        public Collection<Double> loggedValues() {
+        Collection<Double> loggedValues() {
             return this.loggedValues;
         }
 
-        public Collection<String> loggedCategories() {
+        Collection<String> loggedCategories() {
             return this.loggedCategories;
         }
     }
