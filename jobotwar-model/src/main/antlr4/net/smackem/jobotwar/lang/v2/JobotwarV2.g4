@@ -15,31 +15,40 @@ compoundVariableDecl
     ;
 
 variableDecl
-    : ID ('=' literal)?
+    : Ident ('=' expression)?
     ;
 
 stateDecl
-    : 'state' ID '(' parameters? ')' '{' statement* '}'
+    : 'state' Ident '(' parameters? ')' '{' statement* '}'
     ;
 
 parameters
-    : ID (',' ID)*
+    : Ident (',' Ident)*
     ;
 
 statement
     : (compoundVariableDecl
     | assignStmt
     | ifStmt
+    | whileStmt
     | yieldStmt
     | returnStmt) ';'?
     ;
 
 assignStmt
-    : lvalue '=' expression
+    : lvalue assignOperator expression
+    ;
+
+assignOperator
+    : Beq
+    | PlusEq
+    | MinusEq
+    | TimesEq
+    | DivEq
     ;
 
 lvalue
-    : ID
+    : Ident
     ;
 
 ifStmt
@@ -54,6 +63,10 @@ elseClause
     : 'else' '{' statement* '}'
     ;
 
+whileStmt
+    : 'while' '(' expression ')' '{' statement* '}'
+    ;
+
 yieldStmt
     : 'yield' functionCall
     ;
@@ -63,13 +76,64 @@ returnStmt
     ;
 
 functionDecl
-    : 'def' ID '(' parameters? ')' '{' statement* '}'
+    : 'def' Ident '(' parameters? ')' '{' statement* '}'
     ;
 
 expression
-    : literal
+    : condition
+    ;
+
+condition
+    : condition conditionOperator comparison
+    | comparison
+    ;
+
+conditionOperator
+    : Or
+    | And
+    ;
+
+comparison
+    : term comparator term
+    | term
+    ;
+
+comparator
+    : Lt
+    | Le
+    | Gt
+    | Ge
+    | Eq
+    | Ne
+    ;
+
+term
+    : term termOperator product
+    | product
+    ;
+
+termOperator
+    : Plus
+    | Minus
+    ;
+
+product
+    : product productOperator atom
+    | atom
+    ;
+
+productOperator
+    : Times
+    | Div
+    | Mod
+    ;
+
+atom
+    : functionCall
     | member
-    | functionCall
+    | Ident
+    | literal
+    | '(' expression ')'
     ;
 
 member
@@ -77,33 +141,61 @@ member
     ;
 
 functionCall
-    : ID '(' arguments? ')'
+    : Ident '(' arguments? ')'
     ;
 
 arguments
     : expression (',' expression)*
     ;
 
-ID
-    : ('a' .. 'z' | 'A' .. 'Z' | '_') ('a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9') *
-    ;
-
 literal
     : number
+    | bool
     ;
 
 number
-    : ('+' | '-')? NUMBER
+    : (Plus | Minus)? Number
     ;
 
-NUMBER
+bool
+    : False
+    | True
+    ;
+
+Or      : 'or';
+And     : 'and';
+Plus    : '+';
+Minus   : '-';
+Times   : '*';
+Div     : '/';
+Mod     : '%';
+Lt      : '<';
+Le      : '<=';
+Gt      : '>';
+Ge      : '>=';
+Eq      : '==';
+Ne      : '!=';
+Beq     : '=';
+PlusEq  : '+=';
+MinusEq : '-=';
+TimesEq : '*=';
+DivEq   : '/=';
+
+False   : 'false';
+True    : 'true';
+
+Ident
+    : ('a' .. 'z' | 'A' .. 'Z' | '_') ('a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9') *
+    ;
+
+Number
     : [0-9]+ ('.' [0-9]+)?
     ;
 
-COMMENT
+Comment
     : '//' ~ [\r\n]* -> skip
     ;
 
-WS
+Ws
     : [ \t\r\n] -> skip
     ;
