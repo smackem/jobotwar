@@ -250,26 +250,40 @@ public class EditController {
         gameMode.accept(app, robots);
     }
 
+    private static FileChooser createJobotFileChooser() {
+        final FileChooser dialog = new FileChooser();
+        dialog.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Jobotwar Robot", "*.jobot"),
+                new FileChooser.ExtensionFilter("All Files", "*.*"));
+        return dialog;
+    }
+
     @FXML
     private void openRobotFile(ActionEvent actionEvent) {
-        final FileChooser dialog = new FileChooser();
+        final FileChooser dialog = createJobotFileChooser();
         final Window window = this.sourceText.getScene().getWindow();
-        final File file = dialog.showOpenDialog(window);
-        if (file == null) {
+        final List<File> files = dialog.showOpenMultipleDialog(window);
+        if (files == null) {
             return;
         }
-        final EditRobotViewModel robot;
-        try (final InputStream is = new FileInputStream(file)) {
-            robot = PersistableRobots.load(EditRobotViewModel::new, is);
-        } catch (IOException e) {
-            log.error("error opening file " + file.getPath(), e);
-            new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.CLOSE).show();
-            return;
+        boolean firstRobot = true;
+        for (final File file : files) {
+            final EditRobotViewModel robot;
+            try (final InputStream is = new FileInputStream(file)) {
+                robot = PersistableRobots.load(EditRobotViewModel::new, is);
+            } catch (IOException e) {
+                log.error("error opening file " + file.getPath(), e);
+                new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.CLOSE).show();
+                return;
+            }
+            robot.colorProperty().set(getNextRandomColor());
+            robot.nameProperty().set(robot.getBaseName() + " " + (this.robots.size() + 1));
+            this.robots.add(robot);
+            if (firstRobot) {
+                this.robotsListView.getSelectionModel().select(robot);
+                firstRobot = false;
+            }
         }
-        robot.colorProperty().set(getNextRandomColor());
-        robot.nameProperty().set(robot.getBaseName() + " " + (this.robots.size() + 1));
-        this.robots.add(robot);
-        this.robotsListView.getSelectionModel().select(robot);
     }
 
     @FXML
@@ -278,7 +292,7 @@ public class EditController {
         if (robot == null) {
             return;
         }
-        final FileChooser dialog = new FileChooser();
+        final FileChooser dialog = createJobotFileChooser();
         final Window window = this.sourceText.getScene().getWindow();
         final File file = dialog.showOpenDialog(window);
         if (file == null) {
