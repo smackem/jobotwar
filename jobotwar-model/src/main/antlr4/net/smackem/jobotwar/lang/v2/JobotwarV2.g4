@@ -15,7 +15,7 @@ compoundVariableDecl
     ;
 
 variableDecl
-    : ID ('=' number)?
+    : ID ('=' literal)?
     ;
 
 stateDecl
@@ -27,15 +27,69 @@ parameters
     ;
 
 statement
-    : (compoundVariableDecl) ';'?
+    : (compoundVariableDecl
+    | assignStmt
+    | ifStmt
+    | yieldStmt
+    | returnStmt) ';'?
+    ;
+
+assignStmt
+    : lvalue '=' expression
+    ;
+
+lvalue
+    : ID
+    ;
+
+ifStmt
+    : 'if' expression '{' statement* '}' elseIfClause* elseClause?
+    ;
+
+elseIfClause
+    : 'else' 'if' expression '{' statement* '}'
+    ;
+
+elseClause
+    : 'else' '{' statement* '}'
+    ;
+
+yieldStmt
+    : 'yield' functionCall
+    ;
+
+returnStmt
+    : 'return' expression
     ;
 
 functionDecl
-    : 'function' ID '(' parameters? ')' '{' statement* '}'
+    : 'def' ID '(' parameters? ')' '{' statement* '}'
+    ;
+
+expression
+    : literal
+    | member
+    | functionCall
+    ;
+
+member
+    : '@' functionCall
+    ;
+
+functionCall
+    : ID '(' arguments? ')'
+    ;
+
+arguments
+    : expression (',' expression)*
     ;
 
 ID
     : ('a' .. 'z' | 'A' .. 'Z' | '_') ('a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9') *
+    ;
+
+literal
+    : number
     ;
 
 number
