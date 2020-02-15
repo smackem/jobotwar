@@ -1,11 +1,37 @@
 grammar JobotwarV2;
 
 program
-    : (COMMENT | declaration)*
+    : declaration*
     ;
 
 declaration
-    : 'def' ID ('=' number)? (',' ID)*
+    : compoundVariableDecl
+    | stateDecl
+    | functionDecl
+    ;
+
+compoundVariableDecl
+    : 'def' variableDecl (',' variableDecl)*
+    ;
+
+variableDecl
+    : ID ('=' number)?
+    ;
+
+stateDecl
+    : 'state' ID '(' parameters? ')' '{' statement* '}'
+    ;
+
+parameters
+    : ID (',' ID)*
+    ;
+
+statement
+    : (compoundVariableDecl) ';'?
+    ;
+
+functionDecl
+    : 'function' ID '(' parameters? ')' '{' statement* '}'
     ;
 
 ID
@@ -21,13 +47,9 @@ NUMBER
     ;
 
 COMMENT
-    : '//' ~ [\r\n]*
-    ;
-
-EOL
-    : [\r\n] +
+    : '//' ~ [\r\n]* -> skip
     ;
 
 WS
-    : [ \t] -> skip
+    : [ \t\r\n] -> skip
     ;
