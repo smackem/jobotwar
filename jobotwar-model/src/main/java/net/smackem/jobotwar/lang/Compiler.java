@@ -1,5 +1,8 @@
 package net.smackem.jobotwar.lang;
 
+import net.smackem.jobotwar.lang.v1.EmitterV1;
+import net.smackem.jobotwar.lang.v1.JobotwarV1Lexer;
+import net.smackem.jobotwar.lang.v1.JobotwarV1Parser;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.dfa.DFA;
@@ -60,13 +63,13 @@ public final class Compiler {
         }
         final ErrorListener errorListener = new ErrorListener();
         final CharStream input = CharStreams.fromString(source);
-        final JobotwarLexer lexer = new JobotwarLexer(input);
+        final JobotwarV1Lexer lexer = new JobotwarV1Lexer(input);
         lexer.addErrorListener(errorListener);
         final CommonTokenStream tokens = new CommonTokenStream(lexer);
-        final JobotwarParser parser = new JobotwarParser(tokens);
+        final JobotwarV1Parser parser = new JobotwarV1Parser(tokens);
         parser.addErrorListener(errorListener);
-        final JobotwarParser.ProgramContext tree = parser.program();
-        final Emitter emitter = new Emitter();
+        final JobotwarV1Parser.ProgramContext tree = parser.program();
+        final EmitterV1 emitter = new EmitterV1();
         ParseTreeWalker.DEFAULT.walk(emitter, tree);
         final Program program = new Program(emitter.instructions());
         return new Result(errorListener.errors, program);

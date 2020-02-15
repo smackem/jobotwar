@@ -7,27 +7,27 @@ import java.util.Objects;
  * what to do, and a typed argument (either double, int or string) that holds the data to operate on (if any).
  * The type of argument depends upon the {@link OpCode}.
  */
-final class Instruction {
+public final class Instruction {
     private final OpCode opCode;
     private double f64Arg;
     private int intArg;
     private String strArg;
 
-    Instruction(OpCode opCode) {
+    public Instruction(OpCode opCode) {
         this.opCode = opCode;
     }
 
-    Instruction(OpCode opCode, double f64Arg) {
+    public Instruction(OpCode opCode, double f64Arg) {
         this.opCode = opCode;
         this.f64Arg = f64Arg;
     }
 
-    Instruction(OpCode opCode, int intArg) {
+    public Instruction(OpCode opCode, int intArg) {
         this.opCode = opCode;
         this.intArg = intArg;
     }
 
-    Instruction(OpCode opCode, String strArg) {
+    public Instruction(OpCode opCode, String strArg) {
         this.opCode = opCode;
         this.strArg = strArg;
     }
@@ -40,7 +40,7 @@ final class Instruction {
         return this.f64Arg;
     }
 
-    void setF64Arg(double value) {
+    public void setF64Arg(double value) {
         this.f64Arg = value;
     }
 
@@ -48,7 +48,7 @@ final class Instruction {
         return this.intArg;
     }
 
-    void setIntArg(int value) {
+    public void setIntArg(int value) {
         this.intArg = value;
     }
 
@@ -56,7 +56,7 @@ final class Instruction {
         return this.strArg;
     }
 
-    void setStrArg(String value) {
+    public void setStrArg(String value) {
         this.strArg = value;
     }
 

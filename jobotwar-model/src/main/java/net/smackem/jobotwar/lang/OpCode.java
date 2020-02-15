@@ -1,6 +1,6 @@
 package net.smackem.jobotwar.lang;
 
-enum OpCode {
+public enum OpCode {
     LD_F64(false),     // push f64Arg
     LD_REG(false),     // push register strArg
     LD_LOC(false),     // push local intArg

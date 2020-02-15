@@ -1,11 +1,13 @@
-package net.smackem.jobotwar.lang;
+package net.smackem.jobotwar.lang.v1;
 
+import net.smackem.jobotwar.lang.Instruction;
+import net.smackem.jobotwar.lang.OpCode;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.util.*;
 
-class Emitter extends JobotwarBaseListener {
+public class EmitterV1 extends JobotwarV1BaseListener {
     private final List<Instruction> instructions = new ArrayList<>();
     private final Map<String, Integer> locals = new HashMap<>();
     private int labelId = 1;
@@ -18,12 +20,12 @@ class Emitter extends JobotwarBaseListener {
     }
 
     @Override
-    public void exitProgram(JobotwarParser.ProgramContext ctx) {
+    public void exitProgram(JobotwarV1Parser.ProgramContext ctx) {
         fixup();
     }
 
     @Override
-    public void exitDeclaration(JobotwarParser.DeclarationContext ctx) {
+    public void exitDeclaration(JobotwarV1Parser.DeclarationContext ctx) {
         for (final TerminalNode id : ctx.ID()) {
             this.locals.put(id.getText(), this.instructions.size());
             emit(OpCode.LD_F64);
@@ -31,12 +33,12 @@ class Emitter extends JobotwarBaseListener {
     }
 
     @Override
-    public void exitLabel(JobotwarParser.LabelContext ctx) {
+    public void exitLabel(JobotwarV1Parser.LabelContext ctx) {
         emit(OpCode.LABEL, ctx.ID().getText());
     }
 
     @Override
-    public void exitAtom(JobotwarParser.AtomContext ctx) {
+    public void exitAtom(JobotwarV1Parser.AtomContext ctx) {
         final String symbol;
         if (ctx.ID() != null) {
             final String ident = ctx.ID().getText();
@@ -61,7 +63,7 @@ class Emitter extends JobotwarBaseListener {
     }
 
     @Override
-    public void exitCondition(JobotwarParser.ConditionContext ctx) {
+    public void exitCondition(JobotwarV1Parser.ConditionContext ctx) {
         if (ctx.conditionOperator() == null) {
             return;
         }
@@ -78,7 +80,7 @@ class Emitter extends JobotwarBaseListener {
     }
 
     @Override
-    public void exitComparison(JobotwarParser.ComparisonContext ctx) {
+    public void exitComparison(JobotwarV1Parser.ComparisonContext ctx) {
         if (ctx.comparator() == null) {
             return;
         }
@@ -107,7 +109,7 @@ class Emitter extends JobotwarBaseListener {
     }
 
     @Override
-    public void exitTerm(JobotwarParser.TermContext ctx) {
+    public void exitTerm(JobotwarV1Parser.TermContext ctx) {
         if (ctx.termOperator() == null) {
             return;
         }
@@ -124,7 +126,7 @@ class Emitter extends JobotwarBaseListener {
     }
 
     @Override
-    public void exitProduct(JobotwarParser.ProductContext ctx) {
+    public void exitProduct(JobotwarV1Parser.ProductContext ctx) {
         if (ctx.productOperator() == null) {
             return;
         }
@@ -144,7 +146,7 @@ class Emitter extends JobotwarBaseListener {
     }
 
     @Override
-    public void exitMolecule(JobotwarParser.MoleculeContext ctx) {
+    public void exitMolecule(JobotwarV1Parser.MoleculeContext ctx) {
         if (ctx.func() == null) {
             return;
         }
@@ -157,7 +159,7 @@ class Emitter extends JobotwarBaseListener {
     }
 
     @Override
-    public void enterStatement(JobotwarParser.StatementContext ctx) {
+    public void enterStatement(JobotwarV1Parser.StatementContext ctx) {
         if (ctx.ifClause() != null) {
             ParseTreeWalker.DEFAULT.walk(this, ctx.ifClause());
         } else if (ctx.unlessClause() != null) {
@@ -167,46 +169,46 @@ class Emitter extends JobotwarBaseListener {
     }
 
     @Override
-    public void exitStatement(JobotwarParser.StatementContext ctx) {
+    public void exitStatement(JobotwarV1Parser.StatementContext ctx) {
         emit(OpCode.LABEL, "@" + this.labelId);
         this.labelId++;
         this.passModifierClause = false;
     }
 
     @Override
-    public void enterIfClause(JobotwarParser.IfClauseContext ctx) {
+    public void enterIfClause(JobotwarV1Parser.IfClauseContext ctx) {
         this.disabled = this.passModifierClause;
     }
 
     @Override
-    public void enterUnlessClause(JobotwarParser.UnlessClauseContext ctx) {
+    public void enterUnlessClause(JobotwarV1Parser.UnlessClauseContext ctx) {
         this.disabled = this.passModifierClause;
     }
 
     @Override
-    public void exitIfClause(JobotwarParser.IfClauseContext ctx) {
+    public void exitIfClause(JobotwarV1Parser.IfClauseContext ctx) {
         emit(OpCode.BR_ZERO, "@" + this.labelId);
         this.disabled = false;
     }
 
     @Override
-    public void exitUnlessClause(JobotwarParser.UnlessClauseContext ctx) {
+    public void exitUnlessClause(JobotwarV1Parser.UnlessClauseContext ctx) {
         emit(OpCode.NOT);
         emit(OpCode.BR_ZERO, "@" + this.labelId);
         this.disabled = false;
     }
 
     @Override
-    public void exitGotoStatement(JobotwarParser.GotoStatementContext ctx) {
+    public void exitGotoStatement(JobotwarV1Parser.GotoStatementContext ctx) {
         emit(OpCode.BR, ctx.ID().getText());
     }
 
     @Override
-    public void exitAssignStatement(JobotwarParser.AssignStatementContext ctx) {
+    public void exitAssignStatement(JobotwarV1Parser.AssignStatementContext ctx) {
         for (int i = 0; i < ctx.assignTarget().size() - 1; i++) {
             emit(OpCode.DUP);
         }
-        for (final JobotwarParser.AssignTargetContext assignTarget : ctx.assignTarget()) {
+        for (final JobotwarV1Parser.AssignTargetContext assignTarget : ctx.assignTarget()) {
             if (assignTarget.register() != null) {
                 final String ident = assignTarget.register().getText();
                 emit(OpCode.ST_REG, ident);
@@ -234,12 +236,12 @@ class Emitter extends JobotwarBaseListener {
     }
 
     @Override
-    public void exitGosubStatement(JobotwarParser.GosubStatementContext ctx) {
+    public void exitGosubStatement(JobotwarV1Parser.GosubStatementContext ctx) {
         emit(OpCode.CALL, ctx.ID().getText());
     }
 
     @Override
-    public void exitEndsubStatement(JobotwarParser.EndsubStatementContext ctx) {
+    public void exitEndsubStatement(JobotwarV1Parser.EndsubStatementContext ctx) {
         emit(OpCode.RET);
     }
 

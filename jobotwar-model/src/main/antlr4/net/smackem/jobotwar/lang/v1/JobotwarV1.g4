@@ -1,4 +1,4 @@
-grammar Jobotwar;
+grammar JobotwarV1;
 
 program
     : declLine* line*
