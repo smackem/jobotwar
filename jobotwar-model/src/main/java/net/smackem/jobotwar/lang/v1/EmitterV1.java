@@ -1,5 +1,6 @@
 package net.smackem.jobotwar.lang.v1;
 
+import net.smackem.jobotwar.lang.Emitter;
 import net.smackem.jobotwar.lang.Instruction;
 import net.smackem.jobotwar.lang.OpCode;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
@@ -7,7 +8,7 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.util.*;
 
-public class EmitterV1 extends JobotwarV1BaseListener {
+public class EmitterV1 extends JobotwarV1BaseListener implements Emitter {
     private final List<Instruction> instructions = new ArrayList<>();
     private final Map<String, Integer> locals = new HashMap<>();
     private int labelId = 1;

@@ -33,7 +33,7 @@ class TestUtils {
                 "    goto shoot if RADAR < 0 or RANDOM < 0.5\n" +
                 "    goto loop\n";
         final Compiler compiler = new Compiler();
-        final Compiler.Result result = compiler.compile(source);
+        final Compiler.Result result = compiler.compile(source, Compiler.Language.V1);
         assert result.hasErrors() == false;
         return result.program();
     }
@@ -46,7 +46,7 @@ class TestUtils {
                 "    50 - RANDOM * 100 -> SPEEDX if AIM % 45 = 0\n" +
                 "    goto loop\n";
         final Compiler compiler = new Compiler();
-        final Compiler.Result result = compiler.compile(source);
+        final Compiler.Result result = compiler.compile(source, Compiler.Language.V1);
         assert result.hasErrors() == false;
         return result.program();
     }

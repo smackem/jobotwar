@@ -182,7 +182,7 @@ public class EditController {
         final int rgb = RgbConvert.toRgb(color);
         final Image image = robotViewModel.imageProperty().get();
         final Compiler compiler = new Compiler();
-        final Compiler.Result result = compiler.compile(robotViewModel.sourceCodeProperty().get());
+        final Compiler.Result result = compiler.compile(robotViewModel.sourceCodeProperty().get(), Compiler.Language.V1);
         if (result.hasErrors()) {
             throw new Exception(String.join("\n", result.errors()));
         }

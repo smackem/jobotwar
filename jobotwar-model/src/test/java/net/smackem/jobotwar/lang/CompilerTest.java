@@ -303,7 +303,7 @@ public class CompilerTest {
 
     private Program compile(String source) {
         final Compiler compiler = new Compiler();
-        final Compiler.Result result = compiler.compile(source);
+        final Compiler.Result result = compiler.compile(source, Compiler.Language.V1);
         return result.program();
     }
 

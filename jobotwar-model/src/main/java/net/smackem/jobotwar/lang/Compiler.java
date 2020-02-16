@@ -3,6 +3,9 @@ package net.smackem.jobotwar.lang;
 import net.smackem.jobotwar.lang.v1.EmitterV1;
 import net.smackem.jobotwar.lang.v1.JobotwarV1Lexer;
 import net.smackem.jobotwar.lang.v1.JobotwarV1Parser;
+import net.smackem.jobotwar.lang.v2.EmitterV2;
+import net.smackem.jobotwar.lang.v2.JobotwarV2Lexer;
+import net.smackem.jobotwar.lang.v2.JobotwarV2Parser;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.dfa.DFA;
@@ -52,16 +55,49 @@ public final class Compiler {
         }
     }
 
+    public enum Language {
+        V1, V2
+    }
+
     /**
      * Compiles the specified {@code source} to an executable program.
      * @param source The jobotwar source code to compile.
      * @return A {@link Result} that contains the compilation result: the compiled program or error messages.
      */
-    public Result compile(String source) {
+    public Result compile(String source, Language language) {
+        final ErrorListener errorListener = new ErrorListener();
+        final Emitter emitter;
+        switch (language) {
+            case V1:
+                emitter = compileV1(source, errorListener);
+                break;
+            case V2:
+                emitter = compileV2(source, errorListener);
+                break;
+            default:
+                throw new IllegalArgumentException("unsupported language: " + language);
+        }
+        final Program program = new Program(emitter.instructions());
+        return new Result(errorListener.errors, program);
+    }
+
+    private Emitter compileV2(String source, ErrorListener errorListener) {
+        final CharStream input = CharStreams.fromString(source);
+        final JobotwarV2Lexer lexer = new JobotwarV2Lexer(input);
+        lexer.addErrorListener(errorListener);
+        final CommonTokenStream tokens = new CommonTokenStream(lexer);
+        final JobotwarV2Parser parser = new JobotwarV2Parser(tokens);
+        parser.addErrorListener(errorListener);
+        final JobotwarV2Parser.ProgramContext tree = parser.program();
+        final EmitterV2 emitter = new EmitterV2();
+        ParseTreeWalker.DEFAULT.walk(emitter, tree);
+        return emitter;
+    }
+
+    private Emitter compileV1(String source, ErrorListener errorListener) {
         if (source.isEmpty() == false && source.endsWith("\n") == false) {
             source = source + "\n";
         }
-        final ErrorListener errorListener = new ErrorListener();
         final CharStream input = CharStreams.fromString(source);
         final JobotwarV1Lexer lexer = new JobotwarV1Lexer(input);
         lexer.addErrorListener(errorListener);
@@ -71,8 +107,7 @@ public final class Compiler {
         final JobotwarV1Parser.ProgramContext tree = parser.program();
         final EmitterV1 emitter = new EmitterV1();
         ParseTreeWalker.DEFAULT.walk(emitter, tree);
-        final Program program = new Program(emitter.instructions());
-        return new Result(errorListener.errors, program);
+        return emitter;
     }
 
     private static class ErrorListener implements ANTLRErrorListener {

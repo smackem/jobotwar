@@ -154,7 +154,7 @@ literal
     ;
 
 number
-    : (Plus | Minus)? Number
+    : (Plus | Minus) ? Number
     ;
 
 bool
