@@ -5,7 +5,6 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -102,9 +101,7 @@ public class CompilerTest {
         final TestEnvironment env = new TestEnvironment();
         final Interpreter interpreter = new Interpreter(program, env);
 
-        System.out.println(program.instructions().stream()
-                .map(Instruction::toString)
-                .collect(Collectors.joining("\n")));
+        System.out.println(program.toString());
 
         runComplete(interpreter);
 

@@ -5,16 +5,16 @@ program
     ;
 
 declaration
-    : compoundVariableDecl
+    : variableDecl
     | stateDecl
     | functionDecl
     ;
 
-compoundVariableDecl
-    : 'def' variableDecl (',' variableDecl)*
+variableDecl
+    : 'def' declarator (',' declarator)*
     ;
 
-variableDecl
+declarator
     : Ident ('=' expression)?
     ;
 
@@ -27,7 +27,7 @@ parameters
     ;
 
 statement
-    : (compoundVariableDecl
+    : (variableDecl
     | assignStmt
     | ifStmt
     | whileStmt
