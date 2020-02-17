@@ -17,6 +17,7 @@ public final class Interpreter {
     private final RuntimeEnvironment runtime;
     private final Stack stack = new Stack();
     private boolean registerStored;
+    private boolean yield;
     private int pc;
 
     /**
@@ -47,7 +48,7 @@ public final class Interpreter {
 
     /**
      * Executes the next program step.
-     * @return {@code true} if the program has executed completely, otherwise {@code false}.
+     * @return {@code true} if the program is not at its end, {@code false} if it has executed completely
      * @throws StackException in the case of a stack underflow or overflow.
      */
     public boolean runNext() throws StackException {
@@ -64,10 +65,9 @@ public final class Interpreter {
             }
             if (target >= 0) {
                 this.pc = target;
-                return true;
             }
             this.pc++;
-            if (target < -1) {
+            if (this.yield) {
                 return true;
             }
         }
@@ -76,6 +76,7 @@ public final class Interpreter {
 
     private int executeInstruction(Instruction instr) throws StackException {
         double right;
+        this.yield = false;
         switch (instr.opCode()) {
             case LD_F64:
                 this.stack.push(instr.f64Arg());
@@ -146,10 +147,12 @@ public final class Interpreter {
             case LABEL:
                 if (this.registerStored) {
                     this.registerStored = false;
-                    return -2;
+                    this.yield = true;
+                    break;
                 }
                 break;
             case BR:
+                this.yield = true;
                 return instr.intArg();
             case BR_ZERO:
                 if (toBool(this.stack.pop()) == false) {
@@ -168,9 +171,11 @@ public final class Interpreter {
                 this.stack.push(invoke(instr.strArg(), this.stack.pop()));
                 break;
             case CALL:
+                this.yield = true;
                 this.stack.push(this.pc + 1);
                 return instr.intArg();
             case RET:
+                this.yield = true;
                 return (int)this.stack.pop();
             case LOG:
                 this.runtime.log(instr.strArg(), this.stack.pop());
