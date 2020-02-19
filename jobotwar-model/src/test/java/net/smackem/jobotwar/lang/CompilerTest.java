@@ -314,7 +314,7 @@ public class CompilerTest {
                 // proceed until program has finished
             }
         } catch (Interpreter.StackException e) {
-            assertThat(true).isFalse();
+            throw new RuntimeException(e);
         }
     }
 

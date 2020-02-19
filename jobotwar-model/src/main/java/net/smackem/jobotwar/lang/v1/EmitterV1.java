@@ -42,7 +42,7 @@ public class EmitterV1 extends Emitter {
             if (addr == null) {
                 throw new RuntimeException("Unknown local " + ident);
             }
-            emit(OpCode.LD_LOC, addr);
+            emit(OpCode.LD_GLB, addr);
             symbol = ident;
         } else if (ctx.number() != null) {
             final String literal = ctx.number().getText();
@@ -217,7 +217,7 @@ public class EmitterV1 extends Emitter {
                 if (addr == null) {
                     throw new RuntimeException("Unknown local " + assignTarget.ID().getText());
                 }
-                emit(OpCode.ST_LOC, addr);
+                emit(OpCode.ST_GLB, addr);
                 this.lastLoadedSymbol = ident;
                 continue;
             }

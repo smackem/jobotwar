@@ -39,7 +39,7 @@ public class Emitter extends JobotwarV1BaseListener {
     }
 
     private void emit(Instruction instruction) {
-        if (this.disabled) {
+        if (isDisabled()) {
             return;
         }
         this.instructions.add(instruction);

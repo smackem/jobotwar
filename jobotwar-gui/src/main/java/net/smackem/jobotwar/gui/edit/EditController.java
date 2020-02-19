@@ -273,7 +273,7 @@ public class EditController {
                 robot = PersistableRobots.load(EditRobotViewModel::new, is);
             } catch (IOException e) {
                 log.error("error opening file " + file.getPath(), e);
-                new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.CLOSE).show();
+                new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.CLOSE).showAndWait();
                 return;
             }
             robot.colorProperty().set(getNextRandomColor());
@@ -302,7 +302,7 @@ public class EditController {
             PersistableRobots.save(robot, os);
         } catch (IOException e) {
             log.error("error saving file " + file.getPath(), e);
-            new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.CLOSE).show();
+            new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.CLOSE).showAndWait();
         }
     }
 

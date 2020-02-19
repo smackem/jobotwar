@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.EmptyStackException;
 import java.util.List;
 import java.util.Objects;
 
@@ -15,6 +16,7 @@ public final class Interpreter {
     private final Program program;
     private final List<Instruction> code;
     private final RuntimeEnvironment runtime;
+    private final java.util.Stack<Integer> stackFrames = new java.util.Stack<>();//
     private final Stack stack = new Stack();
     private boolean registerStored;
     private boolean yield;
@@ -62,6 +64,11 @@ public final class Interpreter {
                 e.pc = this.pc;
                 e.instruction = instr;
                 throw e;
+            } catch (EmptyStackException e) {
+                final StackException se = new StackException("Return without stack frame");
+                se.pc = this.pc;
+                se.instruction = instr;
+                throw se;
             }
             if (target >= 0) {
                 this.pc = target;
@@ -72,6 +79,10 @@ public final class Interpreter {
             }
         }
         return false;
+    }
+
+    private int stackFrameOffset() {
+        return this.stackFrames.size() > 0 ? this.stackFrames.peek() : 0;
     }
 
     private int executeInstruction(Instruction instr) throws StackException {
@@ -85,11 +96,18 @@ public final class Interpreter {
                 this.stack.push(loadRegister(instr.strArg()));
                 break;
             case LD_LOC:
+                this.stack.push(this.stack.get(stackFrameOffset() + instr.intArg()));
+                break;
+            case LD_GLB:
                 this.stack.push(this.stack.get(instr.intArg()));
+                break;
+            case ST_GLB:
+                right = this.stack.pop();
+                this.stack.set(instr.intArg(), right);
                 break;
             case ST_LOC:
                 right = this.stack.pop();
-                this.stack.set(instr.intArg(), right);
+                this.stack.set(stackFrameOffset() + instr.intArg(), right);
                 break;
             case ST_REG:
                 right = this.stack.pop();
@@ -173,9 +191,11 @@ public final class Interpreter {
             case CALL:
                 this.yield = true;
                 this.stack.push(this.pc + 1);
+                this.stackFrames.push(this.stack.tail);
                 return instr.intArg();
             case RET:
                 this.yield = true;
+                this.stackFrames.pop();
                 return (int)this.stack.pop();
             case LOG:
                 this.runtime.log(instr.strArg(), this.stack.pop());
