@@ -4,8 +4,10 @@ public enum OpCode {
     LD_F64(false),     // push f64Arg
     LD_REG(false),     // push register strArg
     LD_LOC(false),     // push local intArg
+    LD_GLB(false),     // push global intArg
     ST_LOC(false),     // pop a, store a to local intArg
     ST_REG(false),     // pop a, store a to register strArg
+    ST_GLB(false),     // pop a, store a to global intArg
     ADD(false),        // pop b, pop a, push a + b
     SUB(false),        // pop b, pop a, push a - b
     MUL(false),        // pop b, pop a, push a * b

@@ -6,19 +6,14 @@ import net.smackem.jobotwar.lang.OpCode;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
-public class EmitterV1 extends JobotwarV1BaseListener implements Emitter {
-    private final List<Instruction> instructions = new ArrayList<>();
+public class EmitterV1 extends Emitter {
     private final Map<String, Integer> locals = new HashMap<>();
     private int labelId = 1;
-    private boolean disabled;
     private boolean passModifierClause;
     private String lastLoadedSymbol;
-
-    public List<Instruction> instructions() {
-        return Collections.unmodifiableList(this.instructions);
-    }
 
     @Override
     public void exitProgram(JobotwarV1Parser.ProgramContext ctx) {
@@ -28,7 +23,7 @@ public class EmitterV1 extends JobotwarV1BaseListener implements Emitter {
     @Override
     public void exitDeclaration(JobotwarV1Parser.DeclarationContext ctx) {
         for (final TerminalNode id : ctx.ID()) {
-            this.locals.put(id.getText(), this.instructions.size());
+            this.locals.put(id.getText(), this.instructions().size());
             emit(OpCode.LD_F64);
         }
     }
@@ -178,25 +173,25 @@ public class EmitterV1 extends JobotwarV1BaseListener implements Emitter {
 
     @Override
     public void enterIfClause(JobotwarV1Parser.IfClauseContext ctx) {
-        this.disabled = this.passModifierClause;
+        setDisabled(this.passModifierClause);
     }
 
     @Override
     public void enterUnlessClause(JobotwarV1Parser.UnlessClauseContext ctx) {
-        this.disabled = this.passModifierClause;
+        setDisabled(this.passModifierClause);
     }
 
     @Override
     public void exitIfClause(JobotwarV1Parser.IfClauseContext ctx) {
         emit(OpCode.BR_ZERO, "@" + this.labelId);
-        this.disabled = false;
+        setDisabled(false);
     }
 
     @Override
     public void exitUnlessClause(JobotwarV1Parser.UnlessClauseContext ctx) {
         emit(OpCode.NOT);
         emit(OpCode.BR_ZERO, "@" + this.labelId);
-        this.disabled = false;
+        setDisabled(false);
     }
 
     @Override
@@ -246,40 +241,17 @@ public class EmitterV1 extends JobotwarV1BaseListener implements Emitter {
         emit(OpCode.RET);
     }
 
-    private void emit(OpCode opCode) {
-        emit(new Instruction(opCode));
-    }
-
-    private void emit(OpCode opCode, int intArg) {
-        emit(new Instruction(opCode, intArg));
-    }
-
-    private void emit(OpCode opCode, double f64Arg) {
-        emit(new Instruction(opCode, f64Arg));
-    }
-
-    private void emit(OpCode opCode, String strArg) {
-        emit(new Instruction(opCode, strArg));
-    }
-
-    private void emit(Instruction instruction) {
-        if (this.disabled) {
-            return;
-        }
-        this.instructions.add(instruction);
-    }
-
     private void fixup() {
         final Map<String, Integer> labelIndices = new HashMap<>();
         int index = 0;
-        for (final Instruction instr : this.instructions) {
+        for (final Instruction instr : this.instructions()) {
             if (instr.opCode() == OpCode.LABEL) {
                 labelIndices.put(instr.strArg(), index);
                 instr.setIntArg(index);
             }
             index++;
         }
-        this.instructions.stream()
+        this.instructions().stream()
                 .filter(instr -> instr.opCode().isBranch())
                 .forEach(instr -> {
                     final Integer target = labelIndices.get(instr.strArg());
