@@ -83,6 +83,8 @@ public final class Program {
                 return new Instruction(opCode, Double.parseDouble(arg));
             case LD_LOC:
             case ST_LOC:
+            case LD_GLB:
+            case ST_GLB:
             case LABEL:
             case BR:
             case BR_ZERO:
@@ -104,6 +106,8 @@ public final class Program {
                 return String.valueOf(instr.f64Arg());
             case LD_LOC:
             case ST_LOC:
+            case LD_GLB:
+            case ST_GLB:
             case LABEL:
             case BR:
             case BR_ZERO:

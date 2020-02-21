@@ -301,6 +301,31 @@ public class CompilerTest {
         assertThat(env.loggedValues).isEqualTo(Arrays.asList(1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0));
     }
 
+    @Test
+    public void testLocals() throws Program.ParseException {
+        final String asm = "" +
+                "LD_F64      14.0\n" +
+                "CALL        3\n" +
+                "BR          12\n" +
+                "LABEL       3\n" +
+                "LD_F64      0.0\n" +
+                "LD_F64      5\n" +
+                "LD_GLB      0\n" +
+                "ADD\n" +
+                "ST_LOC      0\n" +
+                "LD_LOC      0\n" +
+                "ST_REG      SHOT\n" +
+                "RET\n" +
+                "LABEL       12";
+        final Program program = Program.parse(asm);
+        final TestEnvironment env = new TestEnvironment();
+        final Interpreter interpreter = new Interpreter(program, env);
+
+        runComplete(interpreter);
+
+        assertThat(env.readShot()).isEqualTo(19.0);
+    }
+
     private Program compile(String source) {
         final Compiler compiler = new Compiler();
         final Compiler.Result result = compiler.compile(source, Compiler.Language.V1);
@@ -416,14 +441,6 @@ public class CompilerTest {
 
         void setDamage(double value) {
             this.damage = value;
-        }
-
-        Collection<Double> loggedValues() {
-            return this.loggedValues;
-        }
-
-        Collection<String> loggedCategories() {
-            return this.loggedCategories;
         }
     }
 }

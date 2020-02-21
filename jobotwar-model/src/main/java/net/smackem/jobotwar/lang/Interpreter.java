@@ -72,8 +72,9 @@ public final class Interpreter {
             }
             if (target >= 0) {
                 this.pc = target;
+            } else {
+                this.pc++;
             }
-            this.pc++;
             if (this.yield) {
                 return true;
             }
@@ -195,7 +196,7 @@ public final class Interpreter {
                 return instr.intArg();
             case RET:
                 this.yield = true;
-                this.stackFrames.pop();
+                this.stack.tail = this.stackFrames.pop();
                 return (int)this.stack.pop();
             case LOG:
                 this.runtime.log(instr.strArg(), this.stack.pop());

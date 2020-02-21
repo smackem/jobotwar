@@ -14,10 +14,6 @@ public class Emitter extends JobotwarV1BaseListener {
         return Collections.unmodifiableList(this.instructions);
     }
 
-    protected boolean isDisabled() {
-        return this.disabled;
-    }
-
     protected void setDisabled(boolean value) {
         this.disabled = value;
     }
@@ -30,6 +26,7 @@ public class Emitter extends JobotwarV1BaseListener {
         emit(new Instruction(opCode, intArg));
     }
 
+    @SuppressWarnings("SameParameterValue") // opCode is always LD_F64
     protected void emit(OpCode opCode, double f64Arg) {
         emit(new Instruction(opCode, f64Arg));
     }
@@ -39,7 +36,7 @@ public class Emitter extends JobotwarV1BaseListener {
     }
 
     private void emit(Instruction instruction) {
-        if (isDisabled()) {
+        if (this.disabled) {
             return;
         }
         this.instructions.add(instruction);
