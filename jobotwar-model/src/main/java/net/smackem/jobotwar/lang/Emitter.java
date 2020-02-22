@@ -2,15 +2,18 @@ package net.smackem.jobotwar.lang;
 
 import net.smackem.jobotwar.lang.v1.JobotwarV1BaseListener;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class Emitter extends JobotwarV1BaseListener {
     private final List<Instruction> instructions = new ArrayList<>();
     private boolean disabled;
 
-    public final List<Instruction> instructions() {
+    public final Program buildProgram() {
+        this.fixup();
+        return new Program(instructions());
+    }
+
+    protected List<Instruction> instructions() {
         return Collections.unmodifiableList(this.instructions);
     }
 
@@ -40,5 +43,26 @@ public class Emitter extends JobotwarV1BaseListener {
             return;
         }
         this.instructions.add(instruction);
+    }
+
+    private void fixup() {
+        final Map<String, Integer> labelIndices = new HashMap<>();
+        int index = 0;
+        for (final Instruction instr : this.instructions()) {
+            if (instr.opCode() == OpCode.LABEL) {
+                labelIndices.put(instr.strArg(), index);
+                instr.setIntArg(index);
+            }
+            index++;
+        }
+        this.instructions().stream()
+                .filter(instr -> instr.opCode().isBranch())
+                .forEach(instr -> {
+                    final Integer target = labelIndices.get(instr.strArg());
+                    if (target == null) {
+                        throw new RuntimeException("Unknown label: " + instr.strArg());
+                    }
+                    instr.setIntArg(target);
+                });
     }
 }

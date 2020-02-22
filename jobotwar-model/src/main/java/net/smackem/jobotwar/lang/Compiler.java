@@ -77,7 +77,7 @@ public final class Compiler {
             default:
                 throw new IllegalArgumentException("unsupported language: " + language);
         }
-        final Program program = new Program(emitter.instructions());
+        final Program program = emitter.buildProgram();
         return new Result(errorListener.errors, program);
     }
 

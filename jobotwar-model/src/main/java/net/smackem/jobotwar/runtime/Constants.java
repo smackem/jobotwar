@@ -16,7 +16,7 @@ public class Constants {
     public static final double MAX_ROBOT_ACCELERATION = 8;
     public static final double DEFAULT_ROBOT_ACCELERATION = 0.5;
     public static final double MAX_ROBOT_SPEED = 8;
-    public static final double PROJECTILE_SPEED = 15;
+    public static final double PROJECTILE_SPEED = 17;
     public static final double ROBOT_RADIUS = 18;
     public static final double EXPLOSION_RADIUS = 25;
     public static final int DEFAULT_COOL_DOWN_TICKS = 20;

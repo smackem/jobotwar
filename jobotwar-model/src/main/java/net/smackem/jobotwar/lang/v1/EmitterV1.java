@@ -1,7 +1,6 @@
 package net.smackem.jobotwar.lang.v1;
 
 import net.smackem.jobotwar.lang.Emitter;
-import net.smackem.jobotwar.lang.Instruction;
 import net.smackem.jobotwar.lang.OpCode;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -14,11 +13,6 @@ public class EmitterV1 extends Emitter {
     private int labelId = 1;
     private boolean passModifierClause;
     private String lastLoadedSymbol;
-
-    @Override
-    public void exitProgram(JobotwarV1Parser.ProgramContext ctx) {
-        fixup();
-    }
 
     @Override
     public void exitDeclaration(JobotwarV1Parser.DeclarationContext ctx) {
@@ -239,26 +233,5 @@ public class EmitterV1 extends Emitter {
     @Override
     public void exitEndsubStatement(JobotwarV1Parser.EndsubStatementContext ctx) {
         emit(OpCode.RET);
-    }
-
-    private void fixup() {
-        final Map<String, Integer> labelIndices = new HashMap<>();
-        int index = 0;
-        for (final Instruction instr : this.instructions()) {
-            if (instr.opCode() == OpCode.LABEL) {
-                labelIndices.put(instr.strArg(), index);
-                instr.setIntArg(index);
-            }
-            index++;
-        }
-        this.instructions().stream()
-                .filter(instr -> instr.opCode().isBranch())
-                .forEach(instr -> {
-                    final Integer target = labelIndices.get(instr.strArg());
-                    if (target == null) {
-                        throw new RuntimeException("Unknown label: " + instr.strArg());
-                    }
-                    instr.setIntArg(target);
-                });
     }
 }
