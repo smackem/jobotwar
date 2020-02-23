@@ -22,7 +22,7 @@ public final class Program {
      * Initializes a new instance of {@link Program}.
      * @param instructions The emitted instructions.
      */
-    Program(List<Instruction> instructions) {
+    public Program(List<Instruction> instructions) {
         this.instructions = Objects.requireNonNull(instructions);
     }
 

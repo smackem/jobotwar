@@ -32,6 +32,7 @@ statement
     | ifStmt
     | whileStmt
     | yieldStmt
+    | memberStmt
     | returnStmt) ';'?
     ;
 
@@ -73,6 +74,10 @@ yieldStmt
 
 returnStmt
     : 'return' expression
+    ;
+
+memberStmt
+    : member
     ;
 
 functionDecl

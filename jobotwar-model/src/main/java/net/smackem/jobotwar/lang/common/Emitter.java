@@ -1,48 +1,58 @@
-package net.smackem.jobotwar.lang;
+package net.smackem.jobotwar.lang.common;
 
-import net.smackem.jobotwar.lang.v1.JobotwarV1BaseListener;
+import net.smackem.jobotwar.lang.Instruction;
+import net.smackem.jobotwar.lang.OpCode;
+import net.smackem.jobotwar.lang.Program;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-public class Emitter extends JobotwarV1BaseListener {
-    private final List<Instruction> instructions = new ArrayList<>();
+public class Emitter {
+
     private boolean disabled;
+    private List<Instruction> instructions = new ArrayList<>();
 
-    public final Program buildProgram() {
-        this.fixup();
-        return new Program(instructions());
+    public List<Instruction> instructions() {
+        return this.instructions;
     }
 
-    protected List<Instruction> instructions() {
-        return Collections.unmodifiableList(this.instructions);
-    }
-
-    protected void setDisabled(boolean value) {
+    public void setDisabled(boolean value) {
         this.disabled = value;
     }
 
-    protected void emit(OpCode opCode) {
+    public boolean isDisabled() {
+        return this.disabled;
+    }
+
+    public Program buildProgram() {
+        fixup();
+        return new Program(instructions());
+    }
+
+    public void emit(OpCode opCode) {
         emit(new Instruction(opCode));
     }
 
-    protected void emit(OpCode opCode, int intArg) {
+    public void emit(OpCode opCode, int intArg) {
         emit(new Instruction(opCode, intArg));
     }
 
     @SuppressWarnings("SameParameterValue") // opCode is always LD_F64
-    protected void emit(OpCode opCode, double f64Arg) {
+    public void emit(OpCode opCode, double f64Arg) {
         emit(new Instruction(opCode, f64Arg));
     }
 
-    protected void emit(OpCode opCode, String strArg) {
+    public void emit(OpCode opCode, String strArg) {
         emit(new Instruction(opCode, strArg));
     }
 
     private void emit(Instruction instruction) {
-        if (this.disabled) {
+        if (this.isDisabled()) {
             return;
         }
-        this.instructions.add(instruction);
+        instructions().add(instruction);
     }
 
     private void fixup() {

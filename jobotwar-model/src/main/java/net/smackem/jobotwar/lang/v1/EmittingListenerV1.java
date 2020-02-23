@@ -1,30 +1,36 @@
 package net.smackem.jobotwar.lang.v1;
 
-import net.smackem.jobotwar.lang.Emitter;
 import net.smackem.jobotwar.lang.OpCode;
+import net.smackem.jobotwar.lang.common.Emitter;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
-public class EmitterV1 extends Emitter {
+class EmittingListenerV1 extends JobotwarV1BaseListener {
     private final Map<String, Integer> locals = new HashMap<>();
     private int labelId = 1;
     private boolean passModifierClause;
     private String lastLoadedSymbol;
+    private final Emitter emitter;
+
+    EmittingListenerV1(Emitter emitter) {
+        this.emitter = Objects.requireNonNull(emitter);
+    }
 
     @Override
     public void exitDeclaration(JobotwarV1Parser.DeclarationContext ctx) {
         for (final TerminalNode id : ctx.ID()) {
-            this.locals.put(id.getText(), this.instructions().size());
-            emit(OpCode.LD_F64);
+            this.locals.put(id.getText(), this.emitter.instructions().size());
+            this.emitter.emit(OpCode.LD_F64);
         }
     }
 
     @Override
     public void exitLabel(JobotwarV1Parser.LabelContext ctx) {
-        emit(OpCode.LABEL, ctx.ID().getText());
+        this.emitter.emit(OpCode.LABEL, ctx.ID().getText());
     }
 
     @Override
@@ -36,15 +42,15 @@ public class EmitterV1 extends Emitter {
             if (addr == null) {
                 throw new RuntimeException("Unknown local " + ident);
             }
-            emit(OpCode.LD_GLB, addr);
+            this.emitter.emit(OpCode.LD_GLB, addr);
             symbol = ident;
         } else if (ctx.number() != null) {
             final String literal = ctx.number().getText();
-            emit(OpCode.LD_F64, Double.parseDouble(literal));
+            this.emitter.emit(OpCode.LD_F64, Double.parseDouble(literal));
             symbol = literal;
         } else if (ctx.register() != null) {
             final String register = ctx.register().getText();
-            emit(OpCode.LD_REG, register);
+            this.emitter.emit(OpCode.LD_REG, register);
             symbol = register;
         } else {
             symbol = null; // paren expr
@@ -59,10 +65,10 @@ public class EmitterV1 extends Emitter {
         }
         switch (ctx.conditionOperator().getText()) {
             case "or":
-                emit(OpCode.OR);
+                this.emitter.emit(OpCode.OR);
                 break;
             case "and":
-                emit(OpCode.AND);
+                this.emitter.emit(OpCode.AND);
                 break;
             default:
                 throw new RuntimeException("Unsupported boolean operator " + ctx.conditionOperator().getText());
@@ -76,22 +82,22 @@ public class EmitterV1 extends Emitter {
         }
         switch (ctx.comparator().getText()) {
             case "=":
-                emit(OpCode.EQ);
+                this.emitter.emit(OpCode.EQ);
                 break;
             case "!=":
-                emit(OpCode.NEQ);
+                this.emitter.emit(OpCode.NEQ);
                 break;
             case ">":
-                emit(OpCode.GT);
+                this.emitter.emit(OpCode.GT);
                 break;
             case ">=":
-                emit(OpCode.GE);
+                this.emitter.emit(OpCode.GE);
                 break;
             case "<":
-                emit(OpCode.LT);
+                this.emitter.emit(OpCode.LT);
                 break;
             case "<=":
-                emit(OpCode.LE);
+                this.emitter.emit(OpCode.LE);
                 break;
             default:
                 throw new RuntimeException("Unsupported comparator: " + ctx.comparator().getText());
@@ -105,10 +111,10 @@ public class EmitterV1 extends Emitter {
         }
         switch (ctx.termOperator().getText()) {
             case "+":
-                emit(OpCode.ADD);
+                this.emitter.emit(OpCode.ADD);
                 break;
             case "-":
-                emit(OpCode.SUB);
+                this.emitter.emit(OpCode.SUB);
                 break;
             default:
                 throw new RuntimeException("Unsupported term operator " + ctx.termOperator());
@@ -122,13 +128,13 @@ public class EmitterV1 extends Emitter {
         }
         switch (ctx.productOperator().getText()) {
             case "*":
-                emit(OpCode.MUL);
+                this.emitter.emit(OpCode.MUL);
                 break;
             case "/":
-                emit(OpCode.DIV);
+                this.emitter.emit(OpCode.DIV);
                 break;
             case "%":
-                emit(OpCode.MOD);
+                this.emitter.emit(OpCode.MOD);
                 break;
             default:
                 throw new RuntimeException("Unsupported product operator " + ctx.productOperator());
@@ -142,9 +148,9 @@ public class EmitterV1 extends Emitter {
         }
         final String funcName = ctx.func().getText();
         if ("not".equals(funcName)) {
-            emit(OpCode.NOT);
+            this.emitter.emit(OpCode.NOT);
         } else {
-            emit(OpCode.INVOKE, funcName);
+            this.emitter.emit(OpCode.INVOKE, funcName);
         }
     }
 
@@ -160,48 +166,48 @@ public class EmitterV1 extends Emitter {
 
     @Override
     public void exitStatement(JobotwarV1Parser.StatementContext ctx) {
-        emit(OpCode.LABEL, "@" + this.labelId);
+        this.emitter.emit(OpCode.LABEL, "@" + this.labelId);
         this.labelId++;
         this.passModifierClause = false;
     }
 
     @Override
     public void enterIfClause(JobotwarV1Parser.IfClauseContext ctx) {
-        setDisabled(this.passModifierClause);
+        this.emitter.setDisabled(this.passModifierClause);
     }
 
     @Override
     public void enterUnlessClause(JobotwarV1Parser.UnlessClauseContext ctx) {
-        setDisabled(this.passModifierClause);
+        this.emitter.setDisabled(this.passModifierClause);
     }
 
     @Override
     public void exitIfClause(JobotwarV1Parser.IfClauseContext ctx) {
-        emit(OpCode.BR_ZERO, "@" + this.labelId);
-        setDisabled(false);
+        this.emitter.emit(OpCode.BR_ZERO, "@" + this.labelId);
+        this.emitter.setDisabled(false);
     }
 
     @Override
     public void exitUnlessClause(JobotwarV1Parser.UnlessClauseContext ctx) {
-        emit(OpCode.NOT);
-        emit(OpCode.BR_ZERO, "@" + this.labelId);
-        setDisabled(false);
+        this.emitter.emit(OpCode.NOT);
+        this.emitter.emit(OpCode.BR_ZERO, "@" + this.labelId);
+        this.emitter.setDisabled(false);
     }
 
     @Override
     public void exitGotoStatement(JobotwarV1Parser.GotoStatementContext ctx) {
-        emit(OpCode.BR, ctx.ID().getText());
+        this.emitter.emit(OpCode.BR, ctx.ID().getText());
     }
 
     @Override
     public void exitAssignStatement(JobotwarV1Parser.AssignStatementContext ctx) {
         for (int i = 0; i < ctx.assignTarget().size() - 1; i++) {
-            emit(OpCode.DUP);
+            this.emitter.emit(OpCode.DUP);
         }
         for (final JobotwarV1Parser.AssignTargetContext assignTarget : ctx.assignTarget()) {
             if (assignTarget.register() != null) {
                 final String ident = assignTarget.register().getText();
-                emit(OpCode.ST_REG, ident);
+                this.emitter.emit(OpCode.ST_REG, ident);
                 this.lastLoadedSymbol = ident;
                 continue;
             }
@@ -211,13 +217,13 @@ public class EmitterV1 extends Emitter {
                 if (addr == null) {
                     throw new RuntimeException("Unknown local " + assignTarget.ID().getText());
                 }
-                emit(OpCode.ST_GLB, addr);
+                this.emitter.emit(OpCode.ST_GLB, addr);
                 this.lastLoadedSymbol = ident;
                 continue;
             }
             if (assignTarget.specialAssignTarget() != null) {
                 if (assignTarget.specialAssignTarget().OUT() != null) {
-                    emit(OpCode.LOG, this.lastLoadedSymbol);
+                    this.emitter.emit(OpCode.LOG, this.lastLoadedSymbol);
                     continue;
                 }
             }
@@ -227,11 +233,11 @@ public class EmitterV1 extends Emitter {
 
     @Override
     public void exitGosubStatement(JobotwarV1Parser.GosubStatementContext ctx) {
-        emit(OpCode.CALL, ctx.ID().getText());
+        this.emitter.emit(OpCode.CALL, ctx.ID().getText());
     }
 
     @Override
     public void exitEndsubStatement(JobotwarV1Parser.EndsubStatementContext ctx) {
-        emit(OpCode.RET);
+        this.emitter.emit(OpCode.RET);
     }
 }

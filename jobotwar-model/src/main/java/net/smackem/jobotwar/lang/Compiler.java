@@ -1,18 +1,10 @@
 package net.smackem.jobotwar.lang;
 
-import net.smackem.jobotwar.lang.v1.EmitterV1;
-import net.smackem.jobotwar.lang.v1.JobotwarV1Lexer;
-import net.smackem.jobotwar.lang.v1.JobotwarV1Parser;
-import net.smackem.jobotwar.lang.v2.EmitterV2;
-import net.smackem.jobotwar.lang.v2.JobotwarV2Lexer;
-import net.smackem.jobotwar.lang.v2.JobotwarV2Parser;
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.atn.ATNConfigSet;
-import org.antlr.v4.runtime.dfa.DFA;
-import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import net.smackem.jobotwar.lang.common.CompilerService;
+import net.smackem.jobotwar.lang.v1.CompilerV1;
+import net.smackem.jobotwar.lang.v2.CompilerV2;
 
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -65,69 +57,19 @@ public final class Compiler {
      * @return A {@link Result} that contains the compilation result: the compiled program or error messages.
      */
     public Result compile(String source, Language language) {
-        final ErrorListener errorListener = new ErrorListener();
-        final Emitter emitter;
+        final CompilerService compilerService;
         switch (language) {
             case V1:
-                emitter = compileV1(source, errorListener);
+                compilerService = new CompilerV1();
                 break;
             case V2:
-                emitter = compileV2(source, errorListener);
+                compilerService = new CompilerV2();
                 break;
             default:
                 throw new IllegalArgumentException("unsupported language: " + language);
         }
-        final Program program = emitter.buildProgram();
-        return new Result(errorListener.errors, program);
-    }
-
-    private Emitter compileV2(String source, ErrorListener errorListener) {
-        final CharStream input = CharStreams.fromString(source);
-        final JobotwarV2Lexer lexer = new JobotwarV2Lexer(input);
-        lexer.addErrorListener(errorListener);
-        final CommonTokenStream tokens = new CommonTokenStream(lexer);
-        final JobotwarV2Parser parser = new JobotwarV2Parser(tokens);
-        parser.addErrorListener(errorListener);
-        final JobotwarV2Parser.ProgramContext tree = parser.program();
-        final EmitterV2 emitter = new EmitterV2();
-        ParseTreeWalker.DEFAULT.walk(emitter, tree);
-        return emitter;
-    }
-
-    private Emitter compileV1(String source, ErrorListener errorListener) {
-        if (source.isEmpty() == false && source.endsWith("\n") == false) {
-            source = source + "\n";
-        }
-        final CharStream input = CharStreams.fromString(source);
-        final JobotwarV1Lexer lexer = new JobotwarV1Lexer(input);
-        lexer.addErrorListener(errorListener);
-        final CommonTokenStream tokens = new CommonTokenStream(lexer);
-        final JobotwarV1Parser parser = new JobotwarV1Parser(tokens);
-        parser.addErrorListener(errorListener);
-        final JobotwarV1Parser.ProgramContext tree = parser.program();
-        final EmitterV1 emitter = new EmitterV1();
-        ParseTreeWalker.DEFAULT.walk(emitter, tree);
-        return emitter;
-    }
-
-    private static class ErrorListener implements ANTLRErrorListener {
-        private final Collection<String> errors = new ArrayList<>();
-
-        @Override
-        public void syntaxError(Recognizer<?, ?> recognizer, Object o, int line, int pos, String s, RecognitionException e) {
-            this.errors.add(String.format("line %d:%d: %s", line, pos, s));
-        }
-
-        @Override
-        public void reportAmbiguity(Parser parser, DFA dfa, int i, int i1, boolean b, BitSet bitSet, ATNConfigSet atnConfigSet) {
-        }
-
-        @Override
-        public void reportAttemptingFullContext(Parser parser, DFA dfa, int i, int i1, BitSet bitSet, ATNConfigSet atnConfigSet) {
-        }
-
-        @Override
-        public void reportContextSensitivity(Parser parser, DFA dfa, int i, int i1, int i2, ATNConfigSet atnConfigSet) {
-        }
+        final Collection<String> errors = new ArrayList<>();
+        final Program program = compilerService.compile(source, errors);
+        return new Result(errors, program);
     }
 }
