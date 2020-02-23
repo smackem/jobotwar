@@ -1,9 +1,8 @@
 package net.smackem.jobotwar.lang.v2;
 
-public class VariableDecl {
-    final String name;
+class VariableDecl extends Declaration {
 
-    VariableDecl(String name) {
-        this.name = name;
+    VariableDecl(String name, int order) {
+        super(name, order);
     }
 }

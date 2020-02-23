@@ -26,6 +26,7 @@ public class CompilerV2 implements CompilerService {
         final JobotwarV2Parser.ProgramContext tree = parser.program();
         final DeclarationsExtractor declExtractor = new DeclarationsExtractor();
         ParseTreeWalker.DEFAULT.walk(declExtractor, tree);
+        outErrors.addAll(declExtractor.semanticErrors);
         final Emitter emitter = new Emitter();
         final EmittingListenerV2 listener = new EmittingListenerV2(emitter);
         ParseTreeWalker.DEFAULT.walk(listener, tree);
