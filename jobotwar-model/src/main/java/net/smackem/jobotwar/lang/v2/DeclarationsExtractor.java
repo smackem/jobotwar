@@ -99,7 +99,7 @@ class DeclarationsExtractor extends JobotwarV2BaseListener {
     private void logSemanticError(ParserRuleContext ctx, String message) {
         final String text = String.format("line %d, char %d: %s",
                 ctx.start.getLine(), ctx.start.getCharPositionInLine(), message);
-        log.error(text);
+        log.info(text);
         this.semanticErrors.add(text);
     }
 }
