@@ -1,9 +1,9 @@
 // ==========================
 Loop:
-	AIM + 3 -> AIM
-	200 -> SHOT
+    AIM + 3 -> AIM
+    200 -> SHOT
     50 - RANDOM * 100 -> SPEEDX if AIM % 45 = 0
-	goto Loop
+    goto Loop
 
 // ==========================
 def radar
@@ -382,3 +382,32 @@ loop:
     0 - (speedy + (RANDOM * 50 - 25)) -> speedy
     180 + radar -> radar
     goto loop
+
+// =============================
+// robot stinging_bumblebee
+
+def destX, destY
+def speedX, speedY
+def damage
+
+newloc:
+    50 + (X + RANDOM * 270) % 590 -> destX -> OUT
+    50 + (Y + RANDOM * 190) % 380 -> destY -> OUT
+    destX - X -> speedX
+    destY - Y -> speedY
+    -250 -> speedX if speedX < -250
+    250 -> speedX if speedX > 250
+    -250 -> speedY if speedY < -250
+    250 -> speedY if speedY > 250
+    speedX -> SPEEDX
+    speedY -> SPEEDY
+    DAMAGE -> damage
+
+move:
+    goto newloc if DAMAGE != damage
+    0 -> SPEEDX if abs(destX - X) < 30
+    0 -> SPEEDY if abs(destY - Y) < 30
+    AIM + 7 -> AIM -> RADAR
+    abs(RADAR) -> SHOT if RADAR < 0
+    goto move unless SPEEDX = 0 and SPEEDY = 0
+    goto newloc

@@ -17,6 +17,7 @@ class DeclarationsExtractor extends JobotwarV2BaseListener {
     final Map<String, FunctionDecl> functions = new HashMap<>();
     final Map<String, VariableDecl> globals = new HashMap<>();
     final Collection<String> semanticErrors = new ArrayList<>();
+    private ProcedureDecl currentProcedure;
 
     public static String getStateParameterName(String stateName, String parameterName) {
         return stateName + "$" + parameterName;
@@ -42,10 +43,24 @@ class DeclarationsExtractor extends JobotwarV2BaseListener {
         if (this.states.put(state.name, state) != null) {
             logSemanticError(ctx, "duplicate state name '" + state.name + "'");
         }
+        this.currentProcedure = state;
+    }
+
+    @Override
+    public void exitStateDecl(JobotwarV2Parser.StateDeclContext ctx) {
+        this.currentProcedure = null;
     }
 
     @Override
     public void enterVariableDecl(JobotwarV2Parser.VariableDeclContext ctx) {
+        if (this.currentProcedure != null) {
+            for (final JobotwarV2Parser.DeclaratorContext decl : ctx.declarator()) {
+                final VariableDecl variable = new VariableDecl(
+                        decl.Ident().getText(), this.currentProcedure.locals().size());
+                this.currentProcedure.addLocal(variable.name);
+            }
+            return;
+        }
         for (final JobotwarV2Parser.DeclaratorContext decl : ctx.declarator()) {
             final VariableDecl variable = new VariableDecl(decl.Ident().getText(), this.globals.size());
             if (this.globals.put(variable.name, variable) != null) {
@@ -63,6 +78,12 @@ class DeclarationsExtractor extends JobotwarV2BaseListener {
         if (this.functions.put(function.name, function) != null) {
             logSemanticError(ctx, "duplicate function name '" + function.name + "'");
         }
+        this.currentProcedure = function;
+    }
+
+    @Override
+    public void exitFunctionDecl(JobotwarV2Parser.FunctionDeclContext ctx) {
+        this.currentProcedure = null;
     }
 
     private void collectParameters(ProcedureDecl procedure, JobotwarV2Parser.ParametersContext ctx) {

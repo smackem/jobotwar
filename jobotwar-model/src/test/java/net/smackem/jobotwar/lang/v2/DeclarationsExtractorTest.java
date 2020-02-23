@@ -39,7 +39,7 @@ public class DeclarationsExtractorTest {
     public void testStates() {
         final String source = "" +
                 "state a() {}\n" +
-                "state b() {}\n" +
+                "state b() { def l1, l2 }\n" +
                 "state c(p1, p2) {}";
         final DeclarationsExtractor extractor = extract(source);
         assertThat(extractor.semanticErrors).isEmpty();
@@ -56,13 +56,14 @@ public class DeclarationsExtractorTest {
             assertThat(entry.getKey()).isEqualTo(entry.getValue().name);
         }
         assertThat(extractor.states.get("c").parameters()).hasSize(2);
+        assertThat(extractor.states.get("b").locals()).containsExactly("l1", "l2");
     }
 
     @Test
     public void testFunctions() {
         final String source = "" +
                 "def a() {}\n" +
-                "def b() {}\n" +
+                "def b() { def l1, l2 }\n" +
                 "def c(p1, p2) {}";
         final DeclarationsExtractor extractor = extract(source);
         assertThat(extractor.semanticErrors).isEmpty();
@@ -77,14 +78,15 @@ public class DeclarationsExtractorTest {
             assertThat(entry.getKey()).isEqualTo(entry.getValue().name);
         }
         assertThat(extractor.functions.get("c").parameters()).hasSize(2);
+        assertThat(extractor.functions.get("b").locals()).containsExactly("l1", "l2");
     }
 
     @Test
     public void testProgram() {
         final String source = "" +
                 "def g\n" +
-                "def f() {}\n" +
-                "state s(p1, p2) {}";
+                "def f() { def x }\n" +
+                "state s(p1, p2) { def y }";
         final DeclarationsExtractor extractor = extract(source);
         assertThat(extractor.semanticErrors).isEmpty();
         assertThat(extractor.globals).hasSize(3);
@@ -95,9 +97,11 @@ public class DeclarationsExtractorTest {
         assertThat(extractor.states).hasSize(1);
         assertThat(extractor.states).containsOnlyKeys("s");
         assertThat(extractor.states.get("s").order).isEqualTo(0);
+        assertThat(extractor.states.get("s").locals()).containsExactly("y");
         assertThat(extractor.functions).hasSize(1);
         assertThat(extractor.functions).containsOnlyKeys("f");
         assertThat(extractor.functions.get("f").order).isEqualTo(0);
+        assertThat(extractor.functions.get("f").locals()).containsExactly("x");
     }
 
     @Test
