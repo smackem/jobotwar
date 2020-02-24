@@ -3,6 +3,7 @@ package net.smackem.jobotwar.gui.graphics;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import net.smackem.jobotwar.util.Arguments;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,7 +32,17 @@ class ParticleExplosion {
     public ParticleExplosion(double width, double height) {
         this.width = width;
         this.height = height;
-        this.dots = createDots(width, height);
+        this.dots = createDots(width, height, 3_000, 0, 360);
+    }
+
+    public ParticleExplosion(double width, double height, int dotCount, int minHue, int maxHue) {
+        Arguments.requireRange(dotCount, 0, 10_000);
+        if (minHue >= maxHue) {
+            throw new IllegalArgumentException("minHue must be less than maxHue");
+        }
+        this.width = width;
+        this.height = height;
+        this.dots = createDots(width, height, dotCount, minHue, maxHue);
     }
 
     public double width() {
@@ -63,8 +74,7 @@ class ParticleExplosion {
         return finished == false;
     }
 
-    private static Collection<Dot> createDots(double width, double height) {
-        int dotCount = 3_000;
+    private static Collection<Dot> createDots(double width, double height, int dotCount, int minHue, int maxHue) {
         final Random random = new Random();
         final double maxRadius = width * 3 / 4;
         final Point2D center = new Point2D(width / 2, height / 2);
@@ -80,7 +90,7 @@ class ParticleExplosion {
                     center.getX() + Math.cos(angle) * radius,
                     center.getY() + Math.sin(angle) * radius);
             final double speed = 0.6 + random.nextDouble() * 8.4;
-            dots.add(new Dot(pos, dest, speed, random.nextInt(360)));
+            dots.add(new Dot(pos, dest, speed, minHue + random.nextInt(maxHue - minHue)));
         }
 
         return dots;

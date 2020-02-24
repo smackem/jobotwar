@@ -31,6 +31,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -156,12 +158,15 @@ public class MainController {
     }
 
     private void updateGraphics(GameEngine.TickResult tickResult) {
-        this.graphics.addExplosions(Stream.concat(
-                tickResult.explodedProjectiles().stream().map(Projectile::position),
-                Stream.concat(
-                        tickResult.collisionPositions().stream(),
-                        tickResult.killedRobots().stream().map(r -> new Vector(r.getX(), r.getY())))
-        ).collect(Collectors.toList()));
+        final Collection<Vector> positions = new ArrayList<>();
+        for (final Projectile projectile : tickResult.explodedProjectiles()) {
+            positions.add(projectile.position());
+        }
+        positions.addAll(tickResult.collisionPositions());
+        this.graphics.addExplosions(positions);
+        for (final Robot robot : tickResult.killedRobots()) {
+            this.graphics.addRobotExplosion(robot);
+        }
         this.graphics.addRadarBeams(tickResult.radarBeams());
         if (tickResult.winner() != null) {
             this.graphics.createWinnerAnimation();

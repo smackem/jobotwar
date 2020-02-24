@@ -37,8 +37,12 @@ public class BoardGraphics {
 
     public void addExplosions(Collection<Vector> positions) {
         for (final Vector position : positions) {
-            this.explosions.add(new Explosion(position));
+            this.explosions.add(new Explosion(position, null));
         }
+    }
+
+    public void addRobotExplosion(Robot robot) {
+        this.explosions.add(new Explosion(robot.position(), robot));
     }
 
     public void addRadarBeams(Collection<RadarBeam> beams) {
@@ -149,6 +153,9 @@ public class BoardGraphics {
         gc.setLineWidth(5.0);
         gc.setEffect(new GaussianBlur(2));
         for (final Explosion explosion : this.explosions) {
+            if (explosion.particleExplosion != null) {
+                continue;
+            }
             Paint paint = Color.rgb(0xff,0xd0,0x50,1.0 - explosion.radius / Constants.EXPLOSION_RADIUS);
             gc.setStroke(paint);
             gc.strokeOval(
@@ -166,6 +173,17 @@ public class BoardGraphics {
             explosion.radius += 2.5;
         }
         gc.restore();
+        for (final Explosion explosion : this.explosions) {
+            if (explosion.particleExplosion == null) {
+                continue;
+            }
+            gc.save();
+            gc.translate(explosion.position.x() - explosion.particleExplosion.width() / 2, explosion.position.y() -  explosion.particleExplosion.height() / 2);
+            if (explosion.particleExplosion.render(gc) == false) {
+                explosion.radius = Constants.EXPLOSION_RADIUS + 1;
+            }
+            gc.restore();
+        }
         this.explosions.removeIf(e -> e.radius > Constants.EXPLOSION_RADIUS);
     }
 
@@ -180,11 +198,32 @@ public class BoardGraphics {
 
     private static class Explosion {
         final Vector position;
+        final ParticleExplosion particleExplosion;
         double radius;
 
-        Explosion(Vector position) {
+        Explosion(Vector position, Robot robot) {
             this.position = position;
             this.radius = 1;
+            if (robot == null) {
+                this.particleExplosion = null;
+            } else {
+                final Color color = RgbConvert.toColor(robot.rgb());
+                final int hue = (int)color.getHue();
+                final int hue1 = clampHue(hue - 15);
+                final int hue2 = clampHue(hue + 15);
+                this.particleExplosion = new ParticleExplosion(120, 120,
+                        500, Math.min(hue1, hue2), Math.max(hue1, hue2));
+            }
+        }
+
+        private static int clampHue(int hue) {
+            if (hue < 0) {
+                return hue + 360;
+            }
+            if (hue > 360) {
+                return hue - 360;
+            }
+            return hue;
         }
     }
 
