@@ -90,10 +90,21 @@ class ParticleExplosion {
                     center.getX() + Math.cos(angle) * radius,
                     center.getY() + Math.sin(angle) * radius);
             final double speed = 0.6 + random.nextDouble() * 8.4;
-            dots.add(new Dot(pos, dest, speed, minHue + random.nextInt(maxHue - minHue)));
+            final int hue = clampHue(minHue + random.nextInt(maxHue - minHue));
+            dots.add(new Dot(pos, dest, speed, hue));
         }
 
         return dots;
+    }
+
+    private static int clampHue(int hue) {
+        if (hue < 0) {
+            return hue + 360;
+        }
+        if (hue > 360) {
+            return hue - 360;
+        }
+        return hue;
     }
 
     private static class Dot {

@@ -209,21 +209,9 @@ public class BoardGraphics {
             } else {
                 final Color color = RgbConvert.toColor(robot.rgb());
                 final int hue = (int)color.getHue();
-                final int hue1 = clampHue(hue - 15);
-                final int hue2 = clampHue(hue + 15);
                 this.particleExplosion = new ParticleExplosion(120, 120,
-                        500, Math.min(hue1, hue2), Math.max(hue1, hue2));
+                        500, hue - 15, hue + 15);
             }
-        }
-
-        private static int clampHue(int hue) {
-            if (hue < 0) {
-                return hue + 360;
-            }
-            if (hue > 360) {
-                return hue - 360;
-            }
-            return hue;
         }
     }
 
