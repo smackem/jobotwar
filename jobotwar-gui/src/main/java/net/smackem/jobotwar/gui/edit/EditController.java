@@ -294,7 +294,7 @@ public class EditController {
         }
         final FileChooser dialog = createJobotFileChooser();
         final Window window = this.sourceText.getScene().getWindow();
-        final File file = dialog.showOpenDialog(window);
+        final File file = dialog.showSaveDialog(window);
         if (file == null) {
             return;
         }

@@ -41,6 +41,26 @@ class EmittingListenerV2 extends JobotwarV2BaseListener {
         }
     }
 
+    @Override
+    public void enterStateDecl(JobotwarV2Parser.StateDeclContext ctx) {
+        this.currentProcedure = this.declarations.states.get(ctx.Ident().getText());
+    }
+
+    @Override
+    public void exitStateDecl(JobotwarV2Parser.StateDeclContext ctx) {
+        this.currentProcedure = null;
+    }
+
+    @Override
+    public void enterFunctionDecl(JobotwarV2Parser.FunctionDeclContext ctx) {
+        this.currentProcedure = this.declarations.functions.get(ctx.Ident().getText());
+    }
+
+    @Override
+    public void exitFunctionDecl(JobotwarV2Parser.FunctionDeclContext ctx) {
+        this.currentProcedure = null;
+    }
+
     private boolean emitLoadVariable(String ident) {
         if (this.currentProcedure != null) {
             final int index = this.currentProcedure.findLocalOrParameter(ident);
