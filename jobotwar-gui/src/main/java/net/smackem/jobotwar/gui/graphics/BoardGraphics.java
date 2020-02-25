@@ -8,10 +8,13 @@ import javafx.scene.paint.Paint;
 import javafx.scene.shape.ArcType;
 import net.smackem.jobotwar.runtime.Vector;
 import net.smackem.jobotwar.runtime.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
 public class BoardGraphics {
+    private static final Logger log = LoggerFactory.getLogger(BoardGraphics.class);
     private final Board board;
     private final Collection<Explosion> explosions = new ArrayList<>();
     private final Collection<RenderedRadarBeam> radarBeams = new ArrayList<>();
@@ -152,39 +155,54 @@ public class BoardGraphics {
         gc.save();
         gc.setLineWidth(5.0);
         gc.setEffect(new GaussianBlur(2));
+        final Collection<Explosion> finishedExplosions = new ArrayList<>();
         for (final Explosion explosion : this.explosions) {
             if (explosion.particleExplosion != null) {
                 continue;
             }
-            Paint paint = Color.rgb(0xff,0xd0,0x50,1.0 - explosion.radius / Constants.EXPLOSION_RADIUS);
-            gc.setStroke(paint);
-            gc.strokeOval(
-                    explosion.position.x() - explosion.radius + 4,
-                    explosion.position.y() - explosion.radius + 4,
-                    explosion.radius * 2 - 8,
-                    explosion.radius * 2 - 8);
-            paint = Color.rgb(0xff,0x40,0x40,1.0 - explosion.radius / (Constants.EXPLOSION_RADIUS * 1.5));
-            gc.setStroke(paint);
-            gc.strokeOval(
-                    explosion.position.x() - explosion.radius,
-                    explosion.position.y() - explosion.radius,
-                    explosion.radius * 2,
-                    explosion.radius * 2);
-            explosion.radius += 2.5;
+            if (renderExplosion(gc, explosion)) {
+                finishedExplosions.add(explosion);
+            }
         }
         gc.restore();
         for (final Explosion explosion : this.explosions) {
             if (explosion.particleExplosion == null) {
                 continue;
             }
-            gc.save();
-            gc.translate(explosion.position.x() - explosion.particleExplosion.width() / 2, explosion.position.y() -  explosion.particleExplosion.height() / 2);
-            if (explosion.particleExplosion.render(gc) == false) {
-                explosion.radius = Constants.EXPLOSION_RADIUS + 1;
+            if (renderRobotExplosion(gc, explosion)) {
+                finishedExplosions.add(explosion);
             }
-            gc.restore();
         }
-        this.explosions.removeIf(e -> e.radius > Constants.EXPLOSION_RADIUS);
+        if (this.explosions.removeAll(finishedExplosions)) {
+            log.debug("explosions count: {}", this.explosions.size());
+        }
+    }
+
+    private boolean renderRobotExplosion(GraphicsContext gc, Explosion explosion) {
+        gc.save();
+        gc.translate(explosion.position.x() - explosion.particleExplosion.width() / 2, explosion.position.y() -  explosion.particleExplosion.height() / 2);
+        final boolean finished = explosion.particleExplosion.render(gc) == false;
+        gc.restore();
+        return finished;
+    }
+
+    private boolean renderExplosion(GraphicsContext gc, Explosion explosion) {
+        Paint paint = Color.rgb(0xff,0xd0,0x50,1.0 - explosion.radius / Constants.EXPLOSION_RADIUS);
+        gc.setStroke(paint);
+        gc.strokeOval(
+                explosion.position.x() - explosion.radius + 4,
+                explosion.position.y() - explosion.radius + 4,
+                explosion.radius * 2 - 8,
+                explosion.radius * 2 - 8);
+        paint = Color.rgb(0xff,0x40,0x40,1.0 - explosion.radius / (Constants.EXPLOSION_RADIUS * 1.5));
+        gc.setStroke(paint);
+        gc.strokeOval(
+                explosion.position.x() - explosion.radius,
+                explosion.position.y() - explosion.radius,
+                explosion.radius * 2,
+                explosion.radius * 2);
+        explosion.radius += 2.5;
+        return explosion.radius > Constants.EXPLOSION_RADIUS;
     }
 
     private static Paint getHealthPaint(int health) {
