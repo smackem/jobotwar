@@ -8,6 +8,7 @@ import java.util.List;
 class ProcedureDecl extends Declaration {
     private final List<String> parameters = new ArrayList<>();
     private final List<String> locals = new ArrayList<>();
+    private int address;
 
     protected ProcedureDecl(String name, int order) {
         super(name, order);
@@ -19,6 +20,14 @@ class ProcedureDecl extends Declaration {
 
     public Collection<String> locals() {
         return Collections.unmodifiableCollection(this.locals);
+    }
+
+    public int getAddress() {
+        return this.address;
+    }
+
+    public void setAddress(int value) {
+        this.address = value;
     }
 
     public void addParameter(String parameter) {

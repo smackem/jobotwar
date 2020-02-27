@@ -21,11 +21,11 @@ public class GameRecorderTest {
 
     private void singleSimulation() {
         final Duration duration = Duration.ofMinutes(5);
-        final GameRecorder recorder = new GameRecorder(TestUtils.RANDOM, ctx -> {
-            final Robot r1 = new Robot.Builder(r -> new CompiledProgram(r, TestUtils.createShooter(), ctx))
+        final GameRecorder recorder = new GameRecorder(RuntimeTests.RANDOM, ctx -> {
+            final Robot r1 = new Robot.Builder(r -> new CompiledProgram(r, RuntimeTests.createShooter(), ctx))
                     .name("robot1")
                     .build();
-            final Robot r2 = new Robot.Builder(r -> new CompiledProgram(r, TestUtils.createDumbAss(), ctx))
+            final Robot r2 = new Robot.Builder(r -> new CompiledProgram(r, RuntimeTests.createDumbAss(), ctx))
                     .name("robot2")
                     .build();
             final Board board = new Board(500, 500, Arrays.asList(r1, r2));

@@ -15,19 +15,19 @@ public class BoardTest {
     @Test
     public void disperseRobots() {
         final Robot r1 = new Robot.Builder(r ->
-                new CompiledProgram(r, TestUtils.createDumbAss(), TestUtils.DUMMY_CONTEXT))
+                new CompiledProgram(r, RuntimeTests.createDumbAss(), RuntimeTests.DUMMY_CONTEXT))
                 .build();
         final Robot r2 = new Robot.Builder(r ->
-                new CompiledProgram(r, TestUtils.createShooter(), TestUtils.DUMMY_CONTEXT))
+                new CompiledProgram(r, RuntimeTests.createShooter(), RuntimeTests.DUMMY_CONTEXT))
                 .build();
         final Robot r3 = new Robot.Builder(r ->
-                new CompiledProgram(r, TestUtils.createShooter(), TestUtils.DUMMY_CONTEXT))
+                new CompiledProgram(r, RuntimeTests.createShooter(), RuntimeTests.DUMMY_CONTEXT))
                 .build();
         final Robot r4 = new Robot.Builder(r ->
-                new CompiledProgram(r, TestUtils.createShooter(), TestUtils.DUMMY_CONTEXT))
+                new CompiledProgram(r, RuntimeTests.createShooter(), RuntimeTests.DUMMY_CONTEXT))
                 .build();
         final Robot r5 = new Robot.Builder(r ->
-                new CompiledProgram(r, TestUtils.createShooter(), TestUtils.DUMMY_CONTEXT))
+                new CompiledProgram(r, RuntimeTests.createShooter(), RuntimeTests.DUMMY_CONTEXT))
                 .build();
         final Board board = new Board(300, 300, Arrays.asList(r1, r2, r3, r4, r5));
         for (int i = 0; i < 100; i++) {
@@ -43,10 +43,10 @@ public class BoardTest {
     @Test
     public void fromTemplate() {
         final Robot r1 = new Robot.Builder(r ->
-                new CompiledProgram(r, TestUtils.createDumbAss(), TestUtils.DUMMY_CONTEXT))
+                new CompiledProgram(r, RuntimeTests.createDumbAss(), RuntimeTests.DUMMY_CONTEXT))
                 .build();
         final Robot r2 = new Robot.Builder(r ->
-                new CompiledProgram(r, TestUtils.createShooter(), TestUtils.DUMMY_CONTEXT))
+                new CompiledProgram(r, RuntimeTests.createShooter(), RuntimeTests.DUMMY_CONTEXT))
                 .build();
         final Board template = new Board(200, 200, Arrays.asList(r1, r2));
         final Board board = Board.fromTemplate(template, null);
@@ -55,7 +55,7 @@ public class BoardTest {
         assertThat(board.robots()).hasSameSizeAs(template.robots());
         final Iterator<Robot> iter1 = board.robots().iterator(), iter2 = template.robots().iterator();
         while (iter1.hasNext() && iter2.hasNext()) {
-            TestUtils.assertRobotsBuiltEqual(iter1.next(), iter2.next());
+            RuntimeTests.assertRobotsBuiltEqual(iter1.next(), iter2.next());
         }
         assertThat(iter1.hasNext()).isFalse();
         assertThat(iter2.hasNext()).isFalse();

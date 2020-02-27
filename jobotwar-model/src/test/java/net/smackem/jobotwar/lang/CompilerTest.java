@@ -2,9 +2,7 @@ package net.smackem.jobotwar.lang;
 
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -20,9 +18,9 @@ public class CompilerTest {
                 "5 -> SHOT\n";
 
         final Program program = compile(source);
-        final TestEnvironment env = new TestEnvironment();
+        final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
         final Interpreter interpreter = new Interpreter(program, env);
-        runComplete(interpreter);
+        InterpreterTest.runComplete(interpreter);
 
         assertThat(env.readAim()).isEqualTo(1);
         assertThat(env.readRadar()).isEqualTo(2);
@@ -43,7 +41,7 @@ public class CompilerTest {
                 "DAMAGE -> SHOT\n";
 
         final Program program = compile(source);
-        final TestEnvironment env = new TestEnvironment();
+        final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
         final Interpreter interpreter = new Interpreter(program, env);
 
         env.writeAim(1);
@@ -80,10 +78,10 @@ public class CompilerTest {
                 "x + y -> SHOT\n";
 
         final Program program = compile(source);
-        final TestEnvironment env = new TestEnvironment();
+        final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
         final Interpreter interpreter = new Interpreter(program, env);
 
-        runComplete(interpreter);
+        InterpreterTest.runComplete(interpreter);
 
         assertThat(env.readShot()).isEqualTo(4);
     }
@@ -98,12 +96,12 @@ public class CompilerTest {
                 "i -> SHOT\n";
 
         final Program program = compile(source);
-        final TestEnvironment env = new TestEnvironment();
+        final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
         final Interpreter interpreter = new Interpreter(program, env);
 
         System.out.println(program.toString());
 
-        runComplete(interpreter);
+        InterpreterTest.runComplete(interpreter);
 
         assertThat(env.readShot()).isEqualTo(100);
     }
@@ -116,10 +114,10 @@ public class CompilerTest {
                 "2 -> AIM unless i = 0\n";
 
         final Program program = compile(source);
-        final TestEnvironment env = new TestEnvironment();
+        final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
         final Interpreter interpreter = new Interpreter(program, env);
 
-        runComplete(interpreter);
+        InterpreterTest.runComplete(interpreter);
 
         assertThat(env.readShot()).isEqualTo(1);
         assertThat(env.readAim()).isNotEqualTo(2);
@@ -152,10 +150,10 @@ public class CompilerTest {
                 "y -> SPEEDY\n";
 
         final Program program = compile(source);
-        final TestEnvironment env = new TestEnvironment();
+        final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
         final Interpreter interpreter = new Interpreter(program, env);
 
-        runComplete(interpreter);
+        InterpreterTest.runComplete(interpreter);
 
         assertThat(env.readSpeedX()).isGreaterThanOrEqualTo(1000);
         assertThat(env.readShot()).isEqualTo(env.readSpeedX() + env.readSpeedY() + 200 + env.readRadar() + env.readAim());
@@ -170,10 +168,10 @@ public class CompilerTest {
                 "10 - 5 + 3 -> SPEEDY\n";
 
         final Program program = compile(source);
-        final TestEnvironment env = new TestEnvironment();
+        final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
         final Interpreter interpreter = new Interpreter(program, env);
 
-        runComplete(interpreter);
+        InterpreterTest.runComplete(interpreter);
 
         assertThat(env.readShot()).isEqualTo(3.5);
         assertThat(env.readSpeedX()).isEqualTo(9);
@@ -188,10 +186,10 @@ public class CompilerTest {
                 "42 -> SHOT -> AIM -> RADAR -> x \n";
 
         final Program program = compile(source);
-        final TestEnvironment env = new TestEnvironment();
+        final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
         final Interpreter interpreter = new Interpreter(program, env);
 
-        runComplete(interpreter);
+        InterpreterTest.runComplete(interpreter);
 
         assertThat(env.readShot()).isEqualTo(42);
         assertThat(env.readAim()).isEqualTo(42);
@@ -213,7 +211,7 @@ public class CompilerTest {
                 "sqrt(9) -> SHOT\n";
 
         final Program program = compile(source);
-        final TestEnvironment env = new TestEnvironment();
+        final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
         final Interpreter interpreter = new Interpreter(program, env);
 
         assertThat(interpreter.runNext()).isTrue();
@@ -245,10 +243,10 @@ public class CompilerTest {
                 "50 / (40 - 3 * abs(-10)) -> AIM\n";
 
         final Program program = compile(source);
-        final TestEnvironment env = new TestEnvironment();
+        final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
         final Interpreter interpreter = new Interpreter(program, env);
 
-        runComplete(interpreter);
+        InterpreterTest.runComplete(interpreter);
 
         assertThat(env.readShot()).isEqualTo(200);
         assertThat(env.readAim()).isEqualTo(5);
@@ -269,10 +267,10 @@ public class CompilerTest {
                 "end:";
 
         final Program program = compile(source);
-        final TestEnvironment env = new TestEnvironment();
+        final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
         final Interpreter interpreter = new Interpreter(program, env);
 
-        runComplete(interpreter);
+        InterpreterTest.runComplete(interpreter);
 
         assertThat(env.readShot()).isEqualTo(100);
         assertThat(env.readAim()).isEqualTo(10);
@@ -292,155 +290,18 @@ public class CompilerTest {
                 "7 -> AIM\n" +
                 "AIM -> OUT\n";
         final Program program = compile(source);
-        final TestEnvironment env = new TestEnvironment();
+        final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
         final Interpreter interpreter = new Interpreter(program, env);
 
-        runComplete(interpreter);
+        InterpreterTest.runComplete(interpreter);
 
-        assertThat(env.loggedCategories).isEqualTo(Arrays.asList("SHOT", "SPEEDX", "SPEEDY", "a", "b", "a", "AIM"));
-        assertThat(env.loggedValues).isEqualTo(Arrays.asList(1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0));
-    }
-
-    @Test
-    public void testLocals() throws Program.ParseException {
-        final String asm = "" +
-                "LD_F64      14.0\n" +
-                "CALL        3\n" +
-                "BR          12\n" +
-                "LABEL       3\n" +
-                "LD_F64      0.0\n" +
-                "LD_F64      5\n" +
-                "LD_GLB      0\n" +
-                "ADD\n" +
-                "ST_LOC      0\n" +
-                "LD_LOC      0\n" +
-                "ST_REG      SHOT\n" +
-                "RET\n" +
-                "LABEL       12";
-        final Program program = Program.parse(asm);
-        final TestEnvironment env = new TestEnvironment();
-        final Interpreter interpreter = new Interpreter(program, env);
-
-        runComplete(interpreter);
-
-        assertThat(env.readShot()).isEqualTo(19.0);
+        assertThat(env.loggedCategories()).isEqualTo(Arrays.asList("SHOT", "SPEEDX", "SPEEDY", "a", "b", "a", "AIM"));
+        assertThat(env.loggedValues()).isEqualTo(Arrays.asList(1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0));
     }
 
     private Program compile(String source) {
         final Compiler compiler = new Compiler();
         final Compiler.Result result = compiler.compile(source, Compiler.Language.V1);
         return result.program();
-    }
-
-    private void runComplete(Interpreter interpreter) {
-        try {
-            //noinspection StatementWithEmptyBody
-            while (interpreter.runNext()) {
-                // proceed until program has finished
-            }
-        } catch (Interpreter.StackException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private static class TestEnvironment implements RuntimeEnvironment {
-        private double aim;
-        private double radar;
-        private double speedX;
-        private double speedY;
-        private double x;
-        private double y;
-        private double shot;
-        private double damage;
-        private final Collection<Double> loggedValues = new ArrayList<>();
-        private final Collection<String> loggedCategories = new ArrayList<>();
-
-        @Override
-        public double readAim() {
-            return this.aim;
-        }
-
-        @Override
-        public void writeAim(double value) {
-            this.aim = value;
-        }
-
-        @Override
-        public double readRadar() {
-            return this.radar;
-        }
-
-        @Override
-        public void writeRadar(double value) {
-            this.radar = value;
-        }
-
-        @Override
-        public double readSpeedX() {
-            return this.speedX;
-        }
-
-        @Override
-        public void writeSpeedX(double value) {
-            this.speedX = value;
-        }
-
-        @Override
-        public double readSpeedY() {
-            return this.speedY;
-        }
-
-        @Override
-        public void writeSpeedY(double value) {
-            this.speedY = value;
-        }
-
-        @Override
-        public double readX() {
-            return this.x;
-        }
-
-        @Override
-        public double readY() {
-            return this.y;
-        }
-
-        @Override
-        public double readDamage() {
-            return this.damage;
-        }
-
-        @Override
-        public double readShot() {
-            return this.shot;
-        }
-
-        @Override
-        public void writeShot(double value) {
-            this.shot = value;
-        }
-
-        @Override
-        public double getRandom() {
-            return 42;
-        }
-
-        @Override
-        public void log(String category, double value) {
-            this.loggedCategories.add(category);
-            this.loggedValues.add(value);
-        }
-
-        void setX(double value) {
-            this.x = value;
-        }
-
-        void setY(double value) {
-            this.y = value;
-        }
-
-        void setDamage(double value) {
-            this.damage = value;
-        }
     }
 }

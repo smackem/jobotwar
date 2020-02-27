@@ -44,6 +44,7 @@ class EmittingListenerV2 extends JobotwarV2BaseListener {
     @Override
     public void enterStateDecl(JobotwarV2Parser.StateDeclContext ctx) {
         this.currentProcedure = this.declarations.states.get(ctx.Ident().getText());
+        this.currentProcedure.setAddress(this.emitter.instructions().size());
     }
 
     @Override
@@ -54,6 +55,7 @@ class EmittingListenerV2 extends JobotwarV2BaseListener {
     @Override
     public void enterFunctionDecl(JobotwarV2Parser.FunctionDeclContext ctx) {
         this.currentProcedure = this.declarations.functions.get(ctx.Ident().getText());
+        this.currentProcedure.setAddress(this.emitter.instructions().size());
     }
 
     @Override

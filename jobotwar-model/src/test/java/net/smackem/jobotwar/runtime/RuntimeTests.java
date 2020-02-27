@@ -7,8 +7,8 @@ import java.util.Random;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class TestUtils {
-    private TestUtils() { throw new IllegalAccessError(); }
+class RuntimeTests {
+    private RuntimeTests() { throw new IllegalAccessError(); }
 
     public static final Random RANDOM = new Random();
     public static final RobotProgramContext DUMMY_CONTEXT = new RobotProgramContext() {

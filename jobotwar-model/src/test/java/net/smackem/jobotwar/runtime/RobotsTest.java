@@ -8,7 +8,7 @@ public class RobotsTest {
 
     @Test
     public void fromTemplateFresh() {
-        final Robot r1 = new Robot.Builder(r -> new CompiledProgram(r, TestUtils.createDumbAss(), TestUtils.DUMMY_CONTEXT))
+        final Robot r1 = new Robot.Builder(r -> new CompiledProgram(r, RuntimeTests.createDumbAss(), RuntimeTests.DUMMY_CONTEXT))
                 .name("robot 1")
                 .acceleration(3)
                 .rgb(0x112233)
@@ -19,14 +19,14 @@ public class RobotsTest {
 
         final Robot r2 = Robots.fromTemplate(r1, null);
         assertThat(r1).isNotEqualTo(r2);
-        TestUtils.assertRobotsBuiltEqual(r1, r2);
+        RuntimeTests.assertRobotsBuiltEqual(r1, r2);
         assertThat(r1.getHealth()).isEqualTo(r2.getHealth());
         assertThat(((CompiledProgram)r1.program()).context()).isEqualTo(((CompiledProgram)r2.program()).context());
     }
 
     @Test
     public void fromTemplateWithDifferentContext() {
-        final Robot r1 = new Robot.Builder(r -> new CompiledProgram(r, TestUtils.createDumbAss(), TestUtils.DUMMY_CONTEXT))
+        final Robot r1 = new Robot.Builder(r -> new CompiledProgram(r, RuntimeTests.createDumbAss(), RuntimeTests.DUMMY_CONTEXT))
                 .build();
         final RobotProgramContext newCtx = new RobotProgramContext() {
             @Override
@@ -40,18 +40,18 @@ public class RobotsTest {
         };
 
         final Robot r2 = Robots.fromTemplate(r1, newCtx);
-        TestUtils.assertRobotsBuiltEqual(r1, r2);
+        RuntimeTests.assertRobotsBuiltEqual(r1, r2);
         assertThat(((CompiledProgram)r1.program()).context()).isNotEqualTo(((CompiledProgram)r2.program()).context());
         assertThat(((CompiledProgram)r2.program()).context()).isEqualTo(newCtx);
     }
 
     @Test
     public void fromTemplateDefault() {
-        final Robot r1 = new Robot.Builder(r -> new CompiledProgram(r, TestUtils.createDumbAss(), TestUtils.DUMMY_CONTEXT))
+        final Robot r1 = new Robot.Builder(r -> new CompiledProgram(r, RuntimeTests.createDumbAss(), RuntimeTests.DUMMY_CONTEXT))
                 .build();
         final Robot r2 = Robots.fromTemplate(r1, null);
         assertThat(r1).isNotEqualTo(r2);
-        TestUtils.assertRobotsBuiltEqual(r1, r2);
+        RuntimeTests.assertRobotsBuiltEqual(r1, r2);
         assertThat(r1.getCoolDownHoldOff()).isEqualTo(r2.getCoolDownHoldOff());
         assertThat(r1.getAimAngle()).isEqualTo(r2.getAimAngle());
         assertThat(r1.getRadarAngle()).isEqualTo(r2.getRadarAngle());
@@ -63,7 +63,7 @@ public class RobotsTest {
 
     @Test
     public void fromTemplateDamaged() {
-        final Robot r1 = new Robot.Builder(r -> new CompiledProgram(r, TestUtils.createDumbAss(), TestUtils.DUMMY_CONTEXT))
+        final Robot r1 = new Robot.Builder(r -> new CompiledProgram(r, RuntimeTests.createDumbAss(), RuntimeTests.DUMMY_CONTEXT))
                 .name("robot 1")
                 .acceleration(3)
                 .rgb(0x112233)
@@ -76,14 +76,14 @@ public class RobotsTest {
 
         final Robot r2 = Robots.fromTemplate(r1, null);
         assertThat(r1).isNotEqualTo(r2);
-        TestUtils.assertRobotsBuiltEqual(r1, r2);
+        RuntimeTests.assertRobotsBuiltEqual(r1, r2);
         assertThat(r1.getHealth()).isNotEqualTo(r2.getHealth());
         assertThat(r1.isDead()).isNotEqualTo(r2.isDead());
     }
 
     @Test
     public void fromTemplateModified() {
-        final Robot r1 = new Robot.Builder(r -> new CompiledProgram(r, TestUtils.createDumbAss(), TestUtils.DUMMY_CONTEXT))
+        final Robot r1 = new Robot.Builder(r -> new CompiledProgram(r, RuntimeTests.createDumbAss(), RuntimeTests.DUMMY_CONTEXT))
                 .build();
         r1.setCoolDownHoldOff(12);
         r1.setAimAngle(120);
@@ -94,7 +94,7 @@ public class RobotsTest {
         r1.setSpeedY(8);
         final Robot r2 = Robots.fromTemplate(r1, null);
         assertThat(r1).isNotEqualTo(r2);
-        TestUtils.assertRobotsBuiltEqual(r1, r2);
+        RuntimeTests.assertRobotsBuiltEqual(r1, r2);
         assertThat(r1.getCoolDownHoldOff()).isNotEqualTo(r2.getCoolDownHoldOff());
         assertThat(r1.getAimAngle()).isNotEqualTo(r2.getAimAngle());
         assertThat(r1.getRadarAngle()).isNotEqualTo(r2.getRadarAngle());
