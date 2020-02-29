@@ -63,6 +63,122 @@ class EmittingListenerV2 extends JobotwarV2BaseListener {
         this.currentProcedure = null;
     }
 
+    @Override
+    public void exitAssignStmt(JobotwarV2Parser.AssignStmtContext ctx) {
+        final String ident = ctx.lvalue().Ident().getText();
+        if (emitStoreVariable(ident) == false) {
+            logSemanticError(ctx, "unknown variable '" + ident + "'");
+        }
+    }
+
+    @Override
+    public void exitCondition(JobotwarV2Parser.ConditionContext ctx) {
+        final var operator = ctx.conditionOperator();
+        if (operator == null) {
+            return;
+        }
+        if (operator.And() != null) {
+            this.emitter.emit(OpCode.AND);
+        } else if (operator.Or() != null) {
+            this.emitter.emit(OpCode.OR);
+        }
+    }
+
+    @Override
+    public void exitComparison(JobotwarV2Parser.ComparisonContext ctx) {
+        final var operator = ctx.comparator();
+        if (operator == null) {
+            return;
+        }
+        if (operator.Eq() != null) {
+            this.emitter.emit(OpCode.EQ);
+        } else if (operator.Ne() != null) {
+            this.emitter.emit(OpCode.NEQ);
+        } else if (operator.Gt() != null) {
+            this.emitter.emit(OpCode.GT);
+        } else if (operator.Lt() != null) {
+            this.emitter.emit(OpCode.LT);
+        } else if (operator.Ge() != null) {
+            this.emitter.emit(OpCode.GE);
+        } else if (operator.Le() != null) {
+            this.emitter.emit(OpCode.LE);
+        }
+    }
+
+    @Override
+    public void exitTerm(JobotwarV2Parser.TermContext ctx) {
+        final var operator = ctx.termOperator();
+        if (operator == null) {
+            return;
+        }
+        if (operator.Plus() != null) {
+            this.emitter.emit(OpCode.ADD);
+        } else if (operator.Minus() != null) {
+            this.emitter.emit(OpCode.SUB);
+        }
+    }
+
+    @Override
+    public void exitProduct(JobotwarV2Parser.ProductContext ctx) {
+        final var operator = ctx.productOperator();
+        if (operator == null) {
+            return;
+        }
+        if (operator.Times() != null) {
+            this.emitter.emit(OpCode.MUL);
+        } else if (operator.Div() != null) {
+            this.emitter.emit(OpCode.DIV);
+        } else if (operator.Mod() != null) {
+            this.emitter.emit(OpCode.MOD);
+        }
+    }
+
+    @Override
+    public void exitAtom(JobotwarV2Parser.AtomContext ctx) {
+        if (ctx.functionCall() != null) {
+            final String ident = ctx.functionCall().Ident().getText();
+            final FunctionDecl function = this.declarations.functions.get(ident);
+            if (function == null) {
+                logSemanticError(ctx.functionCall(), "unkown function '" + ident + "'");
+            }
+            this.emitter.emit(OpCode.CALL, ident);
+        } else if (ctx.Ident() != null) {
+            final String ident = ctx.Ident().getText();
+            if (emitLoadVariable(ident) == false) {
+                logSemanticError(ctx, "unknown variable '" + ident + "'");
+            }
+        } else if (ctx.member() != null) {
+            emitMemberAtom(ctx.member());
+        } else if (ctx.literal() != null) {
+            emitLiteralAtom(ctx.literal());
+        }
+    }
+
+    private void emitMemberAtom(JobotwarV2Parser.MemberContext ctx) {
+        switch (ctx.functionCall().Ident().getText()) {
+            case "speed":
+            case "speedX":
+            case "speedY":
+            case "random":
+            case "radar":
+            case "fire":
+                break;
+        }
+    }
+
+    private void emitLiteralAtom(JobotwarV2Parser.LiteralContext ctx) {
+        if (ctx.bool() != null) {
+            if (ctx.bool().True() != null) {
+                this.emitter.emit(OpCode.LD_F64, 1.0);
+            } else if (ctx.bool().False() != null) {
+                this.emitter.emit(OpCode.LD_F64, 0.0);
+            }
+        } else if (ctx.number() != null) {
+            final double d = Double.parseDouble(ctx.number().getText());
+            this.emitter.emit(OpCode.LD_F64, d);
+        }
+    }
+
     private boolean emitLoadVariable(String ident) {
         if (this.currentProcedure != null) {
             final int index = this.currentProcedure.findLocalOrParameter(ident);
