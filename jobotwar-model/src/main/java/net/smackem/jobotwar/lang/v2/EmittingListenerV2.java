@@ -19,7 +19,14 @@ class EmittingListenerV2 extends JobotwarV2BaseListener {
     EmittingListenerV2(Emitter emitter, DeclarationsExtractor declarations) {
         this.emitter = Objects.requireNonNull(emitter);
         this.declarations = declarations;
+    }
 
+    public Collection<String> semanticErrors() {
+        return this.semanticErrors;
+    }
+
+    @Override
+    public void enterProgram(JobotwarV2Parser.ProgramContext ctx) {
         int address = 0;
         final List<VariableDecl> globals = new ArrayList<>(this.declarations.globals.values());
         globals.sort(Comparator.comparingInt(a -> a.order));
@@ -28,6 +35,12 @@ class EmittingListenerV2 extends JobotwarV2BaseListener {
             emitter.emit(OpCode.LD_F64, 0.0);
             variable.setAddress(address);
             address++;
+        }
+
+        if (declarations.states.containsKey(StateDecl.MAIN_STATE_NAME) == false) {
+            this.semanticErrors.add(String.format("no state '%s' declared!", StateDecl.MAIN_STATE_NAME));
+        } else {
+            emitter.emit(OpCode.CALL, StateDecl.MAIN_STATE_NAME);
         }
     }
 
@@ -43,8 +56,12 @@ class EmittingListenerV2 extends JobotwarV2BaseListener {
 
     @Override
     public void enterStateDecl(JobotwarV2Parser.StateDeclContext ctx) {
-        this.currentProcedure = this.declarations.states.get(ctx.Ident().getText());
-        this.currentProcedure.setAddress(this.emitter.instructions().size());
+        final String ident = ctx.Ident().getText();
+        this.currentProcedure = this.declarations.states.get(ident);
+        this.emitter.emit(OpCode.LABEL, ident);
+        for (final String ignored : this.currentProcedure.locals()) {
+            this.emitter.emit(OpCode.LD_F64, 0.0);
+        }
     }
 
     @Override
@@ -54,8 +71,12 @@ class EmittingListenerV2 extends JobotwarV2BaseListener {
 
     @Override
     public void enterFunctionDecl(JobotwarV2Parser.FunctionDeclContext ctx) {
-        this.currentProcedure = this.declarations.functions.get(ctx.Ident().getText());
-        this.currentProcedure.setAddress(this.emitter.instructions().size());
+        final String ident = ctx.Ident().getText();
+        this.currentProcedure = this.declarations.functions.get(ident);
+        this.emitter.emit(OpCode.LABEL, ident);
+        for (final String ignored : this.currentProcedure.locals()) {
+            this.emitter.emit(OpCode.LD_F64, 0.0);
+        }
     }
 
     @Override
@@ -68,6 +89,19 @@ class EmittingListenerV2 extends JobotwarV2BaseListener {
         final String ident = ctx.lvalue().Ident().getText();
         if (emitStoreVariable(ident) == false) {
             logSemanticError(ctx, "unknown variable '" + ident + "'");
+        }
+    }
+
+    @Override
+    public void exitReturnStmt(JobotwarV2Parser.ReturnStmtContext ctx) {
+        if (this.currentProcedure instanceof FunctionDecl == false) {
+            logSemanticError(ctx, "can only return from function!");
+            return;
+        }
+        if (ctx.expression() != null) {
+            this.emitter.emit(OpCode.RET_VAL);
+        } else {
+            this.emitter.emit(OpCode.RET);
         }
     }
 
@@ -136,32 +170,53 @@ class EmittingListenerV2 extends JobotwarV2BaseListener {
     @Override
     public void exitAtom(JobotwarV2Parser.AtomContext ctx) {
         if (ctx.functionCall() != null) {
-            final String ident = ctx.functionCall().Ident().getText();
-            final FunctionDecl function = this.declarations.functions.get(ident);
-            if (function == null) {
-                logSemanticError(ctx.functionCall(), "unkown function '" + ident + "'");
-            }
-            this.emitter.emit(OpCode.CALL, ident);
+            emitFunctionCallAtom(ctx.functionCall());
+        } else if (ctx.member() != null) {
+            emitMemberAtom(ctx.member());
+        } else if (ctx.literal() != null) {
+            emitLiteralAtom(ctx.literal());
         } else if (ctx.Ident() != null) {
             final String ident = ctx.Ident().getText();
             if (emitLoadVariable(ident) == false) {
                 logSemanticError(ctx, "unknown variable '" + ident + "'");
             }
-        } else if (ctx.member() != null) {
-            emitMemberAtom(ctx.member());
-        } else if (ctx.literal() != null) {
-            emitLiteralAtom(ctx.literal());
         }
+    }
+
+    private void emitFunctionCallAtom(JobotwarV2Parser.FunctionCallContext ctx) {
+        final String ident = ctx.Ident().getText();
+        switch (ident) {
+            case "abs":
+            case "tan":
+            case "sin":
+            case "cos":
+            case "atan":
+            case "asin":
+            case "acos":
+            case "sqrt":
+            case "trunc":
+                this.emitter.emit(OpCode.INVOKE, ident);
+                return;
+            case "not":
+                this.emitter.emit(OpCode.NOT);
+                return;
+        }
+        final FunctionDecl function = this.declarations.functions.get(ident);
+        if (function == null) {
+            logSemanticError(ctx, "unkown function '" + ident + "'");
+        }
+        this.emitter.emit(OpCode.CALL, ident);
     }
 
     private void emitMemberAtom(JobotwarV2Parser.MemberContext ctx) {
         switch (ctx.functionCall().Ident().getText()) {
             case "speed":
-            case "speedX":
-            case "speedY":
             case "random":
             case "radar":
             case "fire":
+            case "damage":
+            case "x":
+            case "y":
                 break;
         }
     }
@@ -180,6 +235,7 @@ class EmittingListenerV2 extends JobotwarV2BaseListener {
     }
 
     private boolean emitLoadVariable(String ident) {
+        // local?
         if (this.currentProcedure != null) {
             final int index = this.currentProcedure.findLocalOrParameter(ident);
             if (index >= 0) {
@@ -187,7 +243,18 @@ class EmittingListenerV2 extends JobotwarV2BaseListener {
                 return true;
             }
         }
-        final VariableDecl variable = this.declarations.globals.get(ident);
+        // global?
+        VariableDecl variable = this.declarations.globals.get(ident);
+        if (variable != null) {
+            emitter.emit(OpCode.LD_GLB, variable.getAddress());
+            return true;
+        }
+        // state param?
+        if (this.currentProcedure instanceof StateDecl == false) {
+            return false;
+        }
+        ident = DeclarationsExtractor.getStateParameterName(this.currentProcedure.name, ident);
+        variable = this.declarations.globals.get(ident);
         if (variable != null) {
             emitter.emit(OpCode.LD_GLB, variable.getAddress());
             return true;

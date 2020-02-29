@@ -30,7 +30,7 @@ public class CompilerV2 implements CompilerService {
         final Emitter emitter = new Emitter();
         final EmittingListenerV2 listener = new EmittingListenerV2(emitter, declExtractor);
         ParseTreeWalker.DEFAULT.walk(listener, tree);
-        outErrors.addAll(errorListener.errors);
+        outErrors.addAll(listener.semanticErrors());
         return emitter.buildProgram();
     }
 

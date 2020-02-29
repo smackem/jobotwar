@@ -233,6 +233,7 @@ class EmittingListenerV1 extends JobotwarV1BaseListener {
 
     @Override
     public void exitGosubStatement(JobotwarV1Parser.GosubStatementContext ctx) {
+        this.emitter.emit(OpCode.LD_F64, 0.0);
         this.emitter.emit(OpCode.CALL, ctx.ID().getText());
     }
 

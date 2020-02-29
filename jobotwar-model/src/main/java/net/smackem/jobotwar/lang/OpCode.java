@@ -27,8 +27,9 @@ public enum OpCode {
     DUP(false),        // pop a, push a, push a
     NOT(false),        // pop a push a != 0
     INVOKE(false),     // pop a, push BuiltinFunc:strArg(a)
-    CALL(true),        // push current pc, branch to label intArg
+    CALL(true),        // pop no. of arguments, push current pc, branch to label intArg
     RET(false),        // pop a, a -> pc
+    RET_VAL(false),    // pop v, pop a, a -> pc, push v
     LOG(false);        // pop a, print 'strArg: a'
 
     private final boolean branch;

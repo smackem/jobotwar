@@ -17,7 +17,7 @@ public class CompilerTest {
                 "4 -> SPEEDY\n" +
                 "5 -> SHOT\n";
 
-        final Program program = compile(source);
+        final Program program = compileV1(source);
         final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
         final Interpreter interpreter = new Interpreter(program, env);
         InterpreterTest.runComplete(interpreter);
@@ -40,7 +40,7 @@ public class CompilerTest {
                 "Y -> SHOT\n" +
                 "DAMAGE -> SHOT\n";
 
-        final Program program = compile(source);
+        final Program program = compileV1(source);
         final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
         final Interpreter interpreter = new Interpreter(program, env);
 
@@ -77,7 +77,7 @@ public class CompilerTest {
                 "2.5 -> y\n" +
                 "x + y -> SHOT\n";
 
-        final Program program = compile(source);
+        final Program program = compileV1(source);
         final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
         final Interpreter interpreter = new Interpreter(program, env);
 
@@ -95,7 +95,7 @@ public class CompilerTest {
                 "   goto Loop if i < 100\n" +
                 "i -> SHOT\n";
 
-        final Program program = compile(source);
+        final Program program = compileV1(source);
         final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
         final Interpreter interpreter = new Interpreter(program, env);
 
@@ -113,7 +113,7 @@ public class CompilerTest {
                 "1 -> SHOT unless i = 1\n" +
                 "2 -> AIM unless i = 0\n";
 
-        final Program program = compile(source);
+        final Program program = compileV1(source);
         final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
         final Interpreter interpreter = new Interpreter(program, env);
 
@@ -149,7 +149,7 @@ public class CompilerTest {
                 "x -> SPEEDX\n" +
                 "y -> SPEEDY\n";
 
-        final Program program = compile(source);
+        final Program program = compileV1(source);
         final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
         final Interpreter interpreter = new Interpreter(program, env);
 
@@ -167,7 +167,7 @@ public class CompilerTest {
                 "1 + 5 * 3 -> AIM\n" +
                 "10 - 5 + 3 -> SPEEDY\n";
 
-        final Program program = compile(source);
+        final Program program = compileV1(source);
         final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
         final Interpreter interpreter = new Interpreter(program, env);
 
@@ -185,7 +185,7 @@ public class CompilerTest {
                 "def x\n" +
                 "42 -> SHOT -> AIM -> RADAR -> x \n";
 
-        final Program program = compile(source);
+        final Program program = compileV1(source);
         final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
         final Interpreter interpreter = new Interpreter(program, env);
 
@@ -210,7 +210,7 @@ public class CompilerTest {
                 "not(100) -> SHOT\n" +
                 "sqrt(9) -> SHOT\n";
 
-        final Program program = compile(source);
+        final Program program = compileV1(source);
         final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
         final Interpreter interpreter = new Interpreter(program, env);
 
@@ -242,7 +242,7 @@ public class CompilerTest {
                 "abs(100 * (10 - 12)) -> SHOT\n" +
                 "50 / (40 - 3 * abs(-10)) -> AIM\n";
 
-        final Program program = compile(source);
+        final Program program = compileV1(source);
         final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
         final Interpreter interpreter = new Interpreter(program, env);
 
@@ -266,7 +266,7 @@ public class CompilerTest {
                 "endsub\n" +
                 "end:";
 
-        final Program program = compile(source);
+        final Program program = compileV1(source);
         final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
         final Interpreter interpreter = new Interpreter(program, env);
 
@@ -289,7 +289,7 @@ public class CompilerTest {
                 "a -> OUT\n" +
                 "7 -> AIM\n" +
                 "AIM -> OUT\n";
-        final Program program = compile(source);
+        final Program program = compileV1(source);
         final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
         final Interpreter interpreter = new Interpreter(program, env);
 
@@ -299,9 +299,24 @@ public class CompilerTest {
         assertThat(env.loggedValues()).isEqualTo(Arrays.asList(1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0));
     }
 
-    private Program compile(String source) {
+    @Test
+    public void testV2Assignments() {
+        final String source = "" +
+                "state main() {\n" +
+                "\n";
+    }
+
+    private Program compileV1(String source) {
         final Compiler compiler = new Compiler();
         final Compiler.Result result = compiler.compile(source, Compiler.Language.V1);
+        assertThat(result.hasErrors()).isFalse();
+        return result.program();
+    }
+
+    private Program compileV2(String source) {
+        final Compiler compiler = new Compiler();
+        final Compiler.Result result = compiler.compile(source, Compiler.Language.V2);
+        assertThat(result.hasErrors()).isFalse();
         return result.program();
     }
 }

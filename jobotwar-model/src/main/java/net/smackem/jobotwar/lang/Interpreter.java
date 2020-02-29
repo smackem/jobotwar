@@ -191,13 +191,21 @@ public final class Interpreter {
                 break;
             case CALL:
                 this.yield = true;
-                this.stack.push(this.pc + 1);
-                this.stackFrames.push(this.stack.tail);
+                right = this.stack.pop();
+                this.stack.insert(this.stack.tail - (int)right, this.pc + 1);
+                this.stackFrames.push(this.stack.tail - (int)right);
                 return instr.intArg();
             case RET:
                 this.yield = true;
                 this.stack.tail = this.stackFrames.pop();
                 return (int)this.stack.pop();
+            case RET_VAL:
+                this.yield = true;
+                right = this.stack.pop(); // return value
+                this.stack.tail = this.stackFrames.pop();
+                final int retPC = (int)this.stack.pop();
+                this.stack.push(right);
+                return retPC;
             case LOG:
                 this.runtime.log(instr.strArg(), this.stack.pop());
                 break;
@@ -286,6 +294,14 @@ public final class Interpreter {
             }
             this.tail--;
             return this.array[this.tail];
+        }
+
+        void insert(int index, double value) {
+            if (index < this.tail) {
+                System.arraycopy(this.array, index, this.array, index + 1, this.tail - index);
+            }
+            this.array[index] = value;
+            this.tail++;
         }
 
         double get(int i) {
