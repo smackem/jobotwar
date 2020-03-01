@@ -209,6 +209,12 @@ public final class Interpreter {
             case LOG:
                 this.runtime.log(instr.strArg(), this.stack.pop());
                 break;
+            case SWAP:
+                right = this.stack.pop();
+                final double left = this.stack.pop();
+                this.stack.push(right);
+                this.stack.push(left);
+                break;
         }
 
         return -1;

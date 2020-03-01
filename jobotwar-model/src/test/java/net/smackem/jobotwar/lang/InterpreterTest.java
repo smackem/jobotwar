@@ -7,7 +7,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class InterpreterTest {
 
     @Test
-    public void testLocals() throws Program.ParseException {
+    public void testCallWithLocals() throws Program.ParseException {
         final String asm = "" +
                 "LD_F64      14.0\n" +
                 "LD_F64      0\n" +     // 0 function arguments
@@ -50,6 +50,54 @@ public class InterpreterTest {
                 "ST_REG      SHOT\n" +
                 "RET\n" +
                 "LABEL       14";
+        final Program program = Program.parse(asm);
+        final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
+        final Interpreter interpreter = new Interpreter(program, env);
+
+        runComplete(interpreter);
+
+        assertThat(env.readShot()).isEqualTo(19.0);
+    }
+
+    @Test
+    public void testCallWithReturnValue() throws Program.ParseException {
+        // function add() { return 14 + 5; }
+        // @shot = add()
+        final String asm = "" +
+                "LD_F64      0\n" +     // no of param
+                "CALL        4\n" +
+                "ST_REG      SHOT\n" +
+                "BR          9\n" +
+                "LABEL       4\n" +
+                "LD_F64      14\n" +
+                "LD_F64      5\n" +
+                "ADD\n" +
+                "RET_VAL\n" +
+                "LABEL       9\n";
+        final Program program = Program.parse(asm);
+        final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
+        final Interpreter interpreter = new Interpreter(program, env);
+
+        runComplete(interpreter);
+
+        assertThat(env.readShot()).isEqualTo(19.0);
+    }
+
+    @Test
+    public void testCallWithParamsAndReturnValue() throws Program.ParseException {
+        // function add(a, b) { return a + b; }
+        // @shot = add(14, 5)
+        final String asm = "" +
+                "LD_F64      14\n" +
+                "LD_F64      5\n" +
+                "LD_F64      2\n" +
+                "CALL        6\n" +
+                "ST_REG      SHOT\n" +
+                "BR          9\n" +
+                "LABEL       6\n" +
+                "ADD\n" +
+                "RET_VAL\n" +
+                "LABEL       9\n";
         final Program program = Program.parse(asm);
         final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
         final Interpreter interpreter = new Interpreter(program, env);

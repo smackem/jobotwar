@@ -30,7 +30,8 @@ public enum OpCode {
     CALL(true),        // pop no. of arguments, push current pc, branch to label intArg
     RET(false),        // pop a, a -> pc
     RET_VAL(false),    // pop v, pop a, a -> pc, push v
-    LOG(false);        // pop a, print 'strArg: a'
+    LOG(false),        // pop a, print 'strArg: a'
+    SWAP(false);       // pop a, pop b, push a, push b
 
     private final boolean branch;
 

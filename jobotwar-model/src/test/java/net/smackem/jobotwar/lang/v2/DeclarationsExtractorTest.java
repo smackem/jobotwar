@@ -6,8 +6,6 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -20,9 +18,9 @@ public class DeclarationsExtractorTest {
         final String source = "" +
                 "def a, b = 1\n" +
                 "def c";
-        final Collection<String> errors = new ArrayList<>();
         final DeclarationsExtractor extractor = extract(source);
-        assertThat(extractor.semanticErrors).isEmpty();
+        assertThat(extractor.semanticErrors).hasSize(1);
+        assertThat(extractor.semanticErrors.iterator().next()).contains(StateDecl.MAIN_STATE_NAME);
         assertThat(extractor.functions).isEmpty();
         assertThat(extractor.states).isEmpty();
         assertThat(extractor.globals).hasSize(3);
@@ -40,18 +38,20 @@ public class DeclarationsExtractorTest {
         final String source = "" +
                 "state a() {}\n" +
                 "state b() { def l1, l2 }\n" +
-                "state c(p1, p2) {}";
+                "state c(p1, p2) {}\n" +
+                "state main() {}";
         final DeclarationsExtractor extractor = extract(source);
         assertThat(extractor.semanticErrors).isEmpty();
         assertThat(extractor.functions).isEmpty();
         assertThat(extractor.globals).hasSize(2);
         assertThat(extractor.globals.get("c$p1")).isNotNull();
         assertThat(extractor.globals.get("c$p2")).isNotNull();
-        assertThat(extractor.states).hasSize(3);
-        assertThat(extractor.states).containsOnlyKeys("a", "b", "c");
+        assertThat(extractor.states).hasSize(4);
+        assertThat(extractor.states).containsOnlyKeys("a", "b", "c", "main");
         assertThat(extractor.states.get("a").order).isEqualTo(0);
         assertThat(extractor.states.get("b").order).isEqualTo(1);
         assertThat(extractor.states.get("c").order).isEqualTo(2);
+        assertThat(extractor.states.get("main").order).isEqualTo(3);
         for (final Map.Entry<String, StateDecl> entry : extractor.states.entrySet()) {
             assertThat(entry.getKey()).isEqualTo(entry.getValue().name);
         }
@@ -66,7 +66,8 @@ public class DeclarationsExtractorTest {
                 "def b() { def l1, l2 }\n" +
                 "def c(p1, p2) {}";
         final DeclarationsExtractor extractor = extract(source);
-        assertThat(extractor.semanticErrors).isEmpty();
+        assertThat(extractor.semanticErrors).hasSize(1);
+        assertThat(extractor.semanticErrors.iterator().next()).contains(StateDecl.MAIN_STATE_NAME);
         assertThat(extractor.globals).isEmpty();
         assertThat(extractor.states).isEmpty();
         assertThat(extractor.functions).hasSize(3);
@@ -86,7 +87,8 @@ public class DeclarationsExtractorTest {
         final String source = "" +
                 "def g\n" +
                 "def f() { def x }\n" +
-                "state s(p1, p2) { def y }";
+                "state s(p1, p2) { def y }\n" +
+                "state main() {}";
         final DeclarationsExtractor extractor = extract(source);
         assertThat(extractor.semanticErrors).isEmpty();
         assertThat(extractor.globals).hasSize(3);
@@ -94,9 +96,10 @@ public class DeclarationsExtractorTest {
         assertThat(extractor.globals.get("g").order).isEqualTo(0);
         assertThat(extractor.globals.get("s$p1").order).isEqualTo(1);
         assertThat(extractor.globals.get("s$p2").order).isEqualTo(2);
-        assertThat(extractor.states).hasSize(1);
-        assertThat(extractor.states).containsOnlyKeys("s");
+        assertThat(extractor.states).hasSize(2);
+        assertThat(extractor.states).containsOnlyKeys("s", "main");
         assertThat(extractor.states.get("s").order).isEqualTo(0);
+        assertThat(extractor.states.get("main").order).isEqualTo(1);
         assertThat(extractor.states.get("s").locals()).containsExactly("y");
         assertThat(extractor.functions).hasSize(1);
         assertThat(extractor.functions).containsOnlyKeys("f");
@@ -112,7 +115,8 @@ public class DeclarationsExtractorTest {
                 "state s(p1, p2) {}\n" +
                 "state s() {}\n" +
                 "def f(p1, p2) {}\n" +
-                "def f() {}";
+                "def f() {}\n" +
+                "state main() {}";
         final DeclarationsExtractor extractor = extract(source);
         assertThat(extractor.semanticErrors).hasSize(3);
         final Iterator<String> iter = extractor.semanticErrors.iterator();

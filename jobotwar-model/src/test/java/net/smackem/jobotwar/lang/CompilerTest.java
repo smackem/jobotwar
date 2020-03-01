@@ -303,7 +303,12 @@ public class CompilerTest {
     public void testV2Assignments() {
         final String source = "" +
                 "state main() {\n" +
-                "\n";
+                "   def x = 123\n" +
+                "   @radar(90)\n" +
+                "   exit\n" +
+                "}\n";
+        final Program program = compileV2(source);
+        System.out.println(program.toString());
     }
 
     private Program compileV1(String source) {

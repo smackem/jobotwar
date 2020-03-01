@@ -66,7 +66,7 @@ public class Emitter {
             index++;
         }
         this.instructions().stream()
-                .filter(instr -> instr.opCode().isBranch())
+                .filter(instr -> instr.opCode().isBranch() && instr.strArg() != null)
                 .forEach(instr -> {
                     final Integer target = labelIndices.get(instr.strArg());
                     if (target == null) {

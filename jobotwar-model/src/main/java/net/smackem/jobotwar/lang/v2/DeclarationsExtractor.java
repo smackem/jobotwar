@@ -32,6 +32,9 @@ class DeclarationsExtractor extends JobotwarV2BaseListener {
                 this.globals.put(globalName, new VariableDecl(globalName, order));
             }
         }
+        if (this.states.containsKey(StateDecl.MAIN_STATE_NAME) == false) {
+            this.semanticErrors.add(String.format("no state '%s' declared!", StateDecl.MAIN_STATE_NAME));
+        }
     }
 
     @Override

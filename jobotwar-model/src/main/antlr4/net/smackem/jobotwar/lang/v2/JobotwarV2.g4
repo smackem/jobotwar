@@ -33,7 +33,8 @@ statement
     | whileStmt
     | yieldStmt
     | memberStmt
-    | returnStmt) ';'?
+    | returnStmt
+    | exitStmt) ';'?
     ;
 
 assignStmt
@@ -78,6 +79,10 @@ returnStmt
 
 memberStmt
     : member
+    ;
+
+exitStmt
+    : Exit
     ;
 
 functionDecl
@@ -188,6 +193,8 @@ DivEq   : '/=';
 
 False   : 'false';
 True    : 'true';
+
+Exit    : 'exit';
 
 Ident
     : ('a' .. 'z' | 'A' .. 'Z' | '_') ('a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9') *

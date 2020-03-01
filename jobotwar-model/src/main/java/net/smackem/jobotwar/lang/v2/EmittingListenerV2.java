@@ -3,6 +3,7 @@ package net.smackem.jobotwar.lang.v2;
 import net.smackem.jobotwar.lang.OpCode;
 import net.smackem.jobotwar.lang.common.Emitter;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,10 +12,14 @@ import java.util.*;
 class EmittingListenerV2 extends JobotwarV2BaseListener {
 
     private static final Logger log = LoggerFactory.getLogger(DeclarationsExtractor.class);
+    private static final int STATE_ID_GLB = 0;
+    private static final String END_LABEL = "@end";
     private final Emitter emitter;
     private final DeclarationsExtractor declarations;
     private final Collection<String> semanticErrors = new ArrayList<>();
     private ProcedureDecl currentProcedure;
+    private boolean emitOnlyLocalDeclarators = false;
+    private int labelNumber = 1;
 
     EmittingListenerV2(Emitter emitter, DeclarationsExtractor declarations) {
         this.emitter = Objects.requireNonNull(emitter);
@@ -27,25 +32,57 @@ class EmittingListenerV2 extends JobotwarV2BaseListener {
 
     @Override
     public void enterProgram(JobotwarV2Parser.ProgramContext ctx) {
-        int address = 0;
+        // def state_id, initially main
+        emitter.emit(OpCode.LD_F64, this.declarations.states.get(StateDecl.MAIN_STATE_NAME).order);
+        // def all globals
+        int address = 1;
         final List<VariableDecl> globals = new ArrayList<>(this.declarations.globals.values());
         globals.sort(Comparator.comparingInt(a -> a.order));
-
         for (final VariableDecl variable : globals) {
             emitter.emit(OpCode.LD_F64, 0.0);
             variable.setAddress(address);
             address++;
         }
+        // walk all variable declarations to emit initializations
+        for (final JobotwarV2Parser.DeclarationContext declCtx : ctx.declaration()) {
+            final JobotwarV2Parser.VariableDeclContext varCtx = declCtx.variableDecl();
+            if (varCtx != null) {
+                ParseTreeWalker.DEFAULT.walk(this, varCtx);
+            }
+        }
+        // emit main loop
+        final int mainLoopPC = this.emitter.instructions().size();
+        for (final StateDecl state : this.declarations.states.values()) {
+            final String label = nextLabel();
+            this.emitter.emit(OpCode.LD_GLB, STATE_ID_GLB);
+            this.emitter.emit(OpCode.LD_F64, (double)state.order);
+            this.emitter.emit(OpCode.EQ);
+            this.emitter.emit(OpCode.BR_ZERO, label);
+            this.emitter.emit(OpCode.CALL, state.name);
+            this.emitter.emit(OpCode.LABEL, label);
+        }
+        this.emitter.emit(OpCode.BR, mainLoopPC);
+        this.emitOnlyLocalDeclarators = true;
+    }
 
-        if (declarations.states.containsKey(StateDecl.MAIN_STATE_NAME) == false) {
-            this.semanticErrors.add(String.format("no state '%s' declared!", StateDecl.MAIN_STATE_NAME));
-        } else {
-            emitter.emit(OpCode.CALL, StateDecl.MAIN_STATE_NAME);
+    @Override
+    public void exitProgram(JobotwarV2Parser.ProgramContext ctx) {
+        this.emitter.emit(OpCode.LABEL, END_LABEL);
+    }
+
+    @Override
+    public void enterDeclarator(JobotwarV2Parser.DeclaratorContext ctx) {
+        if (this.emitOnlyLocalDeclarators && this.currentProcedure == null) {
+            this.emitter.setDisabled(true);
         }
     }
 
     @Override
     public void exitDeclarator(JobotwarV2Parser.DeclaratorContext ctx) {
+        this.emitter.setDisabled(false);
+        if (this.emitOnlyLocalDeclarators && this.currentProcedure == null) {
+            return;
+        }
         final String ident = ctx.Ident().getText();
         if (ctx.expression() != null) {
             if (emitStoreVariable(ident) == false) {
@@ -66,6 +103,7 @@ class EmittingListenerV2 extends JobotwarV2BaseListener {
 
     @Override
     public void exitStateDecl(JobotwarV2Parser.StateDeclContext ctx) {
+        this.emitter.emit(OpCode.RET);
         this.currentProcedure = null;
     }
 
@@ -81,6 +119,15 @@ class EmittingListenerV2 extends JobotwarV2BaseListener {
 
     @Override
     public void exitFunctionDecl(JobotwarV2Parser.FunctionDeclContext ctx) {
+        boolean missingReturn = false;
+        if (ctx.statement().isEmpty()) {
+            missingReturn = true;
+        } else if (ctx.statement(ctx.statement().size() - 1).returnStmt() == null) {
+            missingReturn = true;
+        }
+        if (missingReturn) {
+            logSemanticError(ctx, "function must return a value");
+        }
         this.currentProcedure = null;
     }
 
@@ -103,6 +150,60 @@ class EmittingListenerV2 extends JobotwarV2BaseListener {
         } else {
             this.emitter.emit(OpCode.RET);
         }
+    }
+
+    @Override
+    public void exitMemberStmt(JobotwarV2Parser.MemberStmtContext ctx) {
+        final var functionCall = ctx.member().functionCall();
+        switch (functionCall.Ident().getText()) {
+            case "speed":
+                if (functionCall.arguments().expression().size() != 2) {
+                    logSemanticError(functionCall, ctx.getText() + " requires 2 arguments");
+                }
+                this.emitter.emit(OpCode.ST_REG, "SPEEDY");
+                this.emitter.emit(OpCode.ST_REG, "SPEEDX");
+                break;
+            case "speedX":
+                if (functionCall.arguments().expression().size() != 1) {
+                    logSemanticError(functionCall, ctx.getText() + " requires 1 arguments");
+                }
+                this.emitter.emit(OpCode.ST_REG, "SPEEDX");
+                break;
+            case "speedY":
+                if (functionCall.arguments().expression().size() != 1) {
+                    logSemanticError(functionCall, ctx.getText() + " requires 1 arguments");
+                }
+                this.emitter.emit(OpCode.ST_REG, "SPEEDY");
+                break;
+            case "radar":
+                if (functionCall.arguments().expression().size() != 1) {
+                    logSemanticError(functionCall, ctx.getText() + " requires 1 arguments");
+                }
+                this.emitter.emit(OpCode.ST_REG, "RADAR");
+                break;
+            case "fire":
+                if (functionCall.arguments().expression().size() != 2) {
+                    logSemanticError(functionCall, ctx.getText() + " requires 2 arguments");
+                }
+                this.emitter.emit(OpCode.SWAP);
+                this.emitter.emit(OpCode.ST_REG, "AIM");
+                this.emitter.emit(OpCode.ST_REG, "SHOT");
+                break;
+            case "random":
+            case "damage":
+            case "x":
+            case "y":
+                logSemanticError(functionCall, ctx.getText() + " cannot be written to");
+                break;
+            default:
+                logSemanticError(ctx, "unknown register '" + functionCall.Ident().getText() + "'");
+                break;
+        }
+    }
+
+    @Override
+    public void exitExitStmt(JobotwarV2Parser.ExitStmtContext ctx) {
+        this.emitter.emit(OpCode.BR, END_LABEL);
     }
 
     @Override
@@ -209,14 +310,62 @@ class EmittingListenerV2 extends JobotwarV2BaseListener {
     }
 
     private void emitMemberAtom(JobotwarV2Parser.MemberContext ctx) {
-        switch (ctx.functionCall().Ident().getText()) {
-            case "speed":
+        final var functionCall = ctx.functionCall();
+        final String ident = functionCall.Ident().getText();
+        switch (ident) {
+            case "speedX":
+                if (functionCall.arguments().expression().size() != 0) {
+                    logSemanticError(functionCall, "@" + ident + " requires 0 arguments");
+                }
+                this.emitter.emit(OpCode.LD_REG, "SPEEDX");
+                break;
+            case "speedY":
+                if (functionCall.arguments().expression().size() != 0) {
+                    logSemanticError(functionCall, "@" + ident + " requires 0 arguments");
+                }
+                this.emitter.emit(OpCode.LD_REG, "SPEEDY");
+                break;
             case "random":
+                if (functionCall.arguments().expression().size() != 0) {
+                    logSemanticError(functionCall, "@" + ident + " requires 0 arguments");
+                }
+                this.emitter.emit(OpCode.LD_REG, "RANDOM");
+                break;
             case "radar":
+                if (functionCall.arguments().expression().size() > 1) {
+                    logSemanticError(functionCall, "@" + ident + " requires 0 or 1 arguments");
+                }
+                if (functionCall.arguments().expression().size() == 1) {
+                    this.emitter.emit(OpCode.ST_REG, "RADAR");
+                }
+                this.emitter.emit(OpCode.LD_REG, "RADAR");
+                break;
             case "fire":
+                if (functionCall.arguments().expression().size() != 0) {
+                    logSemanticError(functionCall, "@" + ident + " requires 0 arguments");
+                }
+                this.emitter.emit(OpCode.LD_REG, "SHOT");
+                break;
             case "damage":
+                if (functionCall.arguments().expression().size() != 0) {
+                    logSemanticError(functionCall, "@" + ident + " requires 0 arguments");
+                }
+                this.emitter.emit(OpCode.LD_REG, "DAMAGE");
+                break;
             case "x":
+                if (functionCall.arguments().expression().size() != 0) {
+                    logSemanticError(functionCall, "@" + ident + " requires 0 arguments");
+                }
+                this.emitter.emit(OpCode.LD_REG, "X");
+                break;
             case "y":
+                if (functionCall.arguments().expression().size() != 0) {
+                    logSemanticError(functionCall, "@" + ident + " requires 0 arguments");
+                }
+                this.emitter.emit(OpCode.LD_REG, "Y");
+                break;
+            default:
+                logSemanticError(ctx, "unknown register '" + ident + "'");
                 break;
         }
     }
@@ -283,5 +432,11 @@ class EmittingListenerV2 extends JobotwarV2BaseListener {
                 ctx.start.getLine(), ctx.start.getCharPositionInLine(), message);
         log.info(text);
         this.semanticErrors.add(text);
+    }
+
+    private String nextLabel() {
+        final String label = "@lbl" + this.labelNumber;
+        this.labelNumber++;
+        return label;
     }
 }
