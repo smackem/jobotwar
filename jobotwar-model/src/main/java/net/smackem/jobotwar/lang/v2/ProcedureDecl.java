@@ -13,12 +13,12 @@ class ProcedureDecl extends Declaration {
         super(name, order);
     }
 
-    public Collection<String> parameters() {
-        return Collections.unmodifiableCollection(this.parameters);
+    public List<String> parameters() {
+        return Collections.unmodifiableList(this.parameters);
     }
 
-    public Collection<String> locals() {
-        return Collections.unmodifiableCollection(this.locals);
+    public List<String> locals() {
+        return Collections.unmodifiableList(this.locals);
     }
 
     public void addParameter(String parameter) {

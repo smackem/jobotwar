@@ -58,7 +58,7 @@ class EmittingListenerV2 extends JobotwarV2BaseListener {
             this.emitter.emit(OpCode.LD_F64, (double)state.order);
             this.emitter.emit(OpCode.EQ);
             this.emitter.emit(OpCode.BR_ZERO, label);
-            this.emitter.emit(OpCode.CALL, state.name);
+            emitCall(state);
             this.emitter.emit(OpCode.LABEL, label);
         }
         this.emitter.emit(OpCode.BR, mainLoopPC);
@@ -103,7 +103,9 @@ class EmittingListenerV2 extends JobotwarV2BaseListener {
 
     @Override
     public void exitStateDecl(JobotwarV2Parser.StateDeclContext ctx) {
-        this.emitter.emit(OpCode.RET);
+        if (ctx.statement().isEmpty() || ctx.statement(ctx.statement().size() - 1).yieldStmt() == null) {
+            this.emitter.emit(OpCode.RET);
+        }
         this.currentProcedure = null;
     }
 
@@ -137,6 +139,7 @@ class EmittingListenerV2 extends JobotwarV2BaseListener {
         if (emitStoreVariable(ident) == false) {
             logSemanticError(ctx, "unknown variable '" + ident + "'");
         }
+        this.emitter.emit(OpCode.LABEL, nextLabel());
     }
 
     @Override
@@ -199,6 +202,30 @@ class EmittingListenerV2 extends JobotwarV2BaseListener {
                 logSemanticError(ctx, "unknown register '" + functionCall.Ident().getText() + "'");
                 break;
         }
+    }
+
+    @Override
+    public void exitYieldStmt(JobotwarV2Parser.YieldStmtContext ctx) {
+        final var functionCall = ctx.functionCall();
+        final String ident = functionCall.Ident().getText();
+        final StateDecl state = this.declarations.states.get(ident);
+        if (state == null) {
+            logSemanticError(functionCall, "unknown state '" + ident + "'");
+            return;
+        }
+        final List<String> parameters = state.parameters();
+        for (int i = parameters.size() - 1; i >= 0; i--) {
+            final String global = DeclarationsExtractor.getStateParameterName(ident, parameters.get(i));
+            final VariableDecl variable = this.declarations.globals.get(global);
+            if (variable == null) {
+                logSemanticError(ctx, "unknown state parameter '" + parameters.get(i) + "'");
+                return;
+            }
+            emitter.emit(OpCode.ST_GLB, variable.getAddress());
+        }
+        this.emitter.emit(OpCode.LD_F64, (double)state.order);
+        this.emitter.emit(OpCode.ST_GLB, STATE_ID_GLB);
+        this.emitter.emit(OpCode.RET);
     }
 
     @Override
@@ -305,8 +332,18 @@ class EmittingListenerV2 extends JobotwarV2BaseListener {
         final FunctionDecl function = this.declarations.functions.get(ident);
         if (function == null) {
             logSemanticError(ctx, "unkown function '" + ident + "'");
+            return;
         }
-        this.emitter.emit(OpCode.CALL, ident);
+        emitCall(function);
+    }
+
+    private void emitCall(ProcedureDecl function) {
+        if (function instanceof StateDecl) {
+            this.emitter.emit(OpCode.LD_F64, function.parameters().size());
+        } else {
+            this.emitter.emit(OpCode.LD_F64, 0);
+        }
+        this.emitter.emit(OpCode.CALL, function.name);
     }
 
     private void emitMemberAtom(JobotwarV2Parser.MemberContext ctx) {
@@ -419,7 +456,7 @@ class EmittingListenerV2 extends JobotwarV2BaseListener {
                 return true;
             }
         }
-        final VariableDecl variable = this.declarations.globals.get(ident);
+        VariableDecl variable = this.declarations.globals.get(ident);
         if (variable != null) {
             emitter.emit(OpCode.ST_GLB, variable.getAddress());
             return true;

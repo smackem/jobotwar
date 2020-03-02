@@ -302,13 +302,61 @@ public class CompilerTest {
     @Test
     public void testV2Assignments() {
         final String source = "" +
+                "def global = 12" +
                 "state main() {\n" +
-                "   def x = 123\n" +
-                "   @radar(90)\n" +
+                "   def local = 13 + global\n" +
+                "   global = local\n" +
+                "   @radar(global)\n" +
                 "   exit\n" +
                 "}\n";
         final Program program = compileV2(source);
         System.out.println(program.toString());
+        final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
+        final Interpreter interpreter = new Interpreter(program, env);
+
+        InterpreterTest.runComplete(interpreter);
+
+        assertThat(env.readRadar()).isEqualTo(25.0);
+    }
+
+    @Test
+    public void testV2Yield() {
+        final String source = "" +
+                "state main() {\n" +
+                "   yield second()\n" +
+                "}\n" +
+                "state second() {\n" +
+                "   @radar(42)" +
+                "   exit\n" +
+                "}\n";
+        final Program program = compileV2(source);
+        System.out.println(program.toString());
+        final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
+        final Interpreter interpreter = new Interpreter(program, env);
+
+        InterpreterTest.runComplete(interpreter);
+
+        assertThat(env.readRadar()).isEqualTo(42.0);
+    }
+
+    @Test
+    public void testV2StateParams() {
+        final String source = "" +
+                "state main() {\n" +
+                "   yield second(42, 10, 5)\n" +
+                "}\n" +
+                "state second(number1, number2, number3) {\n" +
+                "   @radar(number1 - number2 - number3)" +
+                "   exit\n" +
+                "}\n";
+        final Program program = compileV2(source);
+        System.out.println(program.toString());
+        final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
+        final Interpreter interpreter = new Interpreter(program, env);
+
+        InterpreterTest.runComplete(interpreter);
+
+        assertThat(env.readRadar()).isEqualTo(27);
     }
 
     private Program compileV1(String source) {
