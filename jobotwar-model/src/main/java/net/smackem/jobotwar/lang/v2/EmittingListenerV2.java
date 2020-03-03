@@ -143,6 +143,10 @@ class EmittingListenerV2 extends JobotwarV2BaseListener {
     }
 
     @Override
+    public void exitIfStmt(JobotwarV2Parser.IfStmtContext ctx) {
+    }
+
+    @Override
     public void exitReturnStmt(JobotwarV2Parser.ReturnStmtContext ctx) {
         if (this.currentProcedure instanceof FunctionDecl == false) {
             logSemanticError(ctx, "can only return from function!");

@@ -359,6 +359,50 @@ public class CompilerTest {
         assertThat(env.readRadar()).isEqualTo(27);
     }
 
+    @Test
+    public void testV2Registers() {
+        final String source = "" +
+                "state main() {\n" +
+                "   @speed(101, 102)\n" +
+                "   @fire(90, 1000)" +
+                "   @radar(180)" +
+                "   exit\n" +
+                "}\n";
+        final Program program = compileV2(source);
+        System.out.println(program.toString());
+        final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
+        final Interpreter interpreter = new Interpreter(program, env);
+
+        InterpreterTest.runComplete(interpreter);
+
+        assertThat(env.readSpeedX()).isEqualTo(101);
+        assertThat(env.readSpeedY()).isEqualTo(102);
+        assertThat(env.readAim()).isEqualTo(90);
+        assertThat(env.readShot()).isEqualTo(1000);
+        assertThat(env.readRadar()).isEqualTo(180);
+    }
+
+    @Test
+    public void testV2Arithmetics() {
+        final String source = "" +
+                "state main() {\n" +
+                "   @speedX(101 - 100 + 10)\n" +
+                "   @speedY(20 - 5*2)\n" +
+                "   @radar(10/2 + 15)" +
+                "   exit\n" +
+                "}\n";
+        final Program program = compileV2(source);
+        System.out.println(program.toString());
+        final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
+        final Interpreter interpreter = new Interpreter(program, env);
+
+        InterpreterTest.runComplete(interpreter);
+
+        assertThat(env.readSpeedX()).isEqualTo(11);
+        assertThat(env.readSpeedY()).isEqualTo(10);
+        assertThat(env.readRadar()).isEqualTo(20);
+    }
+
     private Program compileV1(String source) {
         final Compiler compiler = new Compiler();
         final Compiler.Result result = compiler.compile(source, Compiler.Language.V1);
