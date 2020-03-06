@@ -17,9 +17,11 @@ class EmittingListenerV2 extends JobotwarV2BaseListener {
     private final Emitter emitter;
     private final DeclarationsExtractor declarations;
     private final Collection<String> semanticErrors = new ArrayList<>();
+    private final Stack<String> conditionalStmtEnds = new Stack<>();
     private ProcedureDecl currentProcedure;
     private boolean emitOnlyLocalDeclarators = false;
     private int labelNumber = 1;
+    private boolean inConditionalStmt;
 
     EmittingListenerV2(Emitter emitter, DeclarationsExtractor declarations) {
         this.emitter = Objects.requireNonNull(emitter);
@@ -103,7 +105,8 @@ class EmittingListenerV2 extends JobotwarV2BaseListener {
 
     @Override
     public void exitStateDecl(JobotwarV2Parser.StateDeclContext ctx) {
-        if (ctx.statement().isEmpty() || ctx.statement(ctx.statement().size() - 1).yieldStmt() == null) {
+        final var statements = ctx.statementList().statement();
+        if (statements.isEmpty() || statements.get(statements.size() - 1).yieldStmt() == null) {
             this.emitter.emit(OpCode.RET);
         }
         this.currentProcedure = null;
@@ -121,10 +124,11 @@ class EmittingListenerV2 extends JobotwarV2BaseListener {
 
     @Override
     public void exitFunctionDecl(JobotwarV2Parser.FunctionDeclContext ctx) {
+        final var statements = ctx.statementList().statement();
         boolean missingReturn = false;
-        if (ctx.statement().isEmpty()) {
+        if (statements.isEmpty()) {
             missingReturn = true;
-        } else if (ctx.statement(ctx.statement().size() - 1).returnStmt() == null) {
+        } else if (statements.get(statements.size() - 1).returnStmt() == null) {
             missingReturn = true;
         }
         if (missingReturn) {
@@ -143,7 +147,42 @@ class EmittingListenerV2 extends JobotwarV2BaseListener {
     }
 
     @Override
+    public void enterIfStmt(JobotwarV2Parser.IfStmtContext ctx) {
+        this.inConditionalStmt = true;
+    }
+
+    @Override
     public void exitIfStmt(JobotwarV2Parser.IfStmtContext ctx) {
+        this.inConditionalStmt = false;
+    }
+
+    @Override
+    public void enterWhileStmt(JobotwarV2Parser.WhileStmtContext ctx) {
+        this.inConditionalStmt = true;
+    }
+
+    @Override
+    public void exitWhileStmt(JobotwarV2Parser.WhileStmtContext ctx) {
+        this.inConditionalStmt = true;
+    }
+
+    @Override
+    public void exitExpression(JobotwarV2Parser.ExpressionContext ctx) {
+        if (this.inConditionalStmt == false) {
+            return;
+        }
+        final String label = nextLabel();
+        this.conditionalStmtEnds.push(label);
+        this.emitter.emit(OpCode.BR_ZERO, label);
+    }
+
+    @Override
+    public void exitStatementList(JobotwarV2Parser.StatementListContext ctx) {
+        if (this.conditionalStmtEnds.isEmpty()) {
+            return;
+        }
+        final String label = this.conditionalStmtEnds.pop();
+        this.emitter.emit(OpCode.LABEL, label);
     }
 
     @Override

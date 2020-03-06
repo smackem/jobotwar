@@ -43,6 +43,9 @@
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <visitor>true</visitor>
+                </configuration>
             </plugin>
         </plugins>
     </build>

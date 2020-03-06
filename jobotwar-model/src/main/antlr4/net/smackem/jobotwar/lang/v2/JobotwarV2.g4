@@ -19,7 +19,7 @@ declarator
     ;
 
 stateDecl
-    : 'state' Ident '(' parameters? ')' '{' statement* '}'
+    : 'state' Ident '(' parameters? ')' '{' statementList '}'
     ;
 
 parameters
@@ -54,19 +54,23 @@ lvalue
     ;
 
 ifStmt
-    : 'if' expression '{' statement* '}' elseIfClause* elseClause?
+    : 'if' expression '{' statementList '}' elseIfClause* elseClause?
     ;
 
 elseIfClause
-    : 'else' 'if' expression '{' statement* '}'
+    : 'else' 'if' expression '{' statementList '}'
     ;
 
 elseClause
-    : 'else' '{' statement* '}'
+    : 'else' '{' statementList '}'
     ;
 
 whileStmt
-    : 'while' '(' expression ')' '{' statement* '}'
+    : 'while' '(' expression ')' '{' statementList '}'
+    ;
+
+statementList
+    : statement*
     ;
 
 yieldStmt
@@ -86,7 +90,7 @@ exitStmt
     ;
 
 functionDecl
-    : 'def' Ident '(' parameters? ')' '{' statement* '}'
+    : 'def' Ident '(' parameters? ')' '{' statementList '}'
     ;
 
 expression
