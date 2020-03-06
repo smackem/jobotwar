@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 /**
@@ -61,7 +62,7 @@ public class Board {
      * Distributes the robots on the board randomly.
      */
     public void disperseRobots() {
-        final Random random = new Random();
+        final Random random = ThreadLocalRandom.current();
         for (final Robot robot : this.robots) {
             do {
                 robot.setX(Constants.ROBOT_RADIUS + random.nextDouble() * (this.width - Constants.ROBOT_RADIUS * 2));

@@ -4,13 +4,13 @@ import net.smackem.jobotwar.lang.Compiler;
 import net.smackem.jobotwar.lang.Program;
 
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class RuntimeTests {
     private RuntimeTests() { throw new IllegalAccessError(); }
 
-    public static final Random RANDOM = new Random();
     public static final RobotProgramContext DUMMY_CONTEXT = new RobotProgramContext() {
         @Override
         public void logMessage(Robot robot, String category, double value) {
@@ -18,7 +18,7 @@ class RuntimeTests {
 
         @Override
         public double nextRandomDouble(Robot robot) {
-            return RANDOM.nextDouble();
+            return ThreadLocalRandom.current().nextDouble();
         }
     };
 

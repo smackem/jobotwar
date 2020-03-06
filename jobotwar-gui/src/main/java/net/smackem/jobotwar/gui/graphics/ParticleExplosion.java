@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 class ParticleExplosion {
     private final Collection<Dot> dots;
@@ -75,7 +76,7 @@ class ParticleExplosion {
     }
 
     private static Collection<Dot> createDots(double width, double height, int dotCount, int minHue, int maxHue) {
-        final Random random = new Random();
+        final Random random = ThreadLocalRandom.current();
         final double maxRadius = width * 3 / 4;
         final Point2D center = new Point2D(width / 2, height / 2);
         final Collection<Dot> dots = new ArrayList<>(dotCount);

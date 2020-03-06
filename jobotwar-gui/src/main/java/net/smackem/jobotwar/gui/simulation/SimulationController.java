@@ -35,7 +35,6 @@ public class SimulationController {
     private static final Logger log = LoggerFactory.getLogger(SimulationController.class);
     private final ObservableList<MatchViewModel> matches = FXCollections.observableArrayList();
     private final BooleanProperty running = new SimpleBooleanProperty();
-    private final Random random = new Random();
 
     @FXML
     private TableView<MatchViewModel> matchTable;
@@ -128,7 +127,7 @@ public class SimulationController {
         final App app = App.instance();
         final Duration duration = Duration.ofMinutes(5);
         return CompletableFuture.supplyAsync(() ->
-                SimulationRunner.runBatchParallel(app.board(), count, this.random, duration))
+                SimulationRunner.runBatchParallel(app.board(), count, duration))
                 .thenApply(batchResults ->
                         batchResults.stream()
                                 .map(MatchViewModel::new)

@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.BiConsumer;
 
 public class EditController {
@@ -32,7 +33,6 @@ public class EditController {
     private static final Logger log = LoggerFactory.getLogger(EditController.class);
     private final ListProperty<EditRobotViewModel> robots = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ObjectProperty<EditRobotViewModel> selectedRobot = new SimpleObjectProperty<>();
-    private final Random random = new Random();
     private final ToggleGroup languageToggleGroup = new ToggleGroup();
     private static final int BOARD_WIDTH = 640;
     private static final int BOARD_HEIGHT = 480;
@@ -142,7 +142,7 @@ public class EditController {
 
     private Color getNextRandomColor() {
         for (int i = 0; i < 12; i++) {
-            final int newHue = this.random.nextInt(12);
+            final int newHue = ThreadLocalRandom.current().nextInt(12);
             final boolean isUnique = this.robots.stream()
                     .noneMatch(r -> (int)(r.colorProperty().get().getHue() / 30.0) == newHue);
             if (isUnique) {

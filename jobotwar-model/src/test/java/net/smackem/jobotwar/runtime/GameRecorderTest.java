@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -21,7 +22,7 @@ public class GameRecorderTest {
 
     private void singleSimulation() {
         final Duration duration = Duration.ofMinutes(5);
-        final GameRecorder recorder = new GameRecorder(RuntimeTests.RANDOM, ctx -> {
+        final GameRecorder recorder = new GameRecorder(ThreadLocalRandom.current(),ctx -> {
             final Robot r1 = new Robot.Builder(r -> new CompiledProgram(r, RuntimeTests.createShooter(), ctx))
                     .name("robot1")
                     .build();

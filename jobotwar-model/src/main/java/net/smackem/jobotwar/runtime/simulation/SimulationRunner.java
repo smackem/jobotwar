@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -73,19 +74,17 @@ public final class SimulationRunner {
      * @param templateBoard The board that serves as a template for the simulation matches. The template
      *                      is not mutated during the simulation.
      * @param batchSize The number of matches to run.
-     * @param random The random number generator to use.
      * @param maxDuration The maximum duration of a match. If this duration is exceeded, the match counts
      *                    as draw.
      * @return The {@link BatchSimulationResult}s of the simulation, in arbitrary order.
      */
     public static Collection<BatchSimulationResult> runBatchParallel(Board templateBoard,
                                                                      int batchSize,
-                                                                     Random random,
                                                                      Duration maxDuration) {
         return IntStream.rangeClosed(1, batchSize)
                 .parallel()
                 .mapToObj(matchNumber -> {
-                    final GameRecorder recorder = new GameRecorder(random, ctx -> {
+                    final GameRecorder recorder = new GameRecorder(ThreadLocalRandom.current(), ctx -> {
                         final Board board = Board.fromTemplate(templateBoard, ctx);
                         board.disperseRobots();
                         return board;

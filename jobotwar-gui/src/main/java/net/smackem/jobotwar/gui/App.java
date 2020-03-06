@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Objects;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * JavaFX App
@@ -27,7 +27,6 @@ public class App extends Application {
     private Scene scene;
     private Board board;
     private boolean replay;
-    private final Random random = new Random();
     private final RobotProgramContext defaultRobotContext = new RobotProgramContext() {
         @Override
         public void logMessage(Robot robot, String category, double value) {
@@ -36,7 +35,7 @@ public class App extends Application {
 
         @Override
         public double nextRandomDouble(Robot robot) {
-            return random.nextDouble();
+            return ThreadLocalRandom.current().nextDouble();
         }
     };
 
