@@ -359,6 +359,28 @@ public class CompilerTest {
         assertThat(env.readRadar()).isEqualTo(27);
     }
 
+
+    @Test
+    public void testV2YieldMultiple() {
+        final String source = "" +
+                "state main() { yield second() }\n" +
+                "state second() { yield third() }\n" +
+                "state third() { yield fourth() }\n" +
+                "state fourth() { yield final(42) }\n" +
+                "state final(result) {\n" +
+                "   @radar(result)" +
+                "   exit\n" +
+                "}\n";
+        final Program program = compileV2(source);
+        System.out.println(program.toString());
+        final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
+        final Interpreter interpreter = new Interpreter(program, env);
+
+        InterpreterTest.runComplete(interpreter);
+
+        assertThat(env.readRadar()).isEqualTo(42.0);
+    }
+
     @Test
     public void testV2Registers() {
         final String source = "" +
@@ -383,7 +405,7 @@ public class CompilerTest {
     }
 
     @Test
-    public void testV2Arithmetics() {
+    public void testV2Arithmetic() {
         final String source = "" +
                 "state main() {\n" +
                 "   @speedX(101 - 100 + 10)\n" +
@@ -444,6 +466,92 @@ public class CompilerTest {
         InterpreterTest.runComplete(interpreter);
 
         assertThat(env.readRadar()).isEqualTo(10);
+    }
+
+    @Test
+    public void testV2WhileNested() {
+        final String source = "" +
+                "state main() {\n" +
+                "   def x = 0\n" +
+                "   def i = 0\n" +
+                "   while i < 5 {\n" +
+                "       def j = 0\n" +
+                "       while j < 5 {\n" +
+                "           x = x + i * j\n" +
+                "           j = j + 1\n" +
+                "       }\n" +
+                "       i = i + 1\n" +
+                "   }\n" +
+                "   @radar(x)" +
+                "   exit\n" +
+                "}\n";
+        final Program program = compileV2(source);
+        System.out.println(program.toString());
+        final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
+        final Interpreter interpreter = new Interpreter(program, env);
+
+        InterpreterTest.runComplete(interpreter);
+
+        assertThat(env.readRadar()).isEqualTo(100);
+    }
+
+    @Test
+    public void testV2If() {
+        final String source = "" +
+                "state main() {\n" +
+                "   def x = 2\n" +
+                "   if x == 1 { @radar(1) }\n" +
+                "   if x == 2 { @radar(2) }\n" +
+                "   exit\n" +
+                "}\n";
+        final Program program = compileV2(source);
+        System.out.println(program.toString());
+        final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
+        final Interpreter interpreter = new Interpreter(program, env);
+
+        InterpreterTest.runComplete(interpreter);
+
+        assertThat(env.readRadar()).isEqualTo(2);
+    }
+
+    @Test
+    public void testV2IfElse() {
+        final String source = "" +
+                "state main() {\n" +
+                "   def x = 2\n" +
+                "   if x == 1 { @radar(1) }\n" +
+                "   else { @radar(2) }\n" +
+                "   exit\n" +
+                "}\n";
+        final Program program = compileV2(source);
+        System.out.println(program.toString());
+        final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
+        final Interpreter interpreter = new Interpreter(program, env);
+
+        InterpreterTest.runComplete(interpreter);
+
+        assertThat(env.readRadar()).isEqualTo(2);
+    }
+
+    @Test
+    public void testV2IfElseIf() {
+        final String source = "" +
+                "state main() {\n" +
+                "   def x = 3\n" +
+                "   if x == 1 { @radar(1) }\n" +
+                "   else if x == 2 { @radar(2) }\n" +
+                "   else if x == 3 { @radar(3) }\n" +
+                "   else { @radar(10) }\n" +
+                "   exit\n" +
+                "}\n";
+        final Program program = compileV2(source);
+        System.out.println(program.toString());
+        final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
+        final Interpreter interpreter = new Interpreter(program, env);
+
+        InterpreterTest.runComplete(interpreter);
+
+        assertThat(env.readRadar()).isEqualTo(3);
     }
 
     private Program compileV1(String source) {

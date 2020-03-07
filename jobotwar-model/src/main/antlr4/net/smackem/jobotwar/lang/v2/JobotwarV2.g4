@@ -66,7 +66,7 @@ elseClause
     ;
 
 whileStmt
-    : 'while' '(' expression ')' '{' statementList '}'
+    : 'while' expression '{' statementList '}'
     ;
 
 statementList
