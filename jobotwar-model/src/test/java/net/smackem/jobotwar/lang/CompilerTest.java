@@ -403,6 +403,49 @@ public class CompilerTest {
         assertThat(env.readRadar()).isEqualTo(20);
     }
 
+    @Test
+    public void testV2While() {
+        final String source = "" +
+                "state main() {\n" +
+                "   def i = 0\n" +
+                "   while i < 10 {\n" +
+                "       i = i + 1\n" +
+                "   }\n" +
+                "   @radar(i)" +
+                "   exit\n" +
+                "}\n";
+        final Program program = compileV2(source);
+        System.out.println(program.toString());
+        final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
+        final Interpreter interpreter = new Interpreter(program, env);
+
+        InterpreterTest.runComplete(interpreter);
+
+        assertThat(env.readRadar()).isEqualTo(10);
+    }
+
+    @Test
+    public void testV2WhileNoLoop() {
+        final String source = "" +
+                "state main() {\n" +
+                "   def n = 5\n" +
+                "   def i = 10\n" +
+                "   while n < 5 {\n" +
+                "       i = i + 1\n" +
+                "   }\n" +
+                "   @radar(i)" +
+                "   exit\n" +
+                "}\n";
+        final Program program = compileV2(source);
+        System.out.println(program.toString());
+        final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
+        final Interpreter interpreter = new Interpreter(program, env);
+
+        InterpreterTest.runComplete(interpreter);
+
+        assertThat(env.readRadar()).isEqualTo(10);
+    }
+
     private Program compileV1(String source) {
         final Compiler compiler = new Compiler();
         final Compiler.Result result = compiler.compile(source, Compiler.Language.V1);

@@ -1,14 +1,6 @@
 package net.smackem.jobotwar.lang.v2;
 
-import net.smackem.jobotwar.lang.OpCode;
-import net.smackem.jobotwar.lang.common.Emitter;
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.tree.ParseTreeWalker;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.*;
-
+/*
 class EmittingListenerV2 extends JobotwarV2BaseListener {
 
     private static final Logger log = LoggerFactory.getLogger(DeclarationsExtractor.class);
@@ -520,3 +512,4 @@ class EmittingListenerV2 extends JobotwarV2BaseListener {
         return label;
     }
 }
+*/

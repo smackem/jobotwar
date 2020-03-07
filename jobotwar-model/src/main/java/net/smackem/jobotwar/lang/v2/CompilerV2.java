@@ -28,9 +28,11 @@ public class CompilerV2 implements CompilerService {
         ParseTreeWalker.DEFAULT.walk(declExtractor, tree);
         outErrors.addAll(declExtractor.semanticErrors);
         final Emitter emitter = new Emitter();
-        final EmittingListenerV2 listener = new EmittingListenerV2(emitter, declExtractor);
-        ParseTreeWalker.DEFAULT.walk(listener, tree);
-        outErrors.addAll(listener.semanticErrors());
+        //final EmittingListenerV2 listener = new EmittingListenerV2(emitter, declExtractor);
+        //ParseTreeWalker.DEFAULT.walk(listener, tree);
+        final EmittingVisitorV2 visitor = new EmittingVisitorV2(emitter, declExtractor);
+        tree.accept(visitor);
+        outErrors.addAll(visitor.semanticErrors());
         return emitter.buildProgram();
     }
 
