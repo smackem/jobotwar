@@ -101,8 +101,11 @@ public class EditController {
         this.languageV2Radio.setToggleGroup(this.languageToggleGroup);
         this.languageV2Radio.setUserData(Compiler.Language.V2);
         this.languageToggleGroup.selectedToggleProperty().addListener(
-                (prop, old, val) -> this.selectedRobot.get().languageProperty().set((Compiler.Language)val.getUserData())
-        );
+                (prop, old, val) -> {
+                    final Compiler.Language language = (Compiler.Language)val.getUserData();
+                    this.selectedRobot.get().languageProperty().set(language);
+                    this.sourceText.syntaxProperty().set(language);
+                });
     }
 
     private Image getResourceImage(String resourceName) {
