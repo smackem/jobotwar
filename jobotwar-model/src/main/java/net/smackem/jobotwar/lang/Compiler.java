@@ -47,6 +47,9 @@ public final class Compiler {
         }
     }
 
+    /**
+     * Identifies the source language to compile.
+     */
     public enum Language {
         V1, V2
     }

@@ -52,9 +52,16 @@
                     <Label text="Name:" />
                     <TextField fx:id="nameTextField" GridPane.columnIndex="1" />
                     <Label text="Color:" GridPane.rowIndex="1" />
-                    <ColorPicker fx:id="colorPicker" GridPane.rowIndex="1" GridPane.columnIndex="1" />
-                    <Label text="Icon:" GridPane.rowIndex="2" />
-                    <ComboBox fx:id="iconComboBox" GridPane.rowIndex="2" GridPane.columnIndex="1" />
+                    <HBox GridPane.rowIndex="1" GridPane.columnIndex="1" alignment="BASELINE_CENTER" spacing="4">
+                        <ColorPicker fx:id="colorPicker" />
+                        <Label text="Icon:" />
+                        <ComboBox fx:id="iconComboBox" />
+                    </HBox>
+                    <Label text="Language:" GridPane.rowIndex="2" />
+                    <HBox GridPane.rowIndex="2" GridPane.columnIndex="1" spacing="4" alignment="BASELINE_LEFT">
+                        <RadioButton fx:id="languageV1Radio" text="V1" />
+                        <RadioButton fx:id="languageV2Radio" text="V2" />
+                    </HBox>
                 </GridPane>
             </top>
             <center>

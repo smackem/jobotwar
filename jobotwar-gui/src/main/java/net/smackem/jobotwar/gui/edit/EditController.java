@@ -33,6 +33,7 @@ public class EditController {
     private final ListProperty<EditRobotViewModel> robots = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ObjectProperty<EditRobotViewModel> selectedRobot = new SimpleObjectProperty<>();
     private final Random random = new Random();
+    private final ToggleGroup languageToggleGroup = new ToggleGroup();
     private static final int BOARD_WIDTH = 640;
     private static final int BOARD_HEIGHT = 480;
     private static Collection<EditRobotViewModel> cachedRobotViewModels;
@@ -57,6 +58,10 @@ public class EditController {
     private Pane detailsPane;
     @FXML
     private SplitMenuButton newRobotButton;
+    @FXML
+    private RadioButton languageV1Radio;
+    @FXML
+    private RadioButton languageV2Radio;
 
     public EditController() {
         if (cachedRobotViewModels != null) {
@@ -91,6 +96,13 @@ public class EditController {
             selectRobot(this.robots.iterator().next());
         }
         this.detailsPane.visibleProperty().bind(this.selectedRobot.isNotNull());
+        this.languageV1Radio.setToggleGroup(this.languageToggleGroup);
+        this.languageV1Radio.setUserData(Compiler.Language.V1);
+        this.languageV2Radio.setToggleGroup(this.languageToggleGroup);
+        this.languageV2Radio.setUserData(Compiler.Language.V2);
+        this.languageToggleGroup.selectedToggleProperty().addListener(
+                (prop, old, val) -> this.selectedRobot.get().languageProperty().set((Compiler.Language)val.getUserData())
+        );
     }
 
     private Image getResourceImage(String resourceName) {
@@ -155,6 +167,8 @@ public class EditController {
             this.colorPicker.valueProperty().bindBidirectional(robot.colorProperty());
             this.sourceText.replaceText(robot.sourceCodeProperty().get());
             this.iconComboBox.getSelectionModel().select(robot.imageProperty().get());
+            this.languageV1Radio.setSelected(robot.languageProperty().get() == Compiler.Language.V1);
+            this.languageV2Radio.setSelected(robot.languageProperty().get() == Compiler.Language.V2);
         }
     }
 

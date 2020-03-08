@@ -13,7 +13,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class PersistableRobotsTest {
 
     @Test
-    public void save() throws IOException {
+    public void loadV0() throws IOException {
         final String json = "{\"name\":\"robot1\", \"source\":\"100 -> SPEEDX\"}";
         final InputStream is = new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8));
         final PersistableRobot loaded = PersistableRobots.load(DummyPersistableRobot::new, is);
@@ -22,22 +22,24 @@ public class PersistableRobotsTest {
     }
 
     @Test
-    public void load() throws IOException {
-        final PersistableRobot r = new DummyPersistableRobot();
-        r.setBaseName("robot1");
-        r.setSourceCode("100->SPEEDX");
-        final ByteArrayOutputStream os = new ByteArrayOutputStream();
-        PersistableRobots.save(r, os);
-        final String json = os.toString(StandardCharsets.UTF_8)
-                .replaceAll("\\s+", "");
-        assertThat(json).isEqualTo("{\"name\":\"robot1\",\"source\":\"100->SPEEDX\"}");
+    public void loadV1() throws IOException {
+        final String json = "" +
+                "{\"meta\": { \"version\": 1 },\n" +
+                "\"name\":\"robot1\", \"source\": {\n" +
+                "\"code\": \"100 -> SPEEDX\", \"language\": \"V1\"\n" +
+                "}}";
+        final InputStream is = new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8));
+        final PersistableRobot loaded = PersistableRobots.load(DummyPersistableRobot::new, is);
+        assertThat(loaded.getBaseName()).isEqualTo("robot1");
+        assertThat(loaded.getSourceCode()).isEqualTo("100 -> SPEEDX");
     }
 
     @Test
-    public void testClone() throws IOException {
+    public void testSaveAndLoad() throws IOException {
         final PersistableRobot r = new DummyPersistableRobot();
         r.setBaseName("robot1");
         r.setSourceCode("100->SPEEDX");
+        r.setSourceCodeLanguage("V1");
         final ByteArrayOutputStream os = new ByteArrayOutputStream();
         PersistableRobots.save(r, os);
 
@@ -45,11 +47,13 @@ public class PersistableRobotsTest {
         final PersistableRobot loaded = PersistableRobots.load(DummyPersistableRobot::new, is);
         assertThat(loaded.getBaseName()).isEqualTo(r.getBaseName());
         assertThat(loaded.getSourceCode()).isEqualTo(r.getSourceCode());
+        assertThat(loaded.getSourceCodeLanguage()).isEqualTo(r.getSourceCodeLanguage());
     }
 
     private static class DummyPersistableRobot implements PersistableRobot {
         private String sourceCode;
         private String baseName;
+        private String language;
 
         @Override
         public String getSourceCode() {
@@ -59,6 +63,16 @@ public class PersistableRobotsTest {
         @Override
         public void setSourceCode(String value) {
             this.sourceCode = value;
+        }
+
+        @Override
+        public String getSourceCodeLanguage() {
+            return this.language;
+        }
+
+        @Override
+        public void setSourceCodeLanguage(String value) {
+            this.language = value;
         }
 
         @Override

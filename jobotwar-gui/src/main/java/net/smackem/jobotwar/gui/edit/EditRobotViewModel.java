@@ -6,6 +6,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
+import net.smackem.jobotwar.lang.Compiler;
 import net.smackem.jobotwar.persist.PersistableRobot;
 
 class EditRobotViewModel implements PersistableRobot {
@@ -13,6 +14,7 @@ class EditRobotViewModel implements PersistableRobot {
     private final StringProperty sourceCode = new SimpleStringProperty();
     private final ObjectProperty<Color> color = new SimpleObjectProperty<>();
     private final ObjectProperty<Image> image = new SimpleObjectProperty<>();
+    private final ObjectProperty<Compiler.Language> language = new SimpleObjectProperty<>(Compiler.Language.V1);
 
     public StringProperty nameProperty() {
         return this.name;
@@ -20,6 +22,10 @@ class EditRobotViewModel implements PersistableRobot {
 
     public StringProperty sourceCodeProperty() {
         return this.sourceCode;
+    }
+
+    public ObjectProperty<Compiler.Language> languageProperty() {
+        return this.language;
     }
 
     public ObjectProperty<Color> colorProperty() {
@@ -38,6 +44,16 @@ class EditRobotViewModel implements PersistableRobot {
     @Override
     public void setSourceCode(String value) {
         this.sourceCodeProperty().set(value);
+    }
+
+    @Override
+    public String getSourceCodeLanguage() {
+        return this.language.get().name();
+    }
+
+    @Override
+    public void setSourceCodeLanguage(String value) {
+        this.language.set(Enum.valueOf(Compiler.Language.class, value));
     }
 
     @Override
