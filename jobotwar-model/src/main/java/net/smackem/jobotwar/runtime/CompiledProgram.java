@@ -73,6 +73,7 @@ public class CompiledProgram implements RobotProgram {
                     value += 360;
                 }
                 robot.setAimAngle(value % 360);
+                log("writeAim: {}", value % 360);
             }
 
             @Override
@@ -146,6 +147,7 @@ public class CompiledProgram implements RobotProgram {
                 final int shot = (int)(value + 0.5);
                 if (shot >= 0) {
                     robot.setShot(shot);
+                    log("writeShot: {}", shot);
                 }
             }
 

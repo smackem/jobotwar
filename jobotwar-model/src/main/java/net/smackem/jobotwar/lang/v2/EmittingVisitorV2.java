@@ -452,6 +452,7 @@ class EmittingVisitorV2 extends JobotwarV2BaseVisitor<Void> {
                 }
                 if (getArgumentCount(functionCall) == 1) {
                     this.emitter.emit(OpCode.ST_REG, "RADAR");
+                    this.emitter.emit(OpCode.LABEL, nextLabel()); // yield to let engine handle radar
                 }
                 this.emitter.emit(OpCode.LD_REG, "RADAR");
                 break;
