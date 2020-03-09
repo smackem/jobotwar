@@ -17,6 +17,7 @@ class EmittingVisitorV2 extends JobotwarV2BaseVisitor<Void> {
     private final Collection<String> semanticErrors = new ArrayList<>();
     private int labelNumber = 1;
     private ProcedureDecl currentProcedure;
+    private String lastLoadedSymbol;
 
     EmittingVisitorV2(Emitter emitter, DeclarationsExtractor declarations) {
         this.emitter = Objects.requireNonNull(emitter);
@@ -130,7 +131,6 @@ class EmittingVisitorV2 extends JobotwarV2BaseVisitor<Void> {
         if (emitStoreVariable(ident) == false) {
             logSemanticError(ctx, "unknown variable '" + ident + "'");
         }
-        this.emitter.emit(OpCode.LABEL, nextLabel());
         return null;
     }
 
@@ -187,6 +187,12 @@ class EmittingVisitorV2 extends JobotwarV2BaseVisitor<Void> {
                 this.emitter.emit(OpCode.ST_REG, "AIM");
                 this.emitter.emit(OpCode.ST_REG, "SHOT");
                 break;
+            case "log":
+                if (getArgumentCount(functionCall) != 1) {
+                    logSemanticError(functionCall, ctx.getText() + " requires 1 arguments");
+                }
+                this.emitter.emit(OpCode.LOG, this.lastLoadedSymbol);
+                break;
             case "random":
             case "damage":
             case "x":
@@ -197,6 +203,7 @@ class EmittingVisitorV2 extends JobotwarV2BaseVisitor<Void> {
                 logSemanticError(ctx, "unknown register '" + functionCall.Ident().getText() + "'");
                 break;
         }
+        this.emitter.emit(OpCode.LABEL, nextLabel());
         return null;
     }
 
@@ -356,15 +363,21 @@ class EmittingVisitorV2 extends JobotwarV2BaseVisitor<Void> {
         super.visitAtom(ctx);
         if (ctx.functionCall() != null) {
             emitFunctionCallAtom(ctx.functionCall());
+            this.lastLoadedSymbol = ctx.functionCall().Ident().getText();
         } else if (ctx.member() != null) {
             emitMemberAtom(ctx.member());
+            this.lastLoadedSymbol = ctx.member().functionCall().Ident().getText();
         } else if (ctx.literal() != null) {
             emitLiteralAtom(ctx.literal());
+            this.lastLoadedSymbol = ctx.literal().getText();
         } else if (ctx.Ident() != null) {
             final String ident = ctx.Ident().getText();
+            this.lastLoadedSymbol = ident;
             if (emitLoadVariable(ident) == false) {
                 logSemanticError(ctx, "unknown variable '" + ident + "'");
             }
+        } else {
+            this.lastLoadedSymbol = null;
         }
         return null;
     }
