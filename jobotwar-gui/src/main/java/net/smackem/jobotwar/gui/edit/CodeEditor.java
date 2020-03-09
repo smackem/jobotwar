@@ -25,6 +25,7 @@ public class CodeEditor extends CodeArea {
     private static final Pattern PATTERN_WHITESPACE = Pattern.compile("^\\s+");
     private final ObjectProperty<Compiler.Language> syntax = new SimpleObjectProperty<>(Compiler.Language.V1);
     private SyntaxHighlighting syntaxHighlighting = new SyntaxHighlightingV1();
+    private Pattern pattern;
 
     public CodeEditor() {
         // show line numbers
@@ -57,9 +58,12 @@ public class CodeEditor extends CodeArea {
                             this.syntaxHighlighting = new SyntaxHighlightingV1();
                             break;
                         case V2:
+                            this.syntaxHighlighting = new SyntaxHighlightingV2();
+                            break;
                         default:
                             throw new IllegalArgumentException("Unsupported language " + val);
                     }
+                    this.pattern = null;
                     setStyleSpans(0, computeHighlighting(getText()));
                 });
     }
@@ -81,7 +85,7 @@ public class CodeEditor extends CodeArea {
     }
 
     private StyleSpans<Collection<String>> computeHighlighting(String text) {
-        final Matcher matcher = this.syntaxHighlighting.getPattern().matcher(text);
+        final Matcher matcher = ensurePattern().matcher(text);
         final StyleSpansBuilder<Collection<String>> spansBuilder = new StyleSpansBuilder<>();
         int lastKwEnd = 0;
 
@@ -95,6 +99,13 @@ public class CodeEditor extends CodeArea {
 
         spansBuilder.add(Collections.emptyList(), text.length() - lastKwEnd);
         return spansBuilder.create();
+    }
+
+    private Pattern ensurePattern() {
+        if (this.pattern == null) {
+            this.pattern = this.syntaxHighlighting.getPattern();
+        }
+        return this.pattern;
     }
 
     private interface SyntaxHighlighting {
@@ -119,30 +130,60 @@ public class CodeEditor extends CodeArea {
         private static final String NUMBER_PATTERN = "\\b\\d+(\\.\\d*)?\\b";
         private static final String COMMENT_PATTERN = "//[^\n]*";
 
-        private static final Pattern PATTERN = Pattern.compile(
-                "(?<KEYWORD>" + KEYWORD_PATTERN + ")"
-                        + "|(?<LABEL>" + LABEL_PATTERN + ")"
-                        + "|(?<REGISTER>" + REGISTER_PATTERN + ")"
-                        + "|(?<GOESTO>" + GOES_TO_PATTERN + ")"
-                        + "|(?<NUMBER>" + NUMBER_PATTERN + ")"
-                        + "|(?<COMMENT>" + COMMENT_PATTERN + ")"
-        );
-
         @Override
         public Pattern getPattern() {
-            return PATTERN;
+            return Pattern.compile(
+                    "(?<KEYWORD>" + KEYWORD_PATTERN + ")" +
+                    "|(?<LABEL>" + LABEL_PATTERN + ")" +
+                    "|(?<REGISTER>" + REGISTER_PATTERN + ")" +
+                    "|(?<GOESTO>" + GOES_TO_PATTERN + ")" +
+                    "|(?<NUMBER>" + NUMBER_PATTERN + ")" +
+                    "|(?<COMMENT>" + COMMENT_PATTERN + ")");
         }
 
         @Override
         public String getStyleClass(Matcher matcher) {
-            return
-                    matcher.group("KEYWORD") != null ? "keyword" :
+            return matcher.group("KEYWORD") != null ? "keyword" :
                     matcher.group("LABEL") != null ? "label" :
                     matcher.group("REGISTER") != null ? "register" :
                     matcher.group("GOESTO") != null ? "goesTo" :
                     matcher.group("NUMBER") != null ? "number" :
                     matcher.group("COMMENT") != null ? "comment" :
                     null; // never happens
+        }
+    }
+
+    private static class SyntaxHighlightingV2 implements SyntaxHighlighting {
+        private static final String[] KEYWORDS = new String[] {
+                "and", "or", "not", "abs", "sin", "cos",
+                "if", "tan", "asin", "acos", "def",
+                "return", "while", "else",
+        };
+
+        private static final String KEYWORD_PATTERN = "\\b(" + String.join("|", KEYWORDS) + ")\\b";
+        private static final String LABEL_PATTERN = "\\b(state|yield)\\b";
+        private static final String REGISTER_PATTERN = "@\\w+\\b";
+        private static final String NUMBER_PATTERN = "\\b\\d+(\\.\\d*)?\\b";
+        private static final String COMMENT_PATTERN = "//[^\n]*";
+
+        @Override
+        public Pattern getPattern() {
+            return Pattern.compile(
+                    "(?<KEYWORD>" + KEYWORD_PATTERN + ")" +
+                    "|(?<LABEL>" + LABEL_PATTERN + ")" +
+                    "|(?<REGISTER>" + REGISTER_PATTERN + ")" +
+                    "|(?<NUMBER>" + NUMBER_PATTERN + ")" +
+                    "|(?<COMMENT>" + COMMENT_PATTERN + ")");
+        }
+
+        @Override
+        public String getStyleClass(Matcher matcher) {
+            return matcher.group("KEYWORD") != null ? "keyword" :
+                matcher.group("LABEL") != null ? "label" :
+                matcher.group("REGISTER") != null ? "register" :
+                matcher.group("NUMBER") != null ? "number" :
+                matcher.group("COMMENT") != null ? "comment" :
+                null; // never happens
         }
     }
 }

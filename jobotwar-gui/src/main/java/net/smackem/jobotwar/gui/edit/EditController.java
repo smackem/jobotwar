@@ -102,9 +102,11 @@ public class EditController {
         this.languageV2Radio.setUserData(Compiler.Language.V2);
         this.languageToggleGroup.selectedToggleProperty().addListener(
                 (prop, old, val) -> {
-                    final Compiler.Language language = (Compiler.Language)val.getUserData();
-                    this.selectedRobot.get().languageProperty().set(language);
-                    this.sourceText.syntaxProperty().set(language);
+                    if (val != null) {
+                        final Compiler.Language language = (Compiler.Language) val.getUserData();
+                        this.selectedRobot.get().languageProperty().set(language);
+                        this.sourceText.syntaxProperty().set(language);
+                    }
                 });
     }
 
@@ -199,7 +201,8 @@ public class EditController {
         final int rgb = RgbConvert.toRgb(color);
         final Image image = robotViewModel.imageProperty().get();
         final Compiler compiler = new Compiler();
-        final Compiler.Result result = compiler.compile(robotViewModel.sourceCodeProperty().get(), Compiler.Language.V1);
+        final Compiler.Result result = compiler.compile(robotViewModel.sourceCodeProperty().get(),
+                robotViewModel.languageProperty().get());
         if (result.hasErrors()) {
             throw new Exception(String.join("\n", result.errors()));
         }

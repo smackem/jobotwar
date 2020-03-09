@@ -155,32 +155,32 @@ class EmittingVisitorV2 extends JobotwarV2BaseVisitor<Void> {
         final var functionCall = ctx.member().functionCall();
         switch (functionCall.Ident().getText()) {
             case "speed":
-                if (functionCall.arguments().expression().size() != 2) {
+                if (getArgumentCount(functionCall) != 2) {
                     logSemanticError(functionCall, ctx.getText() + " requires 2 arguments");
                 }
                 this.emitter.emit(OpCode.ST_REG, "SPEEDY");
                 this.emitter.emit(OpCode.ST_REG, "SPEEDX");
                 break;
             case "speedX":
-                if (functionCall.arguments().expression().size() != 1) {
+                if (getArgumentCount(functionCall) != 1) {
                     logSemanticError(functionCall, ctx.getText() + " requires 1 arguments");
                 }
                 this.emitter.emit(OpCode.ST_REG, "SPEEDX");
                 break;
             case "speedY":
-                if (functionCall.arguments().expression().size() != 1) {
+                if (getArgumentCount(functionCall) != 1) {
                     logSemanticError(functionCall, ctx.getText() + " requires 1 arguments");
                 }
                 this.emitter.emit(OpCode.ST_REG, "SPEEDY");
                 break;
             case "radar":
-                if (functionCall.arguments().expression().size() != 1) {
+                if (getArgumentCount(functionCall) != 1) {
                     logSemanticError(functionCall, ctx.getText() + " requires 1 arguments");
                 }
                 this.emitter.emit(OpCode.ST_REG, "RADAR");
                 break;
             case "fire":
-                if (functionCall.arguments().expression().size() != 2) {
+                if (getArgumentCount(functionCall) != 2) {
                     logSemanticError(functionCall, ctx.getText() + " requires 2 arguments");
                 }
                 this.emitter.emit(OpCode.SWAP);
@@ -211,6 +211,13 @@ class EmittingVisitorV2 extends JobotwarV2BaseVisitor<Void> {
             return null;
         }
         final List<String> parameters = state.parameters();
+        if (getArgumentCount(functionCall) != parameters.size()) {
+            logSemanticError(functionCall,
+                    String.format("wrong number of arguments: expected %d, found %d",
+                            parameters.size(),
+                            getArgumentCount(functionCall)));
+            return null;
+        }
         for (int i = parameters.size() - 1; i >= 0; i--) {
             final String global = DeclarationsExtractor.getStateParameterName(ident, parameters.get(i));
             final VariableDecl variable = this.declarations.globals.get(global);
@@ -385,6 +392,13 @@ class EmittingVisitorV2 extends JobotwarV2BaseVisitor<Void> {
             logSemanticError(ctx, "unkown function '" + ident + "'");
             return;
         }
+        if (ctx.arguments().expression().size() != function.parameters().size()) {
+            logSemanticError(ctx,
+                    String.format("wrong number of arguments: expected %d, found %d",
+                            function.parameters().size(),
+                            ctx.arguments().expression().size()));
+            return;
+        }
         emitCall(function);
     }
 
@@ -402,52 +416,52 @@ class EmittingVisitorV2 extends JobotwarV2BaseVisitor<Void> {
         final String ident = functionCall.Ident().getText();
         switch (ident) {
             case "speedX":
-                if (functionCall.arguments().expression().size() != 0) {
+                if (getArgumentCount(functionCall) != 0) {
                     logSemanticError(functionCall, "@" + ident + " requires 0 arguments");
                 }
                 this.emitter.emit(OpCode.LD_REG, "SPEEDX");
                 break;
             case "speedY":
-                if (functionCall.arguments().expression().size() != 0) {
+                if (getArgumentCount(functionCall) != 0) {
                     logSemanticError(functionCall, "@" + ident + " requires 0 arguments");
                 }
                 this.emitter.emit(OpCode.LD_REG, "SPEEDY");
                 break;
             case "random":
-                if (functionCall.arguments().expression().size() != 0) {
+                if (getArgumentCount(functionCall) != 0) {
                     logSemanticError(functionCall, "@" + ident + " requires 0 arguments");
                 }
                 this.emitter.emit(OpCode.LD_REG, "RANDOM");
                 break;
             case "radar":
-                if (functionCall.arguments().expression().size() > 1) {
+                if (getArgumentCount(functionCall) > 1) {
                     logSemanticError(functionCall, "@" + ident + " requires 0 or 1 arguments");
                 }
-                if (functionCall.arguments().expression().size() == 1) {
+                if (getArgumentCount(functionCall) == 1) {
                     this.emitter.emit(OpCode.ST_REG, "RADAR");
                 }
                 this.emitter.emit(OpCode.LD_REG, "RADAR");
                 break;
             case "fire":
-                if (functionCall.arguments().expression().size() != 0) {
+                if (getArgumentCount(functionCall) != 0) {
                     logSemanticError(functionCall, "@" + ident + " requires 0 arguments");
                 }
                 this.emitter.emit(OpCode.LD_REG, "SHOT");
                 break;
             case "damage":
-                if (functionCall.arguments().expression().size() != 0) {
+                if (getArgumentCount(functionCall) != 0) {
                     logSemanticError(functionCall, "@" + ident + " requires 0 arguments");
                 }
                 this.emitter.emit(OpCode.LD_REG, "DAMAGE");
                 break;
             case "x":
-                if (functionCall.arguments().expression().size() != 0) {
+                if (getArgumentCount(functionCall) != 0) {
                     logSemanticError(functionCall, "@" + ident + " requires 0 arguments");
                 }
                 this.emitter.emit(OpCode.LD_REG, "X");
                 break;
             case "y":
-                if (functionCall.arguments().expression().size() != 0) {
+                if (getArgumentCount(functionCall) != 0) {
                     logSemanticError(functionCall, "@" + ident + " requires 0 arguments");
                 }
                 this.emitter.emit(OpCode.LD_REG, "Y");
@@ -456,6 +470,14 @@ class EmittingVisitorV2 extends JobotwarV2BaseVisitor<Void> {
                 logSemanticError(ctx, "unknown register '" + ident + "'");
                 break;
         }
+    }
+
+    private int getArgumentCount(JobotwarV2Parser.FunctionCallContext ctx) {
+        final var arguments = ctx.arguments();
+        if (arguments == null) {
+            return 0;
+        }
+        return arguments.expression().size();
     }
 
     private void emitLiteralAtom(JobotwarV2Parser.LiteralContext ctx) {
