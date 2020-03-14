@@ -172,8 +172,10 @@ public class EditController {
             this.colorPicker.valueProperty().bindBidirectional(robot.colorProperty());
             this.sourceText.replaceText(robot.sourceCodeProperty().get());
             this.iconComboBox.getSelectionModel().select(robot.imageProperty().get());
-            this.languageV1Radio.setSelected(robot.languageProperty().get() == Compiler.Language.V1);
-            this.languageV2Radio.setSelected(robot.languageProperty().get() == Compiler.Language.V2);
+            final Compiler.Language language = robot.languageProperty().get();
+            this.languageV1Radio.setSelected(language == Compiler.Language.V1);
+            this.languageV2Radio.setSelected(language == Compiler.Language.V2);
+            this.sourceText.syntaxProperty().set(language);
         }
     }
 

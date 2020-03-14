@@ -157,7 +157,7 @@ public class CodeEditor extends CodeArea {
         private static final String[] KEYWORDS = new String[] {
                 "and", "or", "not", "abs", "sin", "cos",
                 "if", "tan", "asin", "acos", "def",
-                "return", "while", "else",
+                "return", "while", "else", "true", "false", "exit"
         };
 
         private static final String KEYWORD_PATTERN = "\\b(" + String.join("|", KEYWORDS) + ")\\b";
