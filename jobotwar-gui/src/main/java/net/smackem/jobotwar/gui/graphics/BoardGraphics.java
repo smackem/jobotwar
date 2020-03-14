@@ -3,8 +3,7 @@ package net.smackem.jobotwar.gui.graphics;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
+import javafx.scene.paint.*;
 import javafx.scene.shape.ArcType;
 import net.smackem.jobotwar.runtime.Vector;
 import net.smackem.jobotwar.runtime.*;
@@ -137,6 +136,18 @@ public class BoardGraphics {
             gc.setLineWidth(2);
             gc.setStroke(Color.BLACK);
             gc.strokeOval(innerX, innerY, innerW, innerW);
+            // subtle light effect
+            gc.setFill(new RadialGradient(
+                    225,
+                    0.6,
+                    x,
+                    y,
+                    Constants.ROBOT_RADIUS,
+                    false,
+                    CycleMethod.NO_CYCLE,
+                    new Stop(0, Color.rgb(255, 255, 255, 0.1)),
+                    new Stop(1, Color.rgb(0, 0, 0, 0.3))));
+            gc.fillOval(innerX, innerY, innerW, innerW);
 
             // icon image
             final String imageUrl = robot.imageUrl();
