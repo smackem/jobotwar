@@ -554,6 +554,60 @@ public class CompilerTest {
         assertThat(env.readRadar()).isEqualTo(3);
     }
 
+    @Test
+    public void testV2Random0() {
+        final String source = "" +
+                "state main() {\n" +
+                "   @radar(@random())\n" +
+                "   exit\n" +
+                "}\n";
+        final Program program = compileV2(source);
+        System.out.println(program.toString());
+        final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
+        final Interpreter interpreter = new Interpreter(program, env);
+
+        for (int i = 0; i < 100; i++) {
+            InterpreterTest.runComplete(interpreter);
+            assertThat(env.readRadar()).isBetween(0.0, 1.0);
+        }
+    }
+
+    @Test
+    public void testV2Random1() {
+        final String source = "" +
+                "state main() {\n" +
+                "   @radar(@random(10))\n" +
+                "   exit\n" +
+                "}\n";
+        final Program program = compileV2(source);
+        System.out.println(program.toString());
+        final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
+        final Interpreter interpreter = new Interpreter(program, env);
+
+        for (int i = 0; i < 100; i++) {
+            InterpreterTest.runComplete(interpreter);
+            assertThat(env.readRadar()).isBetween(0.0, 10.0);
+        }
+    }
+
+    @Test
+    public void testV2Random2() {
+        final String source = "" +
+                "state main() {\n" +
+                "   @radar(@random(100, 120))\n" +
+                "   exit\n" +
+                "}\n";
+        final Program program = compileV2(source);
+        System.out.println(program.toString());
+        final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
+        final Interpreter interpreter = new Interpreter(program, env);
+
+        for (int i = 0; i < 100; i++) {
+            InterpreterTest.runComplete(interpreter);
+            assertThat(env.readRadar()).isBetween(100.0, 120.0);
+        }
+    }
+
     private Program compileV1(String source) {
         final Compiler compiler = new Compiler();
         final Compiler.Result result = compiler.compile(source, Compiler.Language.V1);

@@ -4,10 +4,7 @@ import net.smackem.jobotwar.lang.Instruction;
 import net.smackem.jobotwar.lang.OpCode;
 import net.smackem.jobotwar.lang.Program;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Emitter is used to emit byte code.
@@ -18,10 +15,10 @@ public class Emitter {
     private List<Instruction> instructions = new ArrayList<>();
 
     /**
-     * @return the {@link Instruction}s that have been emitted.
+     * @return an unmodifiable list containing the {@link Instruction}s that have been emitted.
      */
     public List<Instruction> instructions() {
-        return this.instructions;
+        return Collections.unmodifiableList(this.instructions);
     }
 
     /**
@@ -85,17 +82,31 @@ public class Emitter {
         emit(new Instruction(opCode, strArg));
     }
 
+    /**
+     * Emits an instruction, inserting it immediately before the last instruction.
+     * @param instruction The {@link Instruction} to emit.
+     */
+    public void emitBeforeLast(Instruction instruction) {
+        if (this.instructions.isEmpty()) {
+            throw new UnsupportedOperationException("operation not supported on empty instruction list");
+        }
+        if (this.isDisabled()) {
+            return;
+        }
+        this.instructions.add(instructions.size() - 1, instruction);
+    }
+
     private void emit(Instruction instruction) {
         if (this.isDisabled()) {
             return;
         }
-        instructions().add(instruction);
+        this.instructions.add(instruction);
     }
 
     private void fixup() {
         final Map<String, Integer> labelIndices = new HashMap<>();
         int index = 0;
-        for (final Instruction instr : this.instructions()) {
+        for (final Instruction instr : this.instructions) {
             if (instr.opCode() == OpCode.LABEL) {
                 labelIndices.put(instr.strArg(), index);
                 instr.setIntArg(index);

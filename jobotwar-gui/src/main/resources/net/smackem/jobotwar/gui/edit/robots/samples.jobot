@@ -411,3 +411,49 @@ move:
     abs(RADAR) -> SHOT if RADAR < 0
     goto move unless SPEEDX = 0 and SPEEDY = 0
     goto newloc
+
+// =============================
+// robot shooting bee
+
+def angle = 0
+
+state main() {
+    def damage = @damage()
+    while damage == @damage() {
+        def r = @radar(angle)
+        if r < 0 {
+            @fire(angle, abs(r))
+        } else {
+            angle = angle + 7
+        }
+    }
+    yield newDest()
+}
+
+state newDest() {
+    def x = 50 + @random() * 500
+    def y = 50 + @random() * 400
+    @speedX(x - @x())
+    @speedY(y - @y())
+    yield move(x, y)
+}
+
+state move(x, y) {
+    while true {
+        if abs(x - @x()) < 40 {
+            @speedX(0)
+        }
+        if abs(y - @y()) < 40 {
+            @speedY(0)
+        }
+        if @speedX() == 0 and @speedY() == 0 {
+            yield main
+        }
+        def r = @radar(angle)
+        if r < 0 {
+            @fire(angle, abs(r))
+        } else {
+            angle = angle + 7
+        }
+    }
+}

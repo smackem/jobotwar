@@ -1,5 +1,6 @@
 package net.smackem.jobotwar.lang.v2;
 
+import net.smackem.jobotwar.lang.Instruction;
 import net.smackem.jobotwar.lang.OpCode;
 import net.smackem.jobotwar.lang.common.Emitter;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -441,10 +442,7 @@ class EmittingVisitorV2 extends JobotwarV2BaseVisitor<Void> {
                 this.emitter.emit(OpCode.LD_REG, "SPEEDY");
                 break;
             case "random":
-                if (getArgumentCount(functionCall) != 0) {
-                    logSemanticError(functionCall, "@" + ident + " requires 0 arguments");
-                }
-                this.emitter.emit(OpCode.LD_REG, "RANDOM");
+                emitRandom(functionCall, ident);
                 break;
             case "radar":
                 if (getArgumentCount(functionCall) > 1) {
@@ -482,6 +480,41 @@ class EmittingVisitorV2 extends JobotwarV2BaseVisitor<Void> {
                 break;
             default:
                 logSemanticError(ctx, "unknown register '" + ident + "'");
+                break;
+        }
+    }
+
+    private void emitRandom(JobotwarV2Parser.FunctionCallContext functionCall, String ident) {
+        final int argCount = getArgumentCount(functionCall);
+        switch (argCount) {
+            case 0:
+                this.emitter.emit(OpCode.LD_REG, "RANDOM");
+                break;
+            case 1:
+                this.emitter.emit(OpCode.LD_REG, "RANDOM");
+                this.emitter.emit(OpCode.MUL);
+                break;
+            case 2:
+                /*
+                @random(50, 150) is translated to:
+                    push 50
+                    dup
+                    push 150
+                    swap
+                    sub
+                    push RANDOM
+                    mul
+                    add
+                 */
+                this.emitter.emitBeforeLast(new Instruction(OpCode.DUP));
+                this.emitter.emit(OpCode.SWAP);
+                this.emitter.emit(OpCode.SUB);
+                this.emitter.emit(OpCode.LD_REG, "RANDOM");
+                this.emitter.emit(OpCode.MUL);
+                this.emitter.emit(OpCode.ADD);
+                break;
+            default:
+                logSemanticError(functionCall, "@" + ident + " requires 0, 1 or 2 arguments");
                 break;
         }
     }

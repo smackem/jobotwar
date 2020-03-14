@@ -2,6 +2,7 @@ package net.smackem.jobotwar.lang;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.concurrent.ThreadLocalRandom;
 
 class TestRuntimeEnvironment implements RuntimeEnvironment {
     private double aim;
@@ -82,7 +83,7 @@ class TestRuntimeEnvironment implements RuntimeEnvironment {
 
     @Override
     public double getRandom() {
-        return 42;
+        return ThreadLocalRandom.current().nextDouble();
     }
 
     @Override
