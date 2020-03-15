@@ -39,12 +39,12 @@ public class BoardGraphics {
 
     public void addExplosions(Collection<Vector> positions) {
         for (final Vector position : positions) {
-            this.explosions.add(new Explosion(position, null));
+            this.explosions.add(new GenericExplosion(position));
         }
     }
 
     public void addRobotExplosion(Robot robot) {
-        this.explosions.add(new Explosion(robot.position(), robot));
+        this.explosions.add(new RobotExplosion(robot.position(), robot));
     }
 
     public void addRadarBeams(Collection<RadarBeam> beams) {
@@ -136,6 +136,18 @@ public class BoardGraphics {
             gc.setLineWidth(2);
             gc.setStroke(Color.BLACK);
             gc.strokeOval(innerX, innerY, innerW, innerW);
+
+            // icon image
+            final String imageUrl = robot.imageUrl();
+            if (imageUrl != null) {
+                Image image = this.images.get(imageUrl);
+                if (image == null) {
+                    image = new Image(robot.imageUrl());
+                    this.images.put(imageUrl, image);
+                }
+                gc.drawImage(image, x - image.getWidth() / 2, y - image.getHeight() / 2);
+            }
+
             // subtle light effect
             gc.setFill(new RadialGradient(
                     225,
@@ -148,72 +160,19 @@ public class BoardGraphics {
                     new Stop(0, Color.rgb(255, 255, 255, 0.1)),
                     new Stop(1, Color.rgb(0, 0, 0, 0.3))));
             gc.fillOval(innerX, innerY, innerW, innerW);
-
-            // icon image
-            final String imageUrl = robot.imageUrl();
-            if (imageUrl != null) {
-                Image image = this.images.get(imageUrl);
-                if (image == null) {
-                    image = new Image(robot.imageUrl());
-                    this.images.put(imageUrl, image);
-                }
-                gc.drawImage(image, x - image.getWidth() / 2, y - image.getHeight() / 2);
-            }
         }
     }
 
     private void renderExplosions(GraphicsContext gc) {
-        gc.save();
-        gc.setLineWidth(5.0);
-        gc.setEffect(new GaussianBlur(2));
         final Collection<Explosion> finishedExplosions = new ArrayList<>();
         for (final Explosion explosion : this.explosions) {
-            if (explosion.particleExplosion != null) {
-                continue;
-            }
-            if (renderExplosion(gc, explosion)) {
-                finishedExplosions.add(explosion);
-            }
-        }
-        gc.restore();
-        for (final Explosion explosion : this.explosions) {
-            if (explosion.particleExplosion == null) {
-                continue;
-            }
-            if (renderRobotExplosion(gc, explosion)) {
+            if (explosion.render(gc)) {
                 finishedExplosions.add(explosion);
             }
         }
         if (this.explosions.removeAll(finishedExplosions)) {
             log.debug("explosions count: {}", this.explosions.size());
         }
-    }
-
-    private boolean renderRobotExplosion(GraphicsContext gc, Explosion explosion) {
-        gc.save();
-        gc.translate(explosion.position.x() - explosion.particleExplosion.width() / 2, explosion.position.y() -  explosion.particleExplosion.height() / 2);
-        final boolean finished = explosion.particleExplosion.render(gc) == false;
-        gc.restore();
-        return finished;
-    }
-
-    private boolean renderExplosion(GraphicsContext gc, Explosion explosion) {
-        Paint paint = Color.rgb(0xff,0xd0,0x50,1.0 - explosion.radius / Constants.EXPLOSION_RADIUS);
-        gc.setStroke(paint);
-        gc.strokeOval(
-                explosion.position.x() - explosion.radius + 4,
-                explosion.position.y() - explosion.radius + 4,
-                explosion.radius * 2 - 8,
-                explosion.radius * 2 - 8);
-        paint = Color.rgb(0xff,0x40,0x40,1.0 - explosion.radius / (Constants.EXPLOSION_RADIUS * 1.5));
-        gc.setStroke(paint);
-        gc.strokeOval(
-                explosion.position.x() - explosion.radius,
-                explosion.position.y() - explosion.radius,
-                explosion.radius * 2,
-                explosion.radius * 2);
-        explosion.radius += 2.5;
-        return explosion.radius > Constants.EXPLOSION_RADIUS;
     }
 
     private static Paint getHealthPaint(int health) {
@@ -225,22 +184,69 @@ public class BoardGraphics {
         return cachedPaint;
     }
 
-    private static class Explosion {
+    private static abstract class Explosion {
         final Vector position;
-        final ParticleExplosion particleExplosion;
-        double radius;
 
-        Explosion(Vector position, Robot robot) {
+        Explosion(Vector position) {
             this.position = position;
+        }
+
+        abstract boolean render(GraphicsContext gc);
+    }
+
+    private static class GenericExplosion extends Explosion {
+        double radius;
+        static final GaussianBlur BLUR = new GaussianBlur(2);
+
+        GenericExplosion(Vector position) {
+            super(position);
             this.radius = 1;
-            if (robot == null) {
-                this.particleExplosion = null;
-            } else {
-                final Color color = RgbConvert.toColor(robot.rgb());
-                final int hue = (int)color.getHue();
-                this.particleExplosion = new ParticleExplosion(120, 120,
-                        500, hue - 15, hue + 15);
-            }
+        }
+
+        @Override
+        boolean render(GraphicsContext gc) {
+            gc.save();
+            gc.setLineWidth(5.0);
+            gc.setEffect(BLUR);
+            Paint paint = Color.rgb(0xff,0xd0,0x50,1.0 - radius / Constants.EXPLOSION_RADIUS);
+            gc.setStroke(paint);
+            gc.strokeOval(
+                    this.position.x() - this.radius + 4,
+                    this.position.y() - this.radius + 4,
+                    this.radius * 2 - 8,
+                    this.radius * 2 - 8);
+            paint = Color.rgb(0xff,0x40,0x40,1.0 - this.radius / (Constants.EXPLOSION_RADIUS * 1.5));
+            gc.setStroke(paint);
+            gc.strokeOval(
+                    this.position.x() - this.radius,
+                    this.position.y() - this.radius,
+                    this.radius * 2,
+                    this.radius * 2);
+            gc.restore();
+            this.radius += 2.5;
+            return this.radius > Constants.EXPLOSION_RADIUS;
+        }
+    }
+
+    private static class RobotExplosion extends Explosion {
+        final ParticleExplosion particleExplosion;
+
+        RobotExplosion(Vector position, Robot robot) {
+            super(position);
+            final Color color = RgbConvert.toColor(robot.rgb());
+            final int hue = (int)color.getHue();
+            this.particleExplosion = new ParticleExplosion(120, 120,
+                    500, hue - 15, hue + 15);
+        }
+
+        @Override
+        boolean render(GraphicsContext gc) {
+            gc.save();
+            gc.translate(this.position.x() - this.particleExplosion.width() / 2,
+                    this.position.y() -  this.particleExplosion.height() / 2);
+            final boolean finished = this.particleExplosion.render(gc) == false;
+            gc.restore();
+            return finished;
         }
     }
 
