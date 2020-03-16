@@ -17,7 +17,6 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
@@ -34,7 +33,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class MainController {
 
@@ -56,11 +54,11 @@ public class MainController {
     @FXML
     private Label winnerLabel;
     @FXML
-    private TextArea messagesTextArea;
-    @FXML
     private Label replayLabel;
     @FXML
     private Button playbackButton;
+    @FXML
+    private RichTextBox messagesRichText;
 
     public MainController() {
         final App app = App.instance();
@@ -84,7 +82,7 @@ public class MainController {
         this.canvas.setWidth(board.width());
         this.canvas.setHeight(board.height());
         this.graphics.render(this.canvas.getGraphicsContext2D());
-        this.messagesTextArea.appendText("Welcome to the battle of programs!\n");
+        this.messagesRichText.appendText("Welcome to the battle of programs!\n");
         this.replayLabel.visibleProperty().bind(this.replay);
         this.playbackButton.textProperty().bind(
                 Bindings.when(this.ticker.statusProperty().isEqualTo(Animation.Status.RUNNING))
@@ -100,10 +98,10 @@ public class MainController {
     private void startGame(MouseEvent mouseEvent) {
         if (this.ticker.getStatus() == Animation.Status.RUNNING) {
             this.ticker.stop();
-            this.messagesTextArea.appendText("Game paused at " + LocalDateTime.now() + "\n");
+            this.messagesRichText.appendText("Game paused at " + LocalDateTime.now() + "\n");
         } else {
             this.ticker.play();
-            this.messagesTextArea.appendText("Game started at " + LocalDateTime.now() + "\n");
+            this.messagesRichText.appendText("Game started at " + LocalDateTime.now() + "\n");
         }
     }
 
@@ -121,7 +119,7 @@ public class MainController {
             tickResult = this.engine.tick();
         } catch (RobotProgramException e) {
             this.ticker.stop();
-            this.messagesTextArea.appendText(String.format("ERROR @ Robot '%s': %s", e.robotName(), e.getMessage()));
+            this.messagesRichText.appendText(String.format("ERROR @ Robot '%s': %s", e.robotName(), e.getMessage()));
             return;
         }
 
@@ -133,7 +131,7 @@ public class MainController {
             r.update();
         }
         for (final Robot robot : tickResult.killedRobots()) {
-            this.messagesTextArea.appendText(robot.name() + " got killed.\n");
+            this.messagesRichText.appendText(robot.name() + " got killed.\n");
         }
         if (tickResult.hasEnded()) {
             showGameResult(tickResult);
@@ -146,14 +144,14 @@ public class MainController {
             this.winnerLabel.setText(winner.name() + " has won!");
             this.winnerLabel.setTextFill(RgbConvert.toColor(winner.rgb()));
             this.winnerOverlay.setVisible(true);
-            this.messagesTextArea.appendText(winner.name() + " has won the game!\n");
+            this.messagesRichText.appendText(winner.name() + " has won the game!\n");
             return;
         }
         if (tickResult.isDraw()) {
             this.winnerLabel.setText("Draw!");
             this.winnerLabel.setTextFill(Color.WHITE);
             this.winnerOverlay.setVisible(true);
-            this.messagesTextArea.appendText("The game has ended with a draw!\n");
+            this.messagesRichText.appendText("The game has ended with a draw!\n");
         }
     }
 
@@ -185,7 +183,7 @@ public class MainController {
 
     @Subscribe
     private void onRobotLogMessage(RobotLogMessage message) {
-        this.messagesTextArea.appendText(String.format("[%s] %s: %f\n",
+        this.messagesRichText.appendText(String.format("[%s] %s: %f\n",
                 message.robotName(), message.category(), message.value()));
     }
 }

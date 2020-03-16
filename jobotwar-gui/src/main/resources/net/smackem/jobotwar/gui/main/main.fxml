@@ -4,6 +4,7 @@
 <?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import net.smackem.jobotwar.gui.main.RichTextBox?>
 <BorderPane styleClass="root"
             stylesheets="@main.css"
             xmlns="http://javafx.com/javafx/10.0.2-internal"
@@ -26,7 +27,7 @@
                </VBox>
             </StackPane>
          </StackPane>
-         <TextArea fx:id="messagesTextArea" editable="false" />
+         <RichTextBox fx:id="messagesRichText" editable="false" />
       </VBox>
    </left>
    <center>
