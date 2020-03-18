@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class MainController {
@@ -183,7 +184,17 @@ public class MainController {
 
     @Subscribe
     private void onRobotLogMessage(RobotLogMessage message) {
-        this.messagesRichText.appendText(String.format("[%s] %s: %f\n",
-                message.robotName(), message.category(), message.value()));
+        final Color color = this.robots.stream()
+                .filter(r -> Objects.equals(r.nameProperty().get(), message.robotName()))
+                .map(r -> r.colorProperty().get())
+                .findFirst()
+                .orElse(Color.GRAY);
+        this.messagesRichText.appendText(
+                String.format("[%s] %s: %f\n",
+                        message.robotName(), message.category(), message.value()),
+                String.format("-fx-fill: rgb(%d, %d, %d)",
+                        (int)(color.getRed() * 255),
+                        (int)(color.getGreen() * 255),
+                        (int)(color.getBlue() * 255)));
     }
 }

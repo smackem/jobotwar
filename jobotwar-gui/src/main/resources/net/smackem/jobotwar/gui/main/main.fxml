@@ -27,7 +27,9 @@
                </VBox>
             </StackPane>
          </StackPane>
-         <RichTextBox fx:id="messagesRichText" editable="false" />
+         <StackPane>
+            <RichTextBox fx:id="messagesRichText" editable="false" prefHeight="1000" />
+         </StackPane>
       </VBox>
    </left>
    <center>

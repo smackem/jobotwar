@@ -55,7 +55,7 @@
     -fx-border-color: #101010;
 }
 
-.text-area {
+#messagesRichText {
     -fx-background-color: #000000;
     -fx-font-family: 'Cascadia Code', 'DejaVu Sans Mono', 'Consolas', monospace;
     -fx-text-fill: #c0c0c0;
@@ -63,7 +63,7 @@
     -fx-border-width: 1px;
 }
 
-.text-area .content {
+#messagesRichText .content {
     -fx-background-color: transparent;
 }
 
