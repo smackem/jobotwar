@@ -13,7 +13,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.release>11</maven.compiler.release>
+        <maven.compiler.release>13</maven.compiler.release>
+        <javafx.version>14</javafx.version>
     </properties>
 
     <dependencyManagement>
@@ -48,83 +49,83 @@
             <dependency>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-controls</artifactId>
-                <version>${maven.compiler.release}</version>
+                <version>${javafx.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-controls</artifactId>
-                <version>${maven.compiler.release}</version>
+                <version>${javafx.version}</version>
                 <classifier>win</classifier>
             </dependency>
             <dependency>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-controls</artifactId>
-                <version>${maven.compiler.release}</version>
+                <version>${javafx.version}</version>
                 <classifier>linux</classifier>
             </dependency>
             <dependency>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-controls</artifactId>
-                <version>${maven.compiler.release}</version>
+                <version>${javafx.version}</version>
                 <classifier>mac</classifier>
             </dependency>
             <dependency>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-fxml</artifactId>
-                <version>${maven.compiler.release}</version>
+                <version>${javafx.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-fxml</artifactId>
-                <version>${maven.compiler.release}</version>
+                <version>${javafx.version}</version>
                 <classifier>win</classifier>
             </dependency>
             <dependency>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-fxml</artifactId>
-                <version>${maven.compiler.release}</version>
+                <version>${javafx.version}</version>
                 <classifier>linux</classifier>
             </dependency>
             <dependency>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-fxml</artifactId>
-                <version>${maven.compiler.release}</version>
+                <version>${javafx.version}</version>
                 <classifier>mac</classifier>
             </dependency>
             <dependency>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-base</artifactId>
-                <version>${maven.compiler.release}</version>
+                <version>${javafx.version}</version>
                 <classifier>win</classifier>
             </dependency>
             <dependency>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-base</artifactId>
-                <version>${maven.compiler.release}</version>
+                <version>${javafx.version}</version>
                 <classifier>linux</classifier>
             </dependency>
             <dependency>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-base</artifactId>
-                <version>${maven.compiler.release}</version>
+                <version>${javafx.version}</version>
                 <classifier>mac</classifier>
             </dependency>
             <dependency>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-graphics</artifactId>
-                <version>${maven.compiler.release}</version>
+                <version>${javafx.version}</version>
                 <classifier>win</classifier>
             </dependency>
             <dependency>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-graphics</artifactId>
-                <version>${maven.compiler.release}</version>
+                <version>${javafx.version}</version>
                 <classifier>linux</classifier>
             </dependency>
             <dependency>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-graphics</artifactId>
-                <version>${maven.compiler.release}</version>
+                <version>${javafx.version}</version>
                 <classifier>mac</classifier>
             </dependency>
             <dependency>
@@ -180,10 +181,19 @@
             <plugins>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>2.12.4</version>
+                    <configuration>
+                        <argLine>--enable-preview</argLine>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.8.0</version>
                     <configuration>
                         <release>${maven.compiler.release}</release>
+                        <compilerArgs>--enable-preview</compilerArgs>
                     </configuration>
                 </plugin>
                 <plugin>

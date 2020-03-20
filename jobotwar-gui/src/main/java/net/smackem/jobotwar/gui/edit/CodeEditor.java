@@ -155,9 +155,9 @@ public class CodeEditor extends CodeArea {
 
     private static class SyntaxHighlightingV2 implements SyntaxHighlighting {
         private static final String[] KEYWORDS = new String[] {
-                "and", "or", "not", "abs", "sin", "cos",
-                "if", "tan", "asin", "acos", "def",
-                "return", "while", "else", "true", "false", "exit"
+                "and", "or", "not", "abs", "sin", "cos", "atan",
+                "tan", "asin", "acos", "sqrt", "sign", "min", "max",
+                "def", "return", "while", "if", "else", "true", "false", "exit"
         };
 
         private static final String KEYWORD_PATTERN = "\\b(" + String.join("|", KEYWORDS) + ")\\b";

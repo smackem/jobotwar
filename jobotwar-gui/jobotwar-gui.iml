@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module org.jetbrains.idea.maven.project.MavenProjectsManager.isMavenModule="true" type="JAVA_MODULE" version="4">
-  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_11">
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_13_PREVIEW">
     <output url="file://$MODULE_DIR$/target/classes" />
     <output-test url="file://$MODULE_DIR$/target/test-classes" />
     <content url="file://$MODULE_DIR$">
@@ -15,22 +15,22 @@
     <orderEntry type="library" name="Maven: org.antlr:antlr4-runtime:4.7.2" level="project" />
     <orderEntry type="library" name="Maven: javax.json:javax.json-api:1.1" level="project" />
     <orderEntry type="library" name="Maven: org.glassfish:javax.json:1.1" level="project" />
-    <orderEntry type="library" name="Maven: org.openjfx:javafx-controls:11" level="project" />
-    <orderEntry type="library" name="Maven: org.openjfx:javafx-graphics:11" level="project" />
-    <orderEntry type="library" name="Maven: org.openjfx:javafx-controls:win:11" level="project" />
-    <orderEntry type="library" name="Maven: org.openjfx:javafx-controls:linux:11" level="project" />
-    <orderEntry type="library" name="Maven: org.openjfx:javafx-controls:mac:11" level="project" />
-    <orderEntry type="library" name="Maven: org.openjfx:javafx-fxml:11" level="project" />
-    <orderEntry type="library" name="Maven: org.openjfx:javafx-fxml:win:11" level="project" />
-    <orderEntry type="library" name="Maven: org.openjfx:javafx-fxml:linux:11" level="project" />
-    <orderEntry type="library" name="Maven: org.openjfx:javafx-fxml:mac:11" level="project" />
-    <orderEntry type="library" name="Maven: org.openjfx:javafx-base:win:11" level="project" />
-    <orderEntry type="library" name="Maven: org.openjfx:javafx-base:linux:11" level="project" />
-    <orderEntry type="library" name="Maven: org.openjfx:javafx-base:mac:11" level="project" />
-    <orderEntry type="library" name="Maven: org.openjfx:javafx-graphics:win:11" level="project" />
-    <orderEntry type="library" name="Maven: org.openjfx:javafx-base:11" level="project" />
-    <orderEntry type="library" name="Maven: org.openjfx:javafx-graphics:linux:11" level="project" />
-    <orderEntry type="library" name="Maven: org.openjfx:javafx-graphics:mac:11" level="project" />
+    <orderEntry type="library" name="Maven: org.openjfx:javafx-controls:14" level="project" />
+    <orderEntry type="library" name="Maven: org.openjfx:javafx-graphics:14" level="project" />
+    <orderEntry type="library" name="Maven: org.openjfx:javafx-controls:win:14" level="project" />
+    <orderEntry type="library" name="Maven: org.openjfx:javafx-controls:linux:14" level="project" />
+    <orderEntry type="library" name="Maven: org.openjfx:javafx-controls:mac:14" level="project" />
+    <orderEntry type="library" name="Maven: org.openjfx:javafx-fxml:14" level="project" />
+    <orderEntry type="library" name="Maven: org.openjfx:javafx-fxml:win:14" level="project" />
+    <orderEntry type="library" name="Maven: org.openjfx:javafx-fxml:linux:14" level="project" />
+    <orderEntry type="library" name="Maven: org.openjfx:javafx-fxml:mac:14" level="project" />
+    <orderEntry type="library" name="Maven: org.openjfx:javafx-base:win:14" level="project" />
+    <orderEntry type="library" name="Maven: org.openjfx:javafx-base:linux:14" level="project" />
+    <orderEntry type="library" name="Maven: org.openjfx:javafx-base:mac:14" level="project" />
+    <orderEntry type="library" name="Maven: org.openjfx:javafx-graphics:win:14" level="project" />
+    <orderEntry type="library" name="Maven: org.openjfx:javafx-base:14" level="project" />
+    <orderEntry type="library" name="Maven: org.openjfx:javafx-graphics:linux:14" level="project" />
+    <orderEntry type="library" name="Maven: org.openjfx:javafx-graphics:mac:14" level="project" />
     <orderEntry type="library" name="Maven: org.fxmisc.richtext:richtextfx:0.10.2" level="project" />
     <orderEntry type="library" name="Maven: org.reactfx:reactfx:2.0-M5" level="project" />
     <orderEntry type="library" name="Maven: org.fxmisc.undo:undofx:2.1.0" level="project" />
