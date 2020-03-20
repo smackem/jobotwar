@@ -8,21 +8,22 @@ public class InterpreterTest {
 
     @Test
     public void testCallWithLocals() throws Program.ParseException {
-        final String asm = "" +
-                "LD_F64      14.0\n" +
-                "LD_F64      0\n" +     // 0 function arguments
-                "CALL        4\n" +
-                "BR          13\n" +
-                "LABEL       4\n" +
-                "LD_F64      0.0\n" +
-                "LD_F64      5\n" +
-                "LD_GLB      0\n" +
-                "ADD\n" +
-                "ST_LOC      0\n" +
-                "LD_LOC      0\n" +
-                "ST_REG      SHOT\n" +
-                "RET\n" +
-                "LABEL       13";
+        final String asm = """
+                LD_F64      14.0
+                LD_F64      0
+                CALL        4
+                BR          13
+                LABEL       4
+                LD_F64      0.0
+                LD_F64      5
+                LD_GLB      0
+                ADD
+                ST_LOC      0
+                LD_LOC      0
+                ST_REG      SHOT
+                RET
+                LABEL       13
+                """;
         final Program program = Program.parse(asm);
         final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
         final Interpreter interpreter = new Interpreter(program, env);
@@ -34,22 +35,23 @@ public class InterpreterTest {
 
     @Test
     public void testCallWithParams() throws Program.ParseException {
-        final String asm = "" +
-                "LD_F64      14.0\n" +  // glb_0
-                "LD_F64      5\n" +     // param_0
-                "LD_F64      1\n" +     // no of params
-                "CALL        5\n" +
-                "BR          14\n" +
-                "LABEL       5\n" +
-                "LD_F64      0.0\n" +   // loc_1
-                "LD_LOC      0\n" +     // loc_1 = glb_0 + param_0
-                "LD_GLB      0\n" +
-                "ADD\n" +
-                "ST_LOC      1\n" +
-                "LD_LOC      1\n" +
-                "ST_REG      SHOT\n" +
-                "RET\n" +
-                "LABEL       14";
+        final String asm = """
+                LD_F64      14.0
+                LD_F64      5
+                LD_F64      1
+                CALL        5
+                BR          14
+                LABEL       5
+                LD_F64      0.0
+                LD_LOC      0
+                LD_GLB      0
+                ADD
+                ST_LOC      1
+                LD_LOC      1
+                ST_REG      SHOT
+                RET
+                LABEL       14
+                """;
         final Program program = Program.parse(asm);
         final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
         final Interpreter interpreter = new Interpreter(program, env);
@@ -63,17 +65,18 @@ public class InterpreterTest {
     public void testCallWithReturnValue() throws Program.ParseException {
         // function add() { return 14 + 5; }
         // @shot = add()
-        final String asm = "" +
-                "LD_F64      0\n" +     // no of param
-                "CALL        4\n" +
-                "ST_REG      SHOT\n" +
-                "BR          9\n" +
-                "LABEL       4\n" +
-                "LD_F64      14\n" +
-                "LD_F64      5\n" +
-                "ADD\n" +
-                "RET_VAL\n" +
-                "LABEL       9\n";
+        final String asm = """
+                LD_F64      0
+                CALL        4
+                ST_REG      SHOT
+                BR          9
+                LABEL       4
+                LD_F64      14
+                LD_F64      5
+                ADD
+                RET_VAL
+                LABEL       9
+                """;
         final Program program = Program.parse(asm);
         final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
         final Interpreter interpreter = new Interpreter(program, env);
@@ -87,17 +90,18 @@ public class InterpreterTest {
     public void testCallWithParamsAndReturnValue() throws Program.ParseException {
         // function add(a, b) { return a + b; }
         // @shot = add(14, 5)
-        final String asm = "" +
-                "LD_F64      14\n" +
-                "LD_F64      5\n" +
-                "LD_F64      2\n" +
-                "CALL        6\n" +
-                "ST_REG      SHOT\n" +
-                "BR          9\n" +
-                "LABEL       6\n" +
-                "ADD\n" +
-                "RET_VAL\n" +
-                "LABEL       9\n";
+        final String asm = """
+                LD_F64      14
+                LD_F64      5
+                LD_F64      2
+                CALL        6
+                ST_REG      SHOT
+                BR          9
+                LABEL       6
+                ADD
+                RET_VAL
+                LABEL       9
+                """;
         final Program program = Program.parse(asm);
         final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
         final Interpreter interpreter = new Interpreter(program, env);

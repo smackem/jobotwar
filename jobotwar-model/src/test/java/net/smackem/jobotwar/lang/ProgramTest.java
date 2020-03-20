@@ -47,28 +47,30 @@ public class ProgramTest {
                 new Instruction(OpCode.BR, 0)
         ));
         final String s = stripWhitespace(program.toString());
-        assertThat(s).isEqualTo("" +
-                "LABEL 0\n" +
-                "LD_F64 1.0\n" +
-                "LD_F64 2.0\n" +
-                "LD_REG AIM\n" +
-                "ADD\n" +
-                "BR 0\n");
+        assertThat(s).isEqualTo("""
+                LABEL 0
+                LD_F64 1.0
+                LD_F64 2.0
+                LD_REG AIM
+                ADD
+                BR 0
+                """);
     }
 
     @Test
     public void parse() throws Program.ParseException {
-        final String source = "" +
-                "LABEL 0\n" +
-                "LABEL 1\n" +
-                "LD_F64 125.5\n" +
-                "LD_REG RADAR\n" +
-                "DUP\n" +
-                "SUB\n" +
-                "ADD\n" +
-                "MUL\n" +
-                "BR_ZERO 0\n" +
-                "INVOKE abs\n";
+        final String source = """
+                LABEL 0
+                LABEL 1
+                LD_F64 125.5
+                LD_REG RADAR
+                DUP
+                SUB
+                ADD
+                MUL
+                BR_ZERO 0
+                INVOKE abs
+                """;
         final Program program = Program.parse(source);
         assertThat(program).isEqualTo(new Program(Arrays.asList(
                 new Instruction(OpCode.LABEL, 0),

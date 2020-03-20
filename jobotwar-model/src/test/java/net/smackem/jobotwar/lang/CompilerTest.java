@@ -10,12 +10,13 @@ public class CompilerTest {
 
     @Test
     public void testWriteRegisters() {
-        final String source = "" +
-                "1 -> AIM\n" +
-                "2 -> RADAR\n" +
-                "3 -> SPEEDX\n" +
-                "4 -> SPEEDY\n" +
-                "5 -> SHOT\n";
+        final String source = """
+                1 -> AIM
+                2 -> RADAR
+                3 -> SPEEDX
+                4 -> SPEEDY
+                5 -> SHOT
+                """;
 
         final Program program = compileV1(source);
         final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
@@ -31,14 +32,15 @@ public class CompilerTest {
 
     @Test
     public void testReadRegisters() throws Exception {
-        final String source = "" +
-                "AIM -> SHOT\n" +
-                "RADAR -> SHOT\n" +
-                "SPEEDX -> SHOT\n" +
-                "SPEEDY -> SHOT\n" +
-                "X -> SHOT\n" +
-                "Y -> SHOT\n" +
-                "DAMAGE -> SHOT\n";
+        final String source = """
+                AIM -> SHOT
+                RADAR -> SHOT
+                SPEEDX -> SHOT
+                SPEEDY -> SHOT
+                X -> SHOT
+                Y -> SHOT
+                DAMAGE -> SHOT
+                """;
 
         final Program program = compileV1(source);
         final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
@@ -108,10 +110,11 @@ public class CompilerTest {
 
     @Test
     public void testUnless() {
-        final String source = "" +
-                "def i\n" +
-                "1 -> SHOT unless i = 1\n" +
-                "2 -> AIM unless i = 0\n";
+        final String source = """
+                def i
+                1 -> SHOT unless i = 1
+                2 -> AIM unless i = 0
+                """;
 
         final Program program = compileV1(source);
         final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
@@ -125,29 +128,30 @@ public class CompilerTest {
 
     @Test
     public void testComplex() {
-        final String source = "" +
-                "def x\n" +
-                "def y\n" +
-                "def targetX\n" +
-                "def targetY\n" +
-                "100 -> targetX\n" +
-                "60 -> targetY\n" +
-                "MoveX:\n" +
-                "   x + 1 -> x\n" +
-                "   goto MoveX unless x >= targetX\n" +
-                "MoveY:\n" +
-                "   y + 1 -> y\n" +
-                "   goto MoveY unless y >= targetY\n" +
-                "Scan:\n" +
-                "   RADAR + 5 -> RADAR\n" +
-                "   goto Scan if RADAR < 360\n" +
-                "RADAR -> AIM\n" +
-                "200 + RADAR + AIM + x + y -> SHOT\n" +
-                "targetX + 50 -> targetX\n" +
-                "targetY + 10 -> targetY\n" +
-                "goto MoveX unless targetX > 1000\n" +
-                "x -> SPEEDX\n" +
-                "y -> SPEEDY\n";
+        final String source = """
+                def x
+                def y
+                def targetX
+                def targetY
+                100 -> targetX
+                60 -> targetY
+                MoveX:
+                   x + 1 -> x
+                   goto MoveX unless x >= targetX
+                MoveY:
+                   y + 1 -> y
+                   goto MoveY unless y >= targetY
+                Scan:
+                   RADAR + 5 -> RADAR
+                   goto Scan if RADAR < 360
+                RADAR -> AIM
+                200 + RADAR + AIM + x + y -> SHOT
+                targetX + 50 -> targetX
+                targetY + 10 -> targetY
+                goto MoveX unless targetX > 1000
+                x -> SPEEDX
+                y -> SPEEDY
+                """;
 
         final Program program = compileV1(source);
         final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
@@ -161,11 +165,12 @@ public class CompilerTest {
 
     @Test
     public void testArithmetic() {
-        final String source = "" +
-                "1 + 5 / 2 -> SHOT\n" +
-                "2 * 5 - 1 -> SPEEDX\n" +
-                "1 + 5 * 3 -> AIM\n" +
-                "10 - 5 + 3 -> SPEEDY\n";
+        final String source = """
+                1 + 5 / 2 -> SHOT
+                2 * 5 - 1 -> SPEEDX
+                1 + 5 * 3 -> AIM
+                10 - 5 + 3 -> SPEEDY
+                """;
 
         final Program program = compileV1(source);
         final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
@@ -181,9 +186,10 @@ public class CompilerTest {
 
     @Test
     public void testMultiAssignment() {
-        final String source = "" +
-                "def x\n" +
-                "42 -> SHOT -> AIM -> RADAR -> x \n";
+        final String source = """
+                def x
+                42 -> SHOT -> AIM -> RADAR -> x
+                """;
 
         final Program program = compileV1(source);
         final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
@@ -198,17 +204,18 @@ public class CompilerTest {
 
     @Test
     public void testMathOperators() throws Interpreter.StackException {
-        final String source = "" +
-                "abs(-10) -> SHOT\n" +
-                "abs(10) -> SHOT\n" +
-                "sin(90) -> SHOT\n" +
-                "cos(180) -> SHOT\n" +
-                "atan(tan(90)) -> SHOT\n" +
-                "acos(cos(90)) -> SHOT\n" +
-                "asin(sin(90)) -> SHOT\n" +
-                "not(0) -> SHOT\n" +
-                "not(100) -> SHOT\n" +
-                "sqrt(9) -> SHOT\n";
+        final String source = """
+                abs(-10) -> SHOT
+                abs(10) -> SHOT
+                sin(90) -> SHOT
+                cos(180) -> SHOT
+                atan(tan(90)) -> SHOT
+                acos(cos(90)) -> SHOT
+                asin(sin(90)) -> SHOT
+                not(0) -> SHOT
+                not(100) -> SHOT
+                sqrt(9) -> SHOT
+                """;
 
         final Program program = compileV1(source);
         final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
@@ -238,9 +245,10 @@ public class CompilerTest {
 
     @Test
     public void testParenExpressions() {
-        final String source = "" +
-                "abs(100 * (10 - 12)) -> SHOT\n" +
-                "50 / (40 - 3 * abs(-10)) -> AIM\n";
+        final String source = """
+                abs(100 * (10 - 12)) -> SHOT
+                50 / (40 - 3 * abs(-10)) -> AIM
+                """;
 
         final Program program = compileV1(source);
         final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
@@ -254,17 +262,18 @@ public class CompilerTest {
 
     @Test
     public void testSubs() {
-        final String source = "" +
-                "def x\n" +
-                "abs(-100 + 200) -> SHOT\n" +
-                "gosub inc\n" +
-                "x -> AIM\n" +
-                "goto end\n" +
-                "inc:\n" +
-                "x + 1 -> x\n" +
-                "goto inc unless x >= 10\n" +
-                "endsub\n" +
-                "end:";
+        final String source = """
+                def x
+                abs(-100 + 200) -> SHOT
+                gosub inc
+                x -> AIM
+                goto end
+                inc:
+                x + 1 -> x
+                goto inc unless x >= 10
+                endsub
+                end:
+                """;
 
         final Program program = compileV1(source);
         final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
@@ -278,17 +287,18 @@ public class CompilerTest {
 
     @Test
     public void testLog() {
-        final String source = "" +
-                "def a, b\n" +
-                "1 -> SHOT -> OUT\n" +
-                "2 -> SPEEDX -> OUT\n" +
-                "3 -> SPEEDY -> OUT\n" +
-                "4 -> a -> OUT\n" +
-                "5 -> b -> OUT\n" +
-                "6 -> a\n" +
-                "a -> OUT\n" +
-                "7 -> AIM\n" +
-                "AIM -> OUT\n";
+        final String source = """
+                def a, b
+                1 -> SHOT -> OUT
+                2 -> SPEEDX -> OUT
+                3 -> SPEEDY -> OUT
+                4 -> a -> OUT
+                5 -> b -> OUT
+                6 -> a
+                a -> OUT
+                7 -> AIM
+                AIM -> OUT
+                """;
         final Program program = compileV1(source);
         final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
         final Interpreter interpreter = new Interpreter(program, env);
@@ -301,14 +311,15 @@ public class CompilerTest {
 
     @Test
     public void testV2Assignments() {
-        final String source = "" +
-                "def global = 12" +
-                "state main() {\n" +
-                "   def local = 13 + global\n" +
-                "   global = local\n" +
-                "   @radar(global)\n" +
-                "   exit\n" +
-                "}\n";
+        final String source = """
+                def global = 12
+                state main() {
+                   def local = 13 + global
+                   global = local
+                   @radar(global)
+                   exit
+                }
+                """;
         final Program program = compileV2(source);
         System.out.println(program.toString());
         final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
@@ -321,14 +332,15 @@ public class CompilerTest {
 
     @Test
     public void testV2Yield() {
-        final String source = "" +
-                "state main() {\n" +
-                "   yield second()\n" +
-                "}\n" +
-                "state second() {\n" +
-                "   @radar(42)" +
-                "   exit\n" +
-                "}\n";
+        final String source = """
+                state main() {
+                   yield second()
+                }
+                state second() {
+                   @radar(42)
+                   exit
+                }
+                """;
         final Program program = compileV2(source);
         System.out.println(program.toString());
         final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
@@ -341,14 +353,15 @@ public class CompilerTest {
 
     @Test
     public void testV2StateParams() {
-        final String source = "" +
-                "state main() {\n" +
-                "   yield second(42, 10, 5)\n" +
-                "}\n" +
-                "state second(number1, number2, number3) {\n" +
-                "   @radar(number1 - number2 - number3)" +
-                "   exit\n" +
-                "}\n";
+        final String source = """
+                state main() {
+                   yield second(42, 10, 5)
+                }
+                state second(number1, number2, number3) {
+                   @radar(number1 - number2 - number3)
+                   exit
+                }
+                """;
         final Program program = compileV2(source);
         System.out.println(program.toString());
         final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
@@ -362,15 +375,16 @@ public class CompilerTest {
 
     @Test
     public void testV2YieldMultiple() {
-        final String source = "" +
-                "state main() { yield second() }\n" +
-                "state second() { yield third() }\n" +
-                "state third() { yield fourth() }\n" +
-                "state fourth() { yield final(42) }\n" +
-                "state final(result) {\n" +
-                "   @radar(result)" +
-                "   exit\n" +
-                "}\n";
+        final String source = """
+                state main() { yield second() }
+                state second() { yield third() }
+                state third() { yield fourth() }
+                state fourth() { yield final(42) }
+                state final(result) {
+                   @radar(result)
+                   exit
+                }
+                """;
         final Program program = compileV2(source);
         System.out.println(program.toString());
         final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
@@ -383,13 +397,14 @@ public class CompilerTest {
 
     @Test
     public void testV2Registers() {
-        final String source = "" +
-                "state main() {\n" +
-                "   @speed(101, 102)\n" +
-                "   @fire(90, 1000)" +
-                "   @radar(180)" +
-                "   exit\n" +
-                "}\n";
+        final String source = """
+                state main() {
+                   @speed(101, 102)
+                   @fire(90, 1000)
+                   @radar(180)
+                   exit
+                }
+                """;
         final Program program = compileV2(source);
         System.out.println(program.toString());
         final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
@@ -406,13 +421,14 @@ public class CompilerTest {
 
     @Test
     public void testV2Arithmetic() {
-        final String source = "" +
-                "state main() {\n" +
-                "   @speedX(101 - 100 + 10)\n" +
-                "   @speedY(20 - 5*2)\n" +
-                "   @radar(10/2 + 15)" +
-                "   exit\n" +
-                "}\n";
+        final String source = """
+                state main() {
+                   @speedX(101 - 100 + 10)
+                   @speedY(20 - 5*2)
+                   @radar(10/2 + 15)
+                   exit
+                }
+                """;
         final Program program = compileV2(source);
         System.out.println(program.toString());
         final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
@@ -448,16 +464,17 @@ public class CompilerTest {
 
     @Test
     public void testV2WhileNoLoop() {
-        final String source = "" +
-                "state main() {\n" +
-                "   def n = 5\n" +
-                "   def i = 10\n" +
-                "   while n < 5 {\n" +
-                "       i = i + 1\n" +
-                "   }\n" +
-                "   @radar(i)" +
-                "   exit\n" +
-                "}\n";
+        final String source = """
+                state main() {
+                   def n = 5
+                   def i = 10
+                   while n < 5 {
+                       i = i + 1
+                   }
+                   @radar(i)
+                   exit
+                }
+                """;
         final Program program = compileV2(source);
         System.out.println(program.toString());
         final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
@@ -470,21 +487,22 @@ public class CompilerTest {
 
     @Test
     public void testV2WhileNested() {
-        final String source = "" +
-                "state main() {\n" +
-                "   def x = 0\n" +
-                "   def i = 0\n" +
-                "   while i < 5 {\n" +
-                "       def j = 0\n" +
-                "       while j < 5 {\n" +
-                "           x = x + i * j\n" +
-                "           j = j + 1\n" +
-                "       }\n" +
-                "       i = i + 1\n" +
-                "   }\n" +
-                "   @radar(x)" +
-                "   exit\n" +
-                "}\n";
+        final String source = """
+                state main() {
+                   def x = 0
+                   def i = 0
+                   while i < 5 {
+                       def j = 0
+                       while j < 5 {
+                           x = x + i * j
+                           j = j + 1
+                       }
+                       i = i + 1
+                   }
+                   @radar(x)
+                   exit
+                }
+                """;
         final Program program = compileV2(source);
         System.out.println(program.toString());
         final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
@@ -497,13 +515,14 @@ public class CompilerTest {
 
     @Test
     public void testV2If() {
-        final String source = "" +
-                "state main() {\n" +
-                "   def x = 2\n" +
-                "   if x == 1 { @radar(1) }\n" +
-                "   if x == 2 { @radar(2) }\n" +
-                "   exit\n" +
-                "}\n";
+        final String source = """
+                state main() {
+                   def x = 2
+                   if x == 1 { @radar(1) }
+                   if x == 2 { @radar(2) }
+                   exit
+                }
+                """;
         final Program program = compileV2(source);
         System.out.println(program.toString());
         final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
@@ -516,13 +535,14 @@ public class CompilerTest {
 
     @Test
     public void testV2IfElse() {
-        final String source = "" +
-                "state main() {\n" +
-                "   def x = 2\n" +
-                "   if x == 1 { @radar(1) }\n" +
-                "   else { @radar(2) }\n" +
-                "   exit\n" +
-                "}\n";
+        final String source = """
+                state main() {
+                   def x = 2
+                   if x == 1 { @radar(1) }
+                   else { @radar(2) }
+                   exit
+                }
+                """;
         final Program program = compileV2(source);
         System.out.println(program.toString());
         final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
@@ -535,15 +555,16 @@ public class CompilerTest {
 
     @Test
     public void testV2IfElseIf() {
-        final String source = "" +
-                "state main() {\n" +
-                "   def x = 3\n" +
-                "   if x == 1 { @radar(1) }\n" +
-                "   else if x == 2 { @radar(2) }\n" +
-                "   else if x == 3 { @radar(3) }\n" +
-                "   else { @radar(10) }\n" +
-                "   exit\n" +
-                "}\n";
+        final String source = """
+                state main() {
+                   def x = 3
+                   if x == 1 { @radar(1) }
+                   else if x == 2 { @radar(2) }
+                   else if x == 3 { @radar(3) }
+                   else { @radar(10) }
+                   exit
+                }
+                """;
         final Program program = compileV2(source);
         System.out.println(program.toString());
         final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
@@ -556,11 +577,12 @@ public class CompilerTest {
 
     @Test
     public void testV2Random0() {
-        final String source = "" +
-                "state main() {\n" +
-                "   @radar(@random())\n" +
-                "   exit\n" +
-                "}\n";
+        final String source = """
+                state main() {
+                   @radar(@random())
+                   exit
+                }
+                """;
         final Program program = compileV2(source);
         System.out.println(program.toString());
         final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
@@ -574,11 +596,12 @@ public class CompilerTest {
 
     @Test
     public void testV2Random1() {
-        final String source = "" +
-                "state main() {\n" +
-                "   @radar(@random(10))\n" +
-                "   exit\n" +
-                "}\n";
+        final String source = """
+                state main() {
+                   @radar(@random(10))
+                   exit
+                }
+                """;
         final Program program = compileV2(source);
         System.out.println(program.toString());
         final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
@@ -592,11 +615,12 @@ public class CompilerTest {
 
     @Test
     public void testV2Random2() {
-        final String source = "" +
-                "state main() {\n" +
-                "   @radar(@random(100, 120))\n" +
-                "   exit\n" +
-                "}\n";
+        final String source = """
+                state main() {
+                   @radar(@random(100, 120))
+                   exit
+                }
+                """;
         final Program program = compileV2(source);
         System.out.println(program.toString());
         final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
