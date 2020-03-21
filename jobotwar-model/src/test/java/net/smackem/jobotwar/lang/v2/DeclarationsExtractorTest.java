@@ -15,9 +15,10 @@ public class DeclarationsExtractorTest {
 
     @Test
     public void testGlobals() {
-        final String source = "" +
-                "def a, b = 1\n" +
-                "def c";
+        final String source = """
+                def a, b = 1
+                def c
+                """;
         final DeclarationsExtractor extractor = extract(source);
         assertThat(extractor.semanticErrors).hasSize(1);
         assertThat(extractor.semanticErrors.iterator().next()).contains(StateDecl.MAIN_STATE_NAME);
@@ -35,11 +36,12 @@ public class DeclarationsExtractorTest {
 
     @Test
     public void testStates() {
-        final String source = "" +
-                "state a() {}\n" +
-                "state b() { def l1, l2 }\n" +
-                "state c(p1, p2) {}\n" +
-                "state main() {}";
+        final String source = """
+                state a() {}
+                state b() { def l1, l2 }
+                state c(p1, p2) {}
+                state main() {}
+                """;
         final DeclarationsExtractor extractor = extract(source);
         assertThat(extractor.semanticErrors).isEmpty();
         assertThat(extractor.functions).isEmpty();
@@ -61,10 +63,11 @@ public class DeclarationsExtractorTest {
 
     @Test
     public void testFunctions() {
-        final String source = "" +
-                "def a() {}\n" +
-                "def b() { def l1, l2 }\n" +
-                "def c(p1, p2) {}";
+        final String source = """
+                def a() {}
+                def b() { def l1, l2 }
+                def c(p1, p2) {}
+                """;
         final DeclarationsExtractor extractor = extract(source);
         assertThat(extractor.semanticErrors).hasSize(1);
         assertThat(extractor.semanticErrors.iterator().next()).contains(StateDecl.MAIN_STATE_NAME);
@@ -84,11 +87,12 @@ public class DeclarationsExtractorTest {
 
     @Test
     public void testProgram() {
-        final String source = "" +
-                "def g\n" +
-                "def f() { def x }\n" +
-                "state s(p1, p2) { def y }\n" +
-                "state main() {}";
+        final String source = """
+                def g
+                def f() { def x }
+                state s(p1, p2) { def y }
+                state main() {}
+                """;
         final DeclarationsExtractor extractor = extract(source);
         assertThat(extractor.semanticErrors).isEmpty();
         assertThat(extractor.globals).hasSize(3);
@@ -109,14 +113,15 @@ public class DeclarationsExtractorTest {
 
     @Test
     public void testDuplicates() {
-        final String source = "" +
-                "def g\n" +
-                "def g\n" +
-                "state s(p1, p2) {}\n" +
-                "state s() {}\n" +
-                "def f(p1, p2) {}\n" +
-                "def f() {}\n" +
-                "state main() {}";
+        final String source = """
+                def g
+                def g
+                state s(p1, p2) {}
+                state s() {}
+                def f(p1, p2) {}
+                def f() {}
+                state main() {}
+                """;
         final DeclarationsExtractor extractor = extract(source);
         assertThat(extractor.semanticErrors).hasSize(3);
         final Iterator<String> iter = extractor.semanticErrors.iterator();
