@@ -73,11 +73,12 @@ public class CompilerTest {
 
     @Test
     public void testDef() {
-        final String source = "" +
-                "def x, y\n" +
-                "1.5 -> x\n" +
-                "2.5 -> y\n" +
-                "x + y -> SHOT\n";
+        final String source = """
+                def x, y
+                1.5 -> x
+                2.5 -> y
+                x + y -> SHOT
+                """;
 
         final Program program = compileV1(source);
         final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
@@ -90,12 +91,13 @@ public class CompilerTest {
 
     @Test
     public void testLoop() {
-        final String source = "" +
-                "def i\n" +
-                "Loop:\n" +
-                "   i + 1 -> i\n" +
-                "   goto Loop if i < 100\n" +
-                "i -> SHOT\n";
+        final String source = """
+                def i
+                Loop:
+                   i + 1 -> i
+                   goto Loop if i < 100
+                i -> SHOT
+                """;
 
         final Program program = compileV1(source);
         final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
@@ -630,6 +632,55 @@ public class CompilerTest {
             InterpreterTest.runComplete(interpreter);
             assertThat(env.readRadar()).isBetween(100.0, 120.0);
         }
+    }
+
+    @Test
+    public void testV2Function() {
+        final String source = """
+                state main() {
+                    @radar(func(1, 2, 3))
+                    exit
+                }
+                def func(a, b, c) {
+                    @log(a)
+                    @log(b)
+                    @log(c)
+                    return a + b + c
+                }
+                """;
+        final Program program = compileV2(source);
+        System.out.println(program.toString());
+        final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
+        final Interpreter interpreter = new Interpreter(program, env);
+
+        InterpreterTest.runComplete(interpreter);
+        assertThat(env.loggedValues()).containsExactly(1.0, 2.0, 3.0);
+        assertThat(env.readRadar()).isEqualTo(6.0);
+    }
+
+    @Test
+    public void testV2Recursion() {
+        final String source = """
+                state main() {
+                    @radar(recurse(1))
+                    exit
+                }
+                def recurse(n) {
+                    if n == 10 {
+                        return n
+                    }
+                    @log(n)
+                    return recurse(n + 1)
+                }
+                """;
+        final Program program = compileV2(source);
+        System.out.println(program.toString());
+        final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
+        final Interpreter interpreter = new Interpreter(program, env);
+
+        InterpreterTest.runComplete(interpreter);
+        assertThat(env.loggedValues()).containsExactly(1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0);
+        assertThat(env.readRadar()).isEqualTo(10.0);
     }
 
     private Program compileV1(String source) {

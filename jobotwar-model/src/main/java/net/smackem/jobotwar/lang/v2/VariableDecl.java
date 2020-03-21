@@ -15,4 +15,9 @@ class VariableDecl extends Declaration {
     public void setAddress(int value) {
         this.address = value;
     }
+
+    @Override
+    public String toString() {
+        return String.format("[%d] variable %s", this.order, this.name);
+    }
 }

@@ -1,11 +1,10 @@
 package net.smackem.jobotwar.lang.v2;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-class ProcedureDecl extends Declaration {
+abstract class ProcedureDecl extends Declaration {
     private final List<String> parameters = new ArrayList<>();
     private final List<String> locals = new ArrayList<>();
 
@@ -20,6 +19,11 @@ class ProcedureDecl extends Declaration {
     public List<String> locals() {
         return Collections.unmodifiableList(this.locals);
     }
+
+    /**
+     * @return The number of parameters which are passed via stack push.
+     */
+    public abstract int stackParameterCount();
 
     public void addParameter(String parameter) {
         if (this.parameters.contains(parameter)) {

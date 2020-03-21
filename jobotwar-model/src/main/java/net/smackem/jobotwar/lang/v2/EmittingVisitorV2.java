@@ -155,54 +155,47 @@ class EmittingVisitorV2 extends JobotwarV2BaseVisitor<Void> {
         super.visitMemberStmt(ctx);
         final var functionCall = ctx.member().functionCall();
         switch (functionCall.Ident().getText()) {
-            case "speed":
+            case "speed" -> {
                 if (getArgumentCount(functionCall) != 2) {
                     logSemanticError(functionCall, ctx.getText() + " requires 2 arguments");
                 }
                 this.emitter.emit(OpCode.ST_REG, "SPEEDY");
                 this.emitter.emit(OpCode.ST_REG, "SPEEDX");
-                break;
-            case "speedX":
+            }
+            case "speedX" -> {
                 if (getArgumentCount(functionCall) != 1) {
                     logSemanticError(functionCall, ctx.getText() + " requires 1 arguments");
                 }
                 this.emitter.emit(OpCode.ST_REG, "SPEEDX");
-                break;
-            case "speedY":
+            }
+            case "speedY" -> {
                 if (getArgumentCount(functionCall) != 1) {
                     logSemanticError(functionCall, ctx.getText() + " requires 1 arguments");
                 }
                 this.emitter.emit(OpCode.ST_REG, "SPEEDY");
-                break;
-            case "radar":
+            }
+            case "radar" -> {
                 if (getArgumentCount(functionCall) != 1) {
                     logSemanticError(functionCall, ctx.getText() + " requires 1 arguments");
                 }
                 this.emitter.emit(OpCode.ST_REG, "RADAR");
-                break;
-            case "fire":
+            }
+            case "fire" -> {
                 if (getArgumentCount(functionCall) != 2) {
                     logSemanticError(functionCall, ctx.getText() + " requires 2 arguments");
                 }
                 this.emitter.emit(OpCode.SWAP);
                 this.emitter.emit(OpCode.ST_REG, "AIM");
                 this.emitter.emit(OpCode.ST_REG, "SHOT");
-                break;
-            case "log":
+            }
+            case "log" -> {
                 if (getArgumentCount(functionCall) != 1) {
                     logSemanticError(functionCall, ctx.getText() + " requires 1 arguments");
                 }
                 this.emitter.emit(OpCode.LOG, this.lastLoadedSymbol);
-                break;
-            case "random":
-            case "damage":
-            case "x":
-            case "y":
-                logSemanticError(functionCall, ctx.getText() + " cannot be written to");
-                break;
-            default:
-                logSemanticError(ctx, "unknown register '" + functionCall.Ident().getText() + "'");
-                break;
+            }
+            case "random", "damage", "x", "y" -> logSemanticError(functionCall, ctx.getText() + " cannot be written to");
+            default -> logSemanticError(ctx, "unknown register '" + functionCall.Ident().getText() + "'");
         }
         this.emitter.emit(OpCode.LABEL, nextLabel());
         return null;
@@ -386,20 +379,14 @@ class EmittingVisitorV2 extends JobotwarV2BaseVisitor<Void> {
     private void emitFunctionCallAtom(JobotwarV2Parser.FunctionCallContext ctx) {
         final String ident = ctx.Ident().getText();
         switch (ident) {
-            case "abs":
-            case "tan":
-            case "sin":
-            case "cos":
-            case "atan":
-            case "asin":
-            case "acos":
-            case "sqrt":
-            case "trunc":
+            case "abs", "tan", "sin", "cos", "atan", "asin", "acos", "sqrt", "trunc" -> {
                 this.emitter.emit(OpCode.INVOKE, ident);
                 return;
-            case "not":
+            }
+            case "not" -> {
                 this.emitter.emit(OpCode.NOT);
                 return;
+            }
         }
         final FunctionDecl function = this.declarations.functions.get(ident);
         if (function == null) {
@@ -417,11 +404,7 @@ class EmittingVisitorV2 extends JobotwarV2BaseVisitor<Void> {
     }
 
     private void emitCall(ProcedureDecl function) {
-        if (function instanceof StateDecl) {
-            this.emitter.emit(OpCode.LD_F64, function.parameters().size());
-        } else {
-            this.emitter.emit(OpCode.LD_F64, 0);
-        }
+        this.emitter.emit(OpCode.LD_F64, (double)function.stackParameterCount());
         this.emitter.emit(OpCode.CALL, function.name);
     }
 
@@ -429,22 +412,20 @@ class EmittingVisitorV2 extends JobotwarV2BaseVisitor<Void> {
         final var functionCall = ctx.functionCall();
         final String ident = functionCall.Ident().getText();
         switch (ident) {
-            case "speedX":
+            case "speedX" -> {
                 if (getArgumentCount(functionCall) != 0) {
                     logSemanticError(functionCall, "@" + ident + " requires 0 arguments");
                 }
                 this.emitter.emit(OpCode.LD_REG, "SPEEDX");
-                break;
-            case "speedY":
+            }
+            case "speedY" -> {
                 if (getArgumentCount(functionCall) != 0) {
                     logSemanticError(functionCall, "@" + ident + " requires 0 arguments");
                 }
                 this.emitter.emit(OpCode.LD_REG, "SPEEDY");
-                break;
-            case "random":
-                emitRandom(functionCall, ident);
-                break;
-            case "radar":
+            }
+            case "random" -> emitRandom(functionCall, ident);
+            case "radar" -> {
                 if (getArgumentCount(functionCall) > 1) {
                     logSemanticError(functionCall, "@" + ident + " requires 0 or 1 arguments");
                 }
@@ -453,48 +434,44 @@ class EmittingVisitorV2 extends JobotwarV2BaseVisitor<Void> {
                     this.emitter.emit(OpCode.LABEL, nextLabel()); // yield to let engine handle radar
                 }
                 this.emitter.emit(OpCode.LD_REG, "RADAR");
-                break;
-            case "fire":
+            }
+            case "fire" -> {
                 if (getArgumentCount(functionCall) != 0) {
                     logSemanticError(functionCall, "@" + ident + " requires 0 arguments");
                 }
                 this.emitter.emit(OpCode.LD_REG, "SHOT");
-                break;
-            case "damage":
+            }
+            case "damage" -> {
                 if (getArgumentCount(functionCall) != 0) {
                     logSemanticError(functionCall, "@" + ident + " requires 0 arguments");
                 }
                 this.emitter.emit(OpCode.LD_REG, "DAMAGE");
-                break;
-            case "x":
+            }
+            case "x" -> {
                 if (getArgumentCount(functionCall) != 0) {
                     logSemanticError(functionCall, "@" + ident + " requires 0 arguments");
                 }
                 this.emitter.emit(OpCode.LD_REG, "X");
-                break;
-            case "y":
+            }
+            case "y" -> {
                 if (getArgumentCount(functionCall) != 0) {
                     logSemanticError(functionCall, "@" + ident + " requires 0 arguments");
                 }
                 this.emitter.emit(OpCode.LD_REG, "Y");
-                break;
-            default:
-                logSemanticError(ctx, "unknown register '" + ident + "'");
-                break;
+            }
+            default -> logSemanticError(ctx, "unknown register '" + ident + "'");
         }
     }
 
     private void emitRandom(JobotwarV2Parser.FunctionCallContext functionCall, String ident) {
         final int argCount = getArgumentCount(functionCall);
         switch (argCount) {
-            case 0:
-                this.emitter.emit(OpCode.LD_REG, "RANDOM");
-                break;
-            case 1:
+            case 0 -> this.emitter.emit(OpCode.LD_REG, "RANDOM");
+            case 1 -> {
                 this.emitter.emit(OpCode.LD_REG, "RANDOM");
                 this.emitter.emit(OpCode.MUL);
-                break;
-            case 2:
+            }
+            case 2 -> {
                 /*
                 @random(50, 150) is translated to:
                     push 50
@@ -512,10 +489,8 @@ class EmittingVisitorV2 extends JobotwarV2BaseVisitor<Void> {
                 this.emitter.emit(OpCode.LD_REG, "RANDOM");
                 this.emitter.emit(OpCode.MUL);
                 this.emitter.emit(OpCode.ADD);
-                break;
-            default:
-                logSemanticError(functionCall, "@" + ident + " requires 0, 1 or 2 arguments");
-                break;
+            }
+            default -> logSemanticError(functionCall, "@" + ident + " requires 0, 1 or 2 arguments");
         }
     }
 
