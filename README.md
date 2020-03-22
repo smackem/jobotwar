@@ -71,9 +71,9 @@ Read|Write|Description
 -|`@log(value)`|Writes `value` to the program's log console
 -|`@fire(angle, distance)`|Fires a shot into direction
 `@radar()`|`@radar(angle)`|Gets the result of the last radar scan or sends a radar beam into direction `angle` and returns the result: Either the distance to a wall or the negative distance to a robot. See the sample below.`angle` to explode in `distance`
-`random()`|-|Gets a random floating point value between 0 and 1
-`random(max)`|-|Gets a random floating point value between 0 and `max`
-`random(min, max)`|-|Gets a random floating point value between `min` and `max`.
+`@random()`|-|Gets a random floating point value between 0 and 1
+`@random(max)`|-|Gets a random floating point value between 0 and `max`
+`@random(min, max)`|-|Gets a random floating point value between `min` and `max`.
 `@damage()`|-|Gets the current health state of the robot in the range 0 to 100, where 0 means dead
 
 ```
