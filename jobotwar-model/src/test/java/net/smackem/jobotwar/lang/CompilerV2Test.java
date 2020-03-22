@@ -139,15 +139,15 @@ public class CompilerV2Test {
 
     @Test
     public void testWhile() {
-        final String source = "" +
-                              "state main() {\n" +
-                              "   def i = 0\n" +
-                              "   while i < 10 {\n" +
-                              "       i = i + 1\n" +
-                              "   }\n" +
-                              "   @radar(i)" +
-                              "   exit\n" +
-                              "}\n";
+        final String source = """
+                state main() {
+                   def i = 0
+                   while i < 10 {
+                       i = i + 1
+                   }
+                   @radar(i)   exit
+                }
+                """;
         final Program program = compile(source);
         System.out.println(program.toString());
         final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
