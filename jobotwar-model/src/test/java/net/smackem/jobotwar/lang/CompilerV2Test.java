@@ -377,6 +377,27 @@ public class CompilerV2Test {
         assertThat(env.readRadar()).isEqualTo(10.0);
     }
 
+    @Test
+    public void testBuiltInFunctions() {
+        final String source = """
+                state main() {
+                    @log(sign(100))
+                    @log(sign(-100))
+                    @log(sign(0))
+                    @log(min(-10, 20))
+                    @log(max(-10, 20))
+                    exit
+                }
+                """;
+        final Program program = compile(source);
+        System.out.println(program.toString());
+        final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
+        final Interpreter interpreter = new Interpreter(program, env);
+
+        InterpreterTest.runComplete(interpreter);
+        assertThat(env.loggedValues()).containsExactly(1.0, -1.0, 0.0, -10.0, 20.0);
+    }
+
     private Program compile(String source) {
         final Compiler compiler = new Compiler();
         final Compiler.Result result = compiler.compile(source, Compiler.Language.V2);

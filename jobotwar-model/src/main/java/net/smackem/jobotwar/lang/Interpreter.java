@@ -200,7 +200,7 @@ public final class Interpreter {
         return -1;
     }
 
-    private double invoke(String strArg, double arg) {
+    private double invoke(String strArg, double arg) throws StackException {
         return switch (strArg) {
             case "abs" -> Math.abs(arg);
             case "tan" -> Math.tan(Math.toRadians(arg));
@@ -211,6 +211,9 @@ public final class Interpreter {
             case "acos" -> Math.toDegrees(Math.acos(arg));
             case "sqrt" -> Math.sqrt(arg);
             case "trunc" -> Math.floor(arg);
+            case "sign" -> Math.signum(arg);
+            case "min" -> Math.min(this.stack.pop(), arg);
+            case "max" -> Math.max(this.stack.pop(), arg);
             default -> throw new IllegalArgumentException("Unknown built-in function: '" + strArg + "'");
         };
     }

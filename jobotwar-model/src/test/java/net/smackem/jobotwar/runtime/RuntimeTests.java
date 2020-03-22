@@ -3,7 +3,6 @@ package net.smackem.jobotwar.runtime;
 import net.smackem.jobotwar.lang.Compiler;
 import net.smackem.jobotwar.lang.Program;
 
-import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -23,15 +22,16 @@ class RuntimeTests {
     };
 
     public static Program createShooter() {
-        final String source = "" +
-                "loop:\n" +
-                "    AIM + 7 -> AIM -> RADAR\n" +
-                "    goto loop unless RADAR < 0\n" +
-                "shoot:\n" +
-                "    0 - RADAR -> SHOT\n" +
-                "    AIM -> RADAR\n" +
-                "    goto shoot if RADAR < 0 or RANDOM < 0.5\n" +
-                "    goto loop\n";
+        final String source = """
+                loop:
+                    AIM + 7 -> AIM -> RADAR
+                    goto loop unless RADAR < 0
+                shoot:
+                    0 - RADAR -> SHOT
+                    AIM -> RADAR
+                    goto shoot if RADAR < 0 or RANDOM < 0.5
+                    goto loop
+                """;
         final Compiler compiler = new Compiler();
         final Compiler.Result result = compiler.compile(source, Compiler.Language.V1);
         assert result.hasErrors() == false;
@@ -39,12 +39,13 @@ class RuntimeTests {
     }
 
     public static Program createDumbAss() {
-        final String source = "" +
-                "loop:\n" +
-                "    AIM + 3 -> AIM\n" +
-                "    1000 -> SHOT\n" +
-                "    50 - RANDOM * 100 -> SPEEDX if AIM % 45 = 0\n" +
-                "    goto loop\n";
+        final String source = """
+                loop:
+                    AIM + 3 -> AIM
+                    1000 -> SHOT
+                    50 - RANDOM * 100 -> SPEEDX if AIM % 45 = 0
+                    goto loop
+                """;
         final Compiler compiler = new Compiler();
         final Compiler.Result result = compiler.compile(source, Compiler.Language.V1);
         assert result.hasErrors() == false;

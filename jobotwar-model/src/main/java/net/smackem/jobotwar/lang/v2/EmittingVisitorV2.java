@@ -378,29 +378,51 @@ class EmittingVisitorV2 extends JobotwarV2BaseVisitor<Void> {
 
     private void emitFunctionCallAtom(JobotwarV2Parser.FunctionCallContext ctx) {
         final String ident = ctx.Ident().getText();
-        switch (ident) {
-            case "abs", "tan", "sin", "cos", "atan", "asin", "acos", "sqrt", "trunc" -> {
-                this.emitter.emit(OpCode.INVOKE, ident);
-                return;
-            }
-            case "not" -> {
-                this.emitter.emit(OpCode.NOT);
-                return;
-            }
+        if (emitBuiltInFunction(ctx)) {
+            return;
         }
         final FunctionDecl function = this.declarations.functions.get(ident);
         if (function == null) {
             logSemanticError(ctx, "unkown function '" + ident + "'");
             return;
         }
-        if (ctx.arguments().expression().size() != function.parameters().size()) {
+        final int argumentCount = getArgumentCount(ctx);
+        if (argumentCount != function.parameters().size()) {
             logSemanticError(ctx,
                     String.format("wrong number of arguments: expected %d, found %d",
                             function.parameters().size(),
-                            ctx.arguments().expression().size()));
+                            argumentCount));
             return;
         }
         emitCall(function);
+    }
+
+    private boolean emitBuiltInFunction(JobotwarV2Parser.FunctionCallContext ctx) {
+        final String ident = ctx.Ident().getText();
+        final int argumentCount = getArgumentCount(ctx);
+        switch (ident) {
+            case "abs", "tan", "sin", "cos", "atan", "asin", "acos", "sqrt", "trunc", "sign" -> {
+                if (argumentCount != 1) {
+                    logSemanticError(ctx, String.format(
+                            "wrong number of arguments: expected 1, found %d", argumentCount));
+                }
+                this.emitter.emit(OpCode.INVOKE, ident);
+                return true;
+            }
+            case "min", "max" -> {
+                if (argumentCount != 2) {
+                    logSemanticError(ctx, String.format(
+                            "wrong number of arguments: expected 2, found %d", argumentCount));
+                }
+                this.emitter.emit(OpCode.INVOKE, ident);
+                return true;
+            }
+            case "not" -> {
+                this.emitter.emit(OpCode.NOT);
+                return true;
+            }
+        }
+        return false;
     }
 
     private void emitCall(ProcedureDecl function) {

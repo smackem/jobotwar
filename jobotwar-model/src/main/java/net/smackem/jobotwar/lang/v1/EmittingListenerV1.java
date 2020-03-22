@@ -64,14 +64,9 @@ class EmittingListenerV1 extends JobotwarV1BaseListener {
             return;
         }
         switch (ctx.conditionOperator().getText()) {
-            case "or":
-                this.emitter.emit(OpCode.OR);
-                break;
-            case "and":
-                this.emitter.emit(OpCode.AND);
-                break;
-            default:
-                throw new RuntimeException("Unsupported boolean operator " + ctx.conditionOperator().getText());
+            case "or" -> this.emitter.emit(OpCode.OR);
+            case "and" -> this.emitter.emit(OpCode.AND);
+            default -> throw new RuntimeException("Unsupported boolean operator " + ctx.conditionOperator().getText());
         }
     }
 
@@ -81,26 +76,13 @@ class EmittingListenerV1 extends JobotwarV1BaseListener {
             return;
         }
         switch (ctx.comparator().getText()) {
-            case "=":
-                this.emitter.emit(OpCode.EQ);
-                break;
-            case "!=":
-                this.emitter.emit(OpCode.NEQ);
-                break;
-            case ">":
-                this.emitter.emit(OpCode.GT);
-                break;
-            case ">=":
-                this.emitter.emit(OpCode.GE);
-                break;
-            case "<":
-                this.emitter.emit(OpCode.LT);
-                break;
-            case "<=":
-                this.emitter.emit(OpCode.LE);
-                break;
-            default:
-                throw new RuntimeException("Unsupported comparator: " + ctx.comparator().getText());
+            case "=" -> this.emitter.emit(OpCode.EQ);
+            case "!=" -> this.emitter.emit(OpCode.NEQ);
+            case ">" -> this.emitter.emit(OpCode.GT);
+            case ">=" -> this.emitter.emit(OpCode.GE);
+            case "<" -> this.emitter.emit(OpCode.LT);
+            case "<=" -> this.emitter.emit(OpCode.LE);
+            default -> throw new RuntimeException("Unsupported comparator: " + ctx.comparator().getText());
         }
     }
 
@@ -110,14 +92,9 @@ class EmittingListenerV1 extends JobotwarV1BaseListener {
             return;
         }
         switch (ctx.termOperator().getText()) {
-            case "+":
-                this.emitter.emit(OpCode.ADD);
-                break;
-            case "-":
-                this.emitter.emit(OpCode.SUB);
-                break;
-            default:
-                throw new RuntimeException("Unsupported term operator " + ctx.termOperator());
+            case "+" -> this.emitter.emit(OpCode.ADD);
+            case "-" -> this.emitter.emit(OpCode.SUB);
+            default -> throw new RuntimeException("Unsupported term operator " + ctx.termOperator());
         }
     }
 
@@ -127,17 +104,10 @@ class EmittingListenerV1 extends JobotwarV1BaseListener {
             return;
         }
         switch (ctx.productOperator().getText()) {
-            case "*":
-                this.emitter.emit(OpCode.MUL);
-                break;
-            case "/":
-                this.emitter.emit(OpCode.DIV);
-                break;
-            case "%":
-                this.emitter.emit(OpCode.MOD);
-                break;
-            default:
-                throw new RuntimeException("Unsupported product operator " + ctx.productOperator());
+            case "*" -> this.emitter.emit(OpCode.MUL);
+            case "/" -> this.emitter.emit(OpCode.DIV);
+            case "%" -> this.emitter.emit(OpCode.MOD);
+            default -> throw new RuntimeException("Unsupported product operator " + ctx.productOperator());
         }
     }
 
