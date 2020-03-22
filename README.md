@@ -10,6 +10,6 @@ This screenshot shows jobotwar's V2 language:
 ![screenshot1](https://raw.githubusercontent.com/smackem/jobotwar/master/src/site/screenshot1.png "Screenshot1")
 
 And here is some game play footage:
-![gameplay1](https://raw.githubusercontent.com/smackem/jobotwar/master/src/site/gameplay1.png "Gameplay1")
+![gameplay1](https://raw.githubusercontent.com/smackem/jobotwar/master/src/site/gameplay1.gif "Gameplay1")
 
 The game includes implementations of classic Robot Wars and crobots programs like Mover, Shooter and Corner, plus it adds many fresh designs as samples.
