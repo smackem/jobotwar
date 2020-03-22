@@ -15,3 +15,46 @@ And here is some game play footage:
 </p>
 
 The game includes implementations of classic Robot Wars and crobots programs like Mover, Shooter and Corner, plus it adds many fresh designs as samples.
+
+The game is written in Java 13, using ANTLR and JavaFX.
+
+Here are some code samples to get started with programming robots:
+
+```
+// robot 'Bumblebee'
+
+// main is the default state. programs start in this state
+state main() {
+
+    // randomly choose a new destination
+    def destX = @random(40, 600)
+    def destY = @random(40, 440)
+
+    // print the new destination
+    @log(destX)
+    @log(destY)
+
+    // set the speed
+    @speed(destX - @x(), destY - @y())
+
+    // and change state to 'move'
+    yield move(destX, destY)
+}
+
+// the moving state. yields as soon as the destination has been reached.
+state move(destX, destY) {
+
+    // calculate distance from destination
+    def dx = destX - @x()
+    def dy = destY - @y()
+
+    if sqrt(dx * dx + dy * dy) < 40 {
+        // if distance if less than 40 pixels, change state to 'main'
+        yield main()
+    }
+}
+```
+
+As you can see, the jobotwar language is state based. You define states by declaring code blocks, which are then executed repeatedly by the jobotwar runtime. You change to another state by using the keyword `yield`.
+States can receive arguments, which cannot be changed while the program remains in this state (see `destX` and `destY` in the preceding sample).
+Functions prefixed with `@` are robot methods, which manipulate or monitor the controlled robot.
