@@ -68,8 +68,9 @@ Read|Write|Description
 `@speedX()`|`@speedX(value)`|Gets or sets the speed in x-direction in the range -500 to +500
 `@speedY()`|`@speedY(value)`|Gets or sets the speed in y-direction in the range -500 to +500
 -|`@speed(x, y)`|Sets the speed in x-direction and in y-direction
-`@radar()`|`@radar(angle)`|Gets the result of the last radar scan or sends a radar beam into direction `angle` and returns the result: Either the distance to a wall or the negative distance to a robot. See the sample below.
- -|`@fire(angle, distance)`|Fires a shot into direction `angle` to explode in `distance`
+-|`@log(value)`|Writes `value` to the program's log console
+-|`@fire(angle, distance)`|Fires a shot into direction
+`@radar()`|`@radar(angle)`|Gets the result of the last radar scan or sends a radar beam into direction `angle` and returns the result: Either the distance to a wall or the negative distance to a robot. See the sample below.`angle` to explode in `distance`
 `random()`|-|Gets a random floating point value between 0 and 1
 `random(max)`|-|Gets a random floating point value between 0 and `max`
 `random(min, max)`|-|Gets a random floating point value between `min` and `max`.
