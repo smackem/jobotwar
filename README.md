@@ -97,18 +97,18 @@ state main() {
 
 Function|Description|Example
 --------|-----------|-------
-abs(v)|The absolute value of v
-tan(v)|The tangens of v. v is in degrees
-sin(v)|The sine of v. v is in degrees
-cos(v)|The cosine of v. v is in degrees
-atan(v)|The arc tangens of v in degrees
-asin(v)|The arc sine of v in degrees
-acos(v)|The arc cosine of v in degrees
-sqrt(v)|The square root of v
-trunc(v)|The integer part of v, e.g.|`trunc(12.5) == 12 // true`
-sign(v)|The signum of v (-1, 0 or 1)
-min(a, b)|The smaller value of a and b
-max(a, b)|The greater value of a and b
+`abs(v)`|The absolute value of v
+`tan(v)`|The tangens of v. v is in degrees
+`sin(v)`|The sine of v. v is in degrees
+`cos(v)`|The cosine of v. v is in degrees
+`atan(v)`|The arc tangens of v in degrees
+`asin(v)`|The arc sine of v in degrees
+`acos(v)`|The arc cosine of v in degrees
+`sqrt(v)`|The square root of v
+`trunc(v)`|The integer part of v, e.g.|`trunc(12.5) == 12 // true`
+`sign(v)`|The signum of v (-1, 0 or 1)
+`min(a, b)`|The smaller value of a and b
+`max(a, b)`|The greater value of a and b
 
 #### Types and syntax
 
@@ -121,3 +121,5 @@ The supported control flow mechanisms include `if else` and the `while` loop. `r
 
 To go further, have a look at the samples:
 https://github.com/smackem/jobotwar/tree/master/src/site
+
+All .jobot files in this folder can be loaded into the game.
