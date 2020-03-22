@@ -58,3 +58,66 @@ state move(destX, destY) {
 As you can see, the jobotwar language is state based. You define states by declaring code blocks, which are then executed repeatedly by the jobotwar runtime. You change to another state by using the keyword `yield`.
 States can receive arguments, which cannot be changed while the program remains in this state (see `destX` and `destY` in the preceding sample).
 Functions prefixed with `@` are robot methods, which manipulate or monitor the controlled robot.
+
+#### Here is a list of robot methods:
+
+Read|Write|Description
+----|-----|-----------
+`@x()`|-|Gets the current x-position of the robot
+`@y()`|-|Gets the current y-position of the robot
+`@speedX()`|`@speedX(value)`|Gets or sets the speed in x-direction in the range -500 to +500
+`@speedY()`|`@speedY(value)`|Gets or sets the speed in y-direction in the range -500 to +500
+-|`@speed(x, y)`|Sets the speed in x-direction and in y-direction
+`@radar()`|`@radar(angle)`|Gets the result of the last radar scan or sends a radar beam into direction `angle` and returns the result: Either the distance to a wall or the negative distance to a robot. See the sample below.
+ -|`@fire(angle, distance)`|Fires a shot into direction `angle` to explode in `distance`
+`random()`|-|Gets a random floating point value between 0 and 1
+`random(max)`|-|Gets a random floating point value between 0 and `max`
+`random(min, max)`|-|Gets a random floating point value between `min` and `max`.
+`@damage()`|-|Gets the current health state of the robot in the range 0 to 100, where 0 means dead
+
+```
+// robot 'Shooter'
+// serves as radar sample
+
+def angle
+
+state main() {
+    def distance = @radar(angle)
+    if distance < 0 {
+        // robot hit
+        @fire(angle, abs(distance))
+    } else {
+        // wall hit
+        angle = angle + 17
+    }
+}
+```
+
+#### Built-in functions:
+
+Function|Description|Example
+--------|-----------|-------
+abs(v)|The absolute value of v
+tan(v)|The tangens of v. v is in degrees
+sin(v)|The sine of v. v is in degrees
+cos(v)|The cosine of v. v is in degrees
+atan(v)|The arc tangens of v in degrees
+asin(v)|The arc sine of v in degrees
+acos(v)|The arc cosine of v in degrees
+sqrt(v)|The square root of v
+trunc(v)|The integer part of v, e.g.|`trunc(12.5) == 12 // true`
+sign(v)|The signum of v (-1, 0 or 1)
+min(a, b)|The smaller value of a and b
+max(a, b)|The greater value of a and b
+
+#### Types and syntax
+
+The only supported data type is 64bit floating point.
+
+The syntax is similar to Go: blocks require braces, semicolons and parenthesis are optional.
+
+Use `def` to declare variables or functions, `state` to declare states.
+The supported control flow mechanisms include `if else` and the `while` loop. `return` returns a value from a function, `yield` returns from a state, changing to a new state.
+
+To go further, have a look at the samples:
+https://github.com/smackem/jobotwar/tree/master/src/site
