@@ -110,6 +110,8 @@ Function|Description|Example
 `sign(v)`|The signum of v (-1, 0 or 1)
 `min(a, b)`|The smaller value of a and b
 `max(a, b)`|The greater value of a and b
+`hypot(x, y)`|The square root of the sum of x squared and y squared
+`atan2(x, y)`|The arc tangens of y divided by x
 
 #### Types and syntax
 
