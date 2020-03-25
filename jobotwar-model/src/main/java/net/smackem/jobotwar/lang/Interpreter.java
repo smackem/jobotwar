@@ -214,6 +214,8 @@ public final class Interpreter {
             case "sign" -> Math.signum(arg);
             case "min" -> Math.min(this.stack.pop(), arg);
             case "max" -> Math.max(this.stack.pop(), arg);
+            case "hypot" -> Math.hypot(arg, this.stack.pop());
+            case "atan2" -> Math.toDegrees(Math.atan2(this.stack.pop(), arg));
             default -> throw new IllegalArgumentException("Unknown built-in function: '" + strArg + "'");
         };
     }

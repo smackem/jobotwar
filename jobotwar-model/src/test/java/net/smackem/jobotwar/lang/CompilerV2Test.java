@@ -379,23 +379,28 @@ public class CompilerV2Test {
 
     @Test
     public void testBuiltInFunctions() {
-        final String source = """
+        final String source = String.format("""
                 state main() {
                     @log(sign(100))
                     @log(sign(-100))
                     @log(sign(0))
                     @log(min(-10, 20))
                     @log(max(-10, 20))
+                    @log(hypot(1, 0))
+                    @log(hypot(1, 1))
+                    @log(atan2(%f))
+                    @log(atan2(%f))
                     exit
                 }
-                """;
+                """, Math.tan(Math.toRadians(90)), Math.tan(Math.toRadians(-90)));
         final Program program = compile(source);
         System.out.println(program.toString());
         final TestRuntimeEnvironment env = new TestRuntimeEnvironment();
         final Interpreter interpreter = new Interpreter(program, env);
 
         InterpreterTest.runComplete(interpreter);
-        assertThat(env.loggedValues()).containsExactly(1.0, -1.0, 0.0, -10.0, 20.0);
+        assertThat(env.loggedValues()).containsExactly(
+                1.0, -1.0, 0.0, -10.0, 20.0, 1.0, Math.sqrt(2), 90.0, -90.0);
     }
 
     private Program compile(String source) {

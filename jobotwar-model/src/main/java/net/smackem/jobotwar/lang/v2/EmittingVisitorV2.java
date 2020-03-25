@@ -409,7 +409,7 @@ class EmittingVisitorV2 extends JobotwarV2BaseVisitor<Void> {
                 this.emitter.emit(OpCode.INVOKE, ident);
                 return true;
             }
-            case "min", "max" -> {
+            case "min", "max", "hypot", "atan2" -> {
                 if (argumentCount != 2) {
                     logSemanticError(ctx, String.format(
                             "wrong number of arguments: expected 2, found %d", argumentCount));
