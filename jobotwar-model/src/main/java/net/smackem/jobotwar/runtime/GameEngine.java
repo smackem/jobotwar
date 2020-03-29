@@ -1,5 +1,8 @@
 package net.smackem.jobotwar.runtime;
 
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.Point;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,6 +16,7 @@ import java.util.Objects;
 public final class GameEngine {
     private static final Logger log = LoggerFactory.getLogger(GameEngine.class);
     private final Board board;
+    private final Geometry wallBoxGeometry;
 
     /**
      * Initializes a new instance of {@link GameEngine}.
@@ -20,6 +24,15 @@ public final class GameEngine {
      */
     public GameEngine(Board board) {
         this.board = Objects.requireNonNull(board);
+        final double width = board.width(), height = board.height();
+        this.wallBoxGeometry = EngineObject.GEOMETRY_FACTORY.createLineString(
+                new Coordinate[] {
+                        new Coordinate(0, 0),
+                        new Coordinate(width, 0),
+                        new Coordinate(width, height),
+                        new Coordinate(0, height),
+                        new Coordinate(0, 0),
+                });
     }
 
     /**
@@ -233,6 +246,16 @@ public final class GameEngine {
                 Vector.fromAngleAndLength(radarAngleRadians, Constants.MAX_RADAR_RANGE));
 
         // detect nearest robot
+        for (final Robot r : this.board.robots()) {
+            if (r == robot) {
+                continue;
+            }
+            final Geometry intersection = line.geometry().intersection(r.geometry());
+            if (intersection.getCoordinates().length > 0) {
+                return new RadarBeam(robot, r.position(), RadarBeamHitKind.ROBOT);
+            }
+        }
+        /*
         Vector nearestRobotPos = null;
         double nearestRobotDistance = 0;
         for (final Robot r : this.board.robots()) {
@@ -256,23 +279,12 @@ public final class GameEngine {
         }
         if (nearestRobotPos != null) {
             return new RadarBeam(robot, nearestRobotPos, RadarBeamHitKind.ROBOT);
-        }
+        }*/
 
         // detect wall
-        radarAngle = radarAngle < 0 ? radarAngle + 360 : radarAngle;
-        final Line wall;
-        if (45 <= radarAngle && radarAngle <= 135) { // bottom wall
-            wall = new Line(new Vector(0, this.board.height()), new Vector(this.board.width(), this.board.height()));
-        } else if (136 <= radarAngle && radarAngle <= 225) { // left wall
-            wall = new Line(Vector.ORIGIN, new Vector(0, this.board.height()));
-        } else if (226 <= radarAngle && radarAngle <= 315) { // top wall
-            wall = new Line(Vector.ORIGIN, new Vector(this.board.width(), 0));
-        } else { // right wall
-            wall = new Line(new Vector(this.board.width(), 0), new Vector(this.board.width(), this.board.height()));
-        }
-        final Vector wallIntersection = Line.intersect(line, wall);
-        assert(wallIntersection != null);
-        return new RadarBeam(robot, wallIntersection, RadarBeamHitKind.WALL);
+        final Geometry wallIntersection = line.geometry().intersection(this.wallBoxGeometry);
+        assert(wallIntersection instanceof Point);
+        return new RadarBeam(robot, new Vector(wallIntersection.getCoordinate()), RadarBeamHitKind.WALL);
     }
 
     private boolean moveRobot(Robot robot, Collection<Vector> collisions) {

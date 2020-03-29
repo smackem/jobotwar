@@ -1,13 +1,14 @@
 package net.smackem.jobotwar.runtime;
 
 import net.smackem.jobotwar.util.Arguments;
+import org.locationtech.jts.geom.Geometry;
 
 import java.util.function.Function;
 
 /**
  * A runtime representation of a programmed robot.
  */
-public class Robot {
+public class Robot extends EngineObject {
     private final String name;
     private final double acceleration;
     private final RobotProgram program;
@@ -26,6 +27,7 @@ public class Robot {
     private int health;
     private int coolDownHoldOff;
     private Vector cachedPosition;
+    private Geometry cachedGeometry;
     private RadarBeam latestRadarBeam;
 
     /**
@@ -126,6 +128,15 @@ public class Robot {
         public Robot build() {
             return new Robot(this);
         }
+    }
+
+    @Override
+    Geometry geometry() {
+        if (this.cachedGeometry == null) {
+            this.cachedGeometry = GEOMETRY_FACTORY.createPoint(
+                    this.position().coordinate).buffer(Constants.ROBOT_RADIUS, 3);
+        }
+        return this.cachedGeometry;
     }
 
     /**
@@ -297,6 +308,7 @@ public class Robot {
     public void setX(double value) {
         this.x = Arguments.requireRange(value, 0, Constants.MAX_BOARD_WIDTH);
         this.cachedPosition = null;
+        this.cachedGeometry = null;
     }
 
     /**
@@ -312,6 +324,7 @@ public class Robot {
     public void setY(double value) {
         this.y = Arguments.requireRange(value, 0, Constants.MAX_BOARD_HEIGHT);
         this.cachedPosition = null;
+        this.cachedGeometry = null;
     }
 
     /**

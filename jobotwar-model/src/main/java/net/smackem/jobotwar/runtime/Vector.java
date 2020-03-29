@@ -1,13 +1,14 @@
 package net.smackem.jobotwar.runtime;
 
+import org.locationtech.jts.geom.Coordinate;
+
 import java.util.Objects;
 
 /**
  * An immutable 2D vector.
  */
 public final class Vector {
-    private final double x;
-    private final double y;
+    final Coordinate coordinate;
 
     public static final Vector ORIGIN = new Vector(0, 0);
 
@@ -17,8 +18,11 @@ public final class Vector {
      * @param y the y-coordinate.
      */
     public Vector(double x, double y) {
-        this.x = x;
-        this.y = y;
+        this.coordinate = new Coordinate(x, y);
+    }
+
+    Vector(Coordinate coordinate) {
+        this.coordinate = coordinate;
     }
 
     /**
@@ -35,21 +39,21 @@ public final class Vector {
      * @return The x-coordinate.
      */
     public double x() {
-        return this.x;
+        return this.coordinate.x;
     }
 
     /**
      * @return The y-coordinate.
      */
     public double y() {
-        return this.y;
+        return this.coordinate.y;
     }
 
     /**
      * @return The length or magnitude of the vector (distance from origin).
      */
     public double length() {
-        return Math.sqrt(this.x * this.x + this.y * this.y);
+        return Math.sqrt(this.coordinate.x * this.coordinate.x + this.coordinate.y * this.coordinate.y);
     }
 
     /**
@@ -59,7 +63,7 @@ public final class Vector {
     public Vector normalize() {
         final double mag = length();
         final double im = mag != 0.0 ? 1.0 / mag : 0.0;
-        return new Vector(x * im, y * im);
+        return new Vector(this.coordinate.x * im, this.coordinate.y * im);
     }
 
     /**
@@ -69,7 +73,7 @@ public final class Vector {
      */
     public Vector add(Vector right) {
         Objects.requireNonNull(right);
-        return new Vector(this.x + right.x, this.y + right.y);
+        return new Vector(this.coordinate.x + right.coordinate.x, this.coordinate.y + right.coordinate.y);
     }
 
     /**
@@ -79,7 +83,7 @@ public final class Vector {
      */
     public Vector subtract(Vector right) {
         Objects.requireNonNull(right);
-        return new Vector(this.x - right.x, this.y - right.y);
+        return new Vector(this.coordinate.x - right.coordinate.x, this.coordinate.y - right.coordinate.y);
     }
 
     /**
@@ -88,7 +92,7 @@ public final class Vector {
      * @return A new vector that is the product of this vector and the scalar.
      */
     public Vector multiply(double scalar) {
-        return new Vector(this.x * scalar, this.y * scalar);
+        return new Vector(this.coordinate.x * scalar, this.coordinate.y * scalar);
     }
 
     /**
@@ -97,7 +101,7 @@ public final class Vector {
      * @return A new vector that is the quotient of the division.
      */
     public Vector divide(double scalar) {
-        return new Vector(this.x / scalar, this.y / scalar);
+        return new Vector(this.coordinate.x / scalar, this.coordinate.y / scalar);
     }
 
     /**
@@ -105,7 +109,7 @@ public final class Vector {
      * @return A new vector with negated coordinates.
      */
     public Vector negate() {
-        return new Vector(-this.x, -this.y);
+        return new Vector(-this.coordinate.x, -this.coordinate.y);
     }
 
     /**
@@ -116,7 +120,8 @@ public final class Vector {
      * @return {@code true} if the vectors are close, otherwise {@code false}.
      */
     public boolean isCloseTo(Vector other, double tolerance) {
-        return Math.abs(this.x - other.x) < tolerance && Math.abs(this.y - other.y) < tolerance;
+        return Math.abs(this.coordinate.x - other.coordinate.x) < tolerance
+               && Math.abs(this.coordinate.y - other.coordinate.y) < tolerance;
     }
 
     /**
@@ -129,9 +134,7 @@ public final class Vector {
     public static double distance(Vector a, Vector b) {
         Objects.requireNonNull(a);
         Objects.requireNonNull(b);
-        final double dx = b.x - a.x;
-        final double dy = b.y - a.y;
-        return Math.sqrt(dx * dx + dy * dy);
+        return a.coordinate.distance(b.coordinate);
     }
 
     @Override
@@ -143,16 +146,17 @@ public final class Vector {
             return false;
         }
         final Vector vector = (Vector) o;
-        return Double.compare(vector.x, this.x) == 0 && Double.compare(vector.y, this.y) == 0;
+        return Double.compare(vector.coordinate.x, this.coordinate.x) == 0
+               && Double.compare(vector.coordinate.y, this.coordinate.y) == 0;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.x, this.y);
+        return Objects.hash(this.coordinate.x, this.coordinate.y);
     }
 
     @Override
     public String toString() {
-        return String.format("Vector{x=%f, y=%f}", this.x, this.y);
+        return String.format("Vector{x=%f, y=%f}", this.coordinate.x, this.coordinate.y);
     }
 }

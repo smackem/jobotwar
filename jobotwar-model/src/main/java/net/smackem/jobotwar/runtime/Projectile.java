@@ -1,13 +1,17 @@
 package net.smackem.jobotwar.runtime;
 
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.util.AffineTransformation;
+
 /**
  * A projectile that has been fired by a robot.
  */
-public class Projectile {
+public class Projectile extends EngineObject {
     private final Robot sourceRobot;
     private final Vector destination;
     private final Vector increment;
     private final double speed;
+    private final Geometry geometry;
     private Vector position;
     private double remainingDistance;
 
@@ -25,6 +29,7 @@ public class Projectile {
         final Vector difference = destination.subtract(this.position);
         this.increment = difference.normalize().multiply(speed);
         this.remainingDistance = difference.length();
+        this.geometry = GEOMETRY_FACTORY.createPoint(this.position.coordinate).buffer(2);
     }
 
     /**
@@ -68,11 +73,21 @@ public class Projectile {
 
         double tolerance = this.speed / 2;
         if (remainingDistance <= tolerance) {
+            final Vector difference = this.destination.subtract(this.position);
+            this.geometry.apply(AffineTransformation.translationInstance(
+                    difference.x(), difference.y()));
             this.position = this.destination;
             return;
         }
 
         this.position = this.position.add(this.increment);
         this.remainingDistance -= this.speed;
+        this.geometry.apply(AffineTransformation.translationInstance(
+                this.increment.x(), this.increment.y()));
+    }
+
+    @Override
+    Geometry geometry() {
+        return this.geometry;
     }
 }
