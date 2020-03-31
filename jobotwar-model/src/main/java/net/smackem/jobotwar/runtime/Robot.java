@@ -1,8 +1,8 @@
 package net.smackem.jobotwar.runtime;
 
 import net.smackem.jobotwar.util.Arguments;
-import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.util.AffineTransformation;
 
 import java.util.function.Function;
 
@@ -134,8 +134,9 @@ public class Robot extends EngineObject {
     @Override
     public Geometry geometry() {
         if (this.cachedGeometry == null) {
-            this.cachedGeometry = GEOMETRY_FACTORY.createPoint(
-                    this.position().coordinate).buffer(Constants.ROBOT_RADIUS - 1, 2);
+            this.cachedGeometry = GEOMETRY_FACTORY
+                    .createPoint(this.position().coordinate)
+                    .buffer(Constants.ROBOT_RADIUS - 1, 2);
         }
         return this.cachedGeometry;
     }
@@ -304,15 +305,6 @@ public class Robot extends EngineObject {
     }
 
     /**
-     * Sets the current x-position of the robot.
-     */
-    public void setX(double value) {
-        this.x = Arguments.requireRange(value, 0, Constants.MAX_BOARD_WIDTH);
-        this.cachedPosition = null;
-        this.cachedGeometry = null;
-    }
-
-    /**
      * @return The current y-position of the robot.
      */
     public double getY() {
@@ -320,12 +312,20 @@ public class Robot extends EngineObject {
     }
 
     /**
-     * Sets the current y-position of the robot.
+     * Sets the current x-position and y-position of the robot.
      */
-    public void setY(double value) {
-        this.y = Arguments.requireRange(value, 0, Constants.MAX_BOARD_HEIGHT);
+    public void setPosition(double x, double y) {
+        if (x == this.x && y == this.y) {
+            return;
+        }
+        Arguments.requireRange(x, 0, Constants.MAX_BOARD_WIDTH);
+        Arguments.requireRange(y, 0, Constants.MAX_BOARD_HEIGHT);
+        if (this.cachedGeometry != null) {
+            this.cachedGeometry.apply(AffineTransformation.translationInstance(x - this.x, y - this.y));
+        }
+        this.x = x;
+        this.y = y;
         this.cachedPosition = null;
-        this.cachedGeometry = null;
     }
 
     /**

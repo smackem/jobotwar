@@ -216,8 +216,7 @@ public class GameEngineTest {
         RadarBeam beam = result.radarBeams().iterator().next();
         assertThat(beam.hitKind()).isEqualTo(RadarBeamHitKind.ROBOT);
         assertThat(beam.sourceRobot()).isEqualTo(robot1);
-        assertThat(beam.hitPosition())
-                .usingComparator(vectorComparator)
-                .isEqualTo(robot2.position());
+        assertThat(beam.hitPosition().x()).isBetween(robot2.getX(), robot2.getX() + Constants.ROBOT_RADIUS);
+        assertThat(beam.hitPosition().y()).isEqualTo(robot2.getY());
     }
 }

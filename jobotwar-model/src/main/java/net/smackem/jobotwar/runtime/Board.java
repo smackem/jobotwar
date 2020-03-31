@@ -65,8 +65,9 @@ public class Board {
         final Random random = ThreadLocalRandom.current();
         for (final Robot robot : this.robots) {
             do {
-                robot.setX(Constants.ROBOT_RADIUS + random.nextDouble() * (this.width - Constants.ROBOT_RADIUS * 2));
-                robot.setY(Constants.ROBOT_RADIUS + random.nextDouble() * (this.height - Constants.ROBOT_RADIUS * 2));
+                robot.setPosition(
+                        Constants.ROBOT_RADIUS + random.nextDouble() * (this.width - Constants.ROBOT_RADIUS * 2),
+                        Constants.ROBOT_RADIUS + random.nextDouble() * (this.height - Constants.ROBOT_RADIUS * 2));
             } while (getCloseRobot(robot) != null);
         }
     }

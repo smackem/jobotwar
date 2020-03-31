@@ -2,7 +2,6 @@ package net.smackem.jobotwar.runtime;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.Point;
 
 /**
  * A geometrical line between two points (expressed as {@link Vector}s.
@@ -73,12 +72,6 @@ public final class Line extends EngineObject {
      * @return The point where the two lines intersect or {@code null} if they are in parallel.
      */
     public static Vector intersect(Line line1, Line line2) {
-        final Geometry intersection = line1.geometry.intersection(line2.geometry);
-        if (intersection instanceof Point) {
-            return new Vector(((Point)intersection).getCoordinate());
-        }
-        return null;
-        /*
         final Vector p1 = line1.p1, p2 = line1.p2;
         final Vector p3 = line2.p1, p4 = line2.p2;
         final double x1 = p1.x(), y1 = p1.y();
@@ -103,7 +96,6 @@ public final class Line extends EngineObject {
 
         final double x = (m1*x1 - m2*x3 + y3 - y1) / (m1 - m2);
         return new Vector(x, (x-x1) * m1 + y1);
-        */
     }
 
     private static Vector intersectVertical(double x1, double y1, double x2, double y2, double x) {

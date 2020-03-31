@@ -245,7 +245,7 @@ public final class GameEngine {
         final Line line = new Line(position,
                 position.add(Vector.fromAngleAndLength(radarAngleRadians, Constants.MAX_RADAR_RANGE)));
 
-        // detect nearest robot
+        // detect robot
         for (final Robot r : this.board.robots()) {
             if (r == robot) {
                 continue;
@@ -256,31 +256,6 @@ public final class GameEngine {
                 return new RadarBeam(robot, new Vector(coordinate), RadarBeamHitKind.ROBOT);
             }
         }
-        /*
-        Vector nearestRobotPos = null;
-        double nearestRobotDistance = 0;
-        for (final Robot r : this.board.robots()) {
-            if (r == robot) {
-                continue;
-            }
-            final Vector p = r.position();
-            final double distanceFromBeam = line.distanceFromPoint(p);
-            if (distanceFromBeam > Constants.ROBOT_RADIUS) {
-                continue;
-            }
-            final double robotDistance = Vector.distance(position, p);
-            final Vector beamPos = position.add(Vector.fromAngleAndLength(radarAngleRadians, robotDistance));
-            if (beamPos.isCloseTo(p, Constants.ROBOT_RADIUS) == false) {
-                continue;
-            }
-            if (robotDistance < nearestRobotDistance || nearestRobotPos == null) {
-                nearestRobotDistance = robotDistance;
-                nearestRobotPos = beamPos;
-            }
-        }
-        if (nearestRobotPos != null) {
-            return new RadarBeam(robot, nearestRobotPos, RadarBeamHitKind.ROBOT);
-        }*/
 
         // detect wall
         final Geometry wallIntersection = line.geometry().intersection(this.wallBoxGeometry);
@@ -334,8 +309,7 @@ public final class GameEngine {
             }
         }
 
-        robot.setX(nextX);
-        robot.setY(nextY);
+        robot.setPosition(nextX, nextY);
         return hasCollision;
     }
 

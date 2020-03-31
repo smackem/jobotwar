@@ -162,7 +162,7 @@ public class BoardGraphics {
                     new Stop(0, Color.rgb(255, 255, 255, 0.1)),
                     new Stop(1, Color.rgb(0, 0, 0, 0.3))));
             gc.fillOval(innerX, innerY, innerW, innerW);
-            renderGeometry(gc, robot.geometry());
+            //renderGeometry(gc, robot.geometry());
         }
     }
 
