@@ -50,25 +50,23 @@ public final class GameRecorder implements RobotProgramContext {
     @Override
     public void logMessage(Robot robot, String category, double value) {
         switch (this.mode) {
-            case RECORD:
+            case RECORD -> {
                 this.robotRecords.get(robot.name()).logMessages.add(new RobotLogMessage(robot.name(), category, value));
-                break;
-            case PLAY:
+            }
+            case PLAY -> {
                 if (this.robotMessageLogger != null) {
                     this.robotMessageLogger.accept(new RobotLogMessage(robot.name(), category, value));
                 }
-                break;
+            }
         }
     }
 
     @Override
     public double nextRandomDouble(Robot robot) {
-        switch (this.mode) {
-            case RECORD:    return recordRandomDouble(robot);
-            case PLAY:      return playRandomDouble(robot);
-            default:
-                throw new IllegalStateException("Unexpected value: " + this.mode);
-        }
+        return switch (this.mode) {
+            case RECORD -> recordRandomDouble(robot);
+            case PLAY -> playRandomDouble(robot);
+        };
     }
 
     private double recordRandomDouble(Robot r) {
