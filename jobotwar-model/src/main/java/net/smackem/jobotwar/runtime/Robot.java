@@ -1,6 +1,7 @@
 package net.smackem.jobotwar.runtime;
 
 import net.smackem.jobotwar.util.Arguments;
+import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 
 import java.util.function.Function;
@@ -131,10 +132,10 @@ public class Robot extends EngineObject {
     }
 
     @Override
-    Geometry geometry() {
+    public Geometry geometry() {
         if (this.cachedGeometry == null) {
             this.cachedGeometry = GEOMETRY_FACTORY.createPoint(
-                    this.position().coordinate).buffer(Constants.ROBOT_RADIUS, 3);
+                    this.position().coordinate).buffer(Constants.ROBOT_RADIUS - 1, 2);
         }
         return this.cachedGeometry;
     }

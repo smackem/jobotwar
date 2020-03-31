@@ -7,6 +7,8 @@ import javafx.scene.paint.*;
 import javafx.scene.shape.ArcType;
 import net.smackem.jobotwar.runtime.Vector;
 import net.smackem.jobotwar.runtime.*;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -160,7 +162,20 @@ public class BoardGraphics {
                     new Stop(0, Color.rgb(255, 255, 255, 0.1)),
                     new Stop(1, Color.rgb(0, 0, 0, 0.3))));
             gc.fillOval(innerX, innerY, innerW, innerW);
+            renderGeometry(gc, robot.geometry());
         }
+    }
+
+    private void renderGeometry(GraphicsContext gc, Geometry geometry) {
+        gc.save();
+        gc.setStroke(Color.WHITE);
+        gc.setLineWidth(1.0);
+        gc.beginPath();
+        for (final Coordinate coordinate : geometry.getCoordinates()) {
+            gc.lineTo(coordinate.x, coordinate.y);
+        }
+        gc.closePath();
+        gc.stroke();
     }
 
     private void renderExplosions(GraphicsContext gc) {

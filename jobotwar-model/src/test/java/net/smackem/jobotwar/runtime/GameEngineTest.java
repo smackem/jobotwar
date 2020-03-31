@@ -118,23 +118,28 @@ public class GameEngineTest {
     public void radarWall() throws RobotProgramException {
         final int width = 100, height = 100;
         final Robot robot = new Robot.Builder(
-            rob -> new RuntimeProgram(rob,
-                RuntimeProgram.instruction(null, r -> {
-                    r.setRadarAngle(0.0); return null;
-                }),
-                RuntimeProgram.instruction(null, r -> {
-                    r.setRadarAngle(90.0); return null;
-                }),
-                RuntimeProgram.instruction(null, r -> {
-                    r.setRadarAngle(180.0); return null;
-                }),
-                RuntimeProgram.instruction(null, r -> {
-                    r.setRadarAngle(270.0); return null;
-                }),
-                RuntimeProgram.instruction(null, r -> {
-                    r.setRadarAngle(45.0); return null;
-                })
-        )).acceleration(1).x(width / 2.0).y(height / 2.0).build();
+                rob -> new RuntimeProgram(rob,
+                        RuntimeProgram.instruction(null, r -> {
+                            r.setRadarAngle(0.0);
+                            return null;
+                        }),
+                        RuntimeProgram.instruction(null, r -> {
+                            r.setRadarAngle(90.0);
+                            return null;
+                        }),
+                        RuntimeProgram.instruction(null, r -> {
+                            r.setRadarAngle(180.0);
+                            return null;
+                        }),
+                        RuntimeProgram.instruction(null, r -> {
+                            r.setRadarAngle(270.0);
+                            return null;
+                        }),
+                        RuntimeProgram.instruction(null, r -> {
+                            r.setRadarAngle(45.0);
+                            return null;
+                        })
+                )).acceleration(1).x(width / 2.0).y(height / 2.0).build();
         final Board board = new Board(width, height, Collections.singleton(robot));
         final GameEngine engine = new GameEngine(board);
         final VectorComparator vectorComparator = new VectorComparator(1);
