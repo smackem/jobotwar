@@ -1,9 +1,1 @@
-// ==========================
-loop:
-    AIM + 7 -> AIM -> RADAR
-    goto loop unless RADAR < 0
-shoot:
-    0 - RADAR -> SHOT
-    AIM -> RADAR
-    goto shoot if RADAR < 0
-    goto loop
+{"meta":{"version":1},"name":"Shooter","source":{"language":"V1","code":"// ==========================\nloop:\n    AIM + 7 -> AIM -> RADAR\n    goto loop unless RADAR < 0\nshoot:\n    0 - RADAR -> SHOT\n    AIM -> RADAR\n    goto shoot if RADAR < 0\n    goto loop\n"}}

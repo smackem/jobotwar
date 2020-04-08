@@ -1,6 +1,5 @@
 package net.smackem.jobotwar.gui.edit;
 
-import com.google.common.io.CharStreams;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleListProperty;
@@ -121,21 +120,11 @@ public class EditController {
 
     @FXML
     private void newRobot(ActionEvent mouseEvent) {
-        newRobotWithProgram("Robot", null);
-    }
-
-    private void newRobotWithProgram(String robotBaseName, String resourceName) {
         final EditRobotViewModel robot = new EditRobotViewModel();
-        robot.nameProperty().set(robotBaseName + " " + (this.robots.size() + 1));
+        robot.nameProperty().set("Robot" + (this.robots.size() + 1));
         robot.colorProperty().set(getNextRandomColor());
-        if (resourceName != null) {
-            try (final InputStream stream = getClass().getResourceAsStream(resourceName);
-                 final InputStreamReader reader = new InputStreamReader(stream)) {
-                robot.sourceCodeProperty().set(CharStreams.toString(reader));
-            } catch (Exception ignored) { }
-        } else {
-            robot.sourceCodeProperty().set("");
-        }
+        robot.sourceCodeProperty().set("");
+        robot.languageProperty().set(Compiler.Language.V2);
         this.robots.add(robot);
         this.robotsListView.getSelectionModel().select(robot);
     }
@@ -216,46 +205,6 @@ public class EditController {
     }
 
     @FXML
-    private void newRobotMover(ActionEvent actionEvent) {
-        newRobotWithProgram("Mover", "robots/mover.jobot");
-    }
-
-    @FXML
-    private void newRobotSmart(ActionEvent actionEvent) {
-        newRobotWithProgram("Smartie", "robots/smart.jobot");
-    }
-
-    @FXML
-    private void newRobotDumbShooter(ActionEvent actionEvent) {
-        newRobotWithProgram("DumbShooter", "robots/dumbshooter.jobot");
-    }
-
-    @FXML
-    private void newRobotPatrol(ActionEvent actionEvent) {
-        newRobotWithProgram("Patrol", "robots/patrol.jobot");
-    }
-
-    @FXML
-    private void newRobotBumblebee(ActionEvent actionEvent) {
-        newRobotWithProgram("Bumblebee", "robots/bumblebee.jobot");
-    }
-
-    @FXML
-    private void newRobotFastScan(ActionEvent actionEvent) {
-        newRobotWithProgram("FastScan", "robots/fastscan.jobot");
-    }
-
-    @FXML
-    private void newRobotShooter(ActionEvent actionEvent) {
-        newRobotWithProgram("Shooter", "robots/shooter.jobot");
-    }
-
-    @FXML
-    private void newRobotCorner(ActionEvent actionEvent) {
-        newRobotWithProgram("Corner", "robots/corner.jobot");
-    }
-
-    @FXML
     private void simulateGame(ActionEvent actionEvent) {
         initiateGame((app, robots) -> app.simulateGame(BOARD_WIDTH, BOARD_HEIGHT, robots));
     }
@@ -326,6 +275,27 @@ public class EditController {
             log.error("error saving file " + file.getPath(), e);
             new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.CLOSE).showAndWait();
         }
+    }
+
+    @FXML
+    private void loadRobotFromResource(ActionEvent actionEvent) {
+        final var source = actionEvent.getSource();
+        if (source instanceof MenuItem == false) {
+            return;
+        }
+        final var widget = (MenuItem)source;
+        final String resourceName = (String)widget.getUserData();
+        final EditRobotViewModel robot;
+        try (final InputStream stream = getClass().getResourceAsStream("robots/" + resourceName);
+             final InputStreamReader reader = new InputStreamReader(stream)) {
+            robot = PersistableRobots.load(EditRobotViewModel::new, stream);
+        } catch (Exception ignored) {
+            return;
+        }
+        robot.colorProperty().set(getNextRandomColor());
+        robot.nameProperty().set(robot.getBaseName() + " " + (this.robots.size() + 1));
+        this.robotsListView.getSelectionModel().select(robot);
+        this.robots.add(robot);
     }
 
     private static class RobotViewModelCell extends ListCell<EditRobotViewModel> {

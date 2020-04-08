@@ -20,14 +20,12 @@
                     <HBox spacing="4" alignment="CENTER">
                         <SplitMenuButton fx:id="newRobotButton" minWidth="123" text="New Robot" onAction="#newRobot">
                             <items>
-                                <MenuItem text="shooter" onAction="#newRobotShooter" />
-                                <MenuItem text="mover" onAction="#newRobotMover" />
-                                <MenuItem text="corner" onAction="#newRobotCorner" />
-                                <MenuItem text="smart" onAction="#newRobotSmart" />
-                                <MenuItem text="dumbshooter" onAction="#newRobotDumbShooter" />
-                                <MenuItem text="patrol" onAction="#newRobotPatrol" />
-                                <MenuItem text="bumblebee" onAction="#newRobotBumblebee" />
-                                <MenuItem text="fastscan" onAction="#newRobotFastScan" />
+                                <MenuItem text="shooter" onAction="#loadRobotFromResource" userData="shooter.jobot" />
+                                <MenuItem text="mover" onAction="#loadRobotFromResource" userData="mover.jobot" />
+                                <MenuItem text="shooter V2" onAction="#loadRobotFromResource" userData="shooterpp.jobot" />
+                                <MenuItem text="patrol" onAction="#loadRobotFromResource" userData="patrolpp.jobot" />
+                                <MenuItem text="corner" onAction="#loadRobotFromResource" userData="cornerpp.jobot" />
+                                <MenuItem text="battering ram" onAction="#loadRobotFromResource" userData="batteringrampp.jobot" />
                                 <SeparatorMenuItem />
                                 <MenuItem text="Open..." onAction="#openRobotFile" />
                             </items>
