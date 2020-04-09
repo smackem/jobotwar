@@ -23,6 +23,7 @@
                                 <MenuItem text="shooter" onAction="#loadRobotFromResource" userData="shooter.jobot" />
                                 <MenuItem text="mover" onAction="#loadRobotFromResource" userData="mover.jobot" />
                                 <MenuItem text="shooter V2" onAction="#loadRobotFromResource" userData="shooterpp.jobot" />
+                                <MenuItem text="bumblebee" onAction="#loadRobotFromResource" userData="bumblebeepp.jobot" />
                                 <MenuItem text="patrol" onAction="#loadRobotFromResource" userData="patrolpp.jobot" />
                                 <MenuItem text="corner" onAction="#loadRobotFromResource" userData="cornerpp.jobot" />
                                 <MenuItem text="battering ram" onAction="#loadRobotFromResource" userData="batteringrampp.jobot" />
