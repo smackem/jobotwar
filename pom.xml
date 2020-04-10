@@ -13,7 +13,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.release>13</maven.compiler.release>
+        <maven.compiler.release>14</maven.compiler.release>
         <javafx.version>14</javafx.version>
     </properties>
 

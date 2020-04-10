@@ -11,9 +11,9 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="jobotwar" target="13" />
-      <module name="jobotwar-gui" target="13" />
-      <module name="jobotwar-model" target="13" />
+      <module name="jobotwar" target="14" />
+      <module name="jobotwar-gui" target="14" />
+      <module name="jobotwar-model" target="14" />
     </bytecodeTargetLevel>
   </component>
 </project>
