@@ -10,7 +10,7 @@
         <module name="jobotwar-model" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
+    <bytecodeTargetLevel target="14">
       <module name="jobotwar" target="14" />
       <module name="jobotwar-gui" target="14" />
       <module name="jobotwar-model" target="14" />
