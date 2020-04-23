@@ -388,8 +388,8 @@ public class CompilerV2Test {
                     @log(max(-10, 20))
                     @log(hypot(1, 0))
                     @log(hypot(1, 1))
-                    @log(atan2(%f))
-                    @log(atan2(%f))
+                    @log(atan(%f))
+                    @log(atan(%f))
                     exit
                 }
                 """, Math.tan(Math.toRadians(90)), Math.tan(Math.toRadians(-90)));
