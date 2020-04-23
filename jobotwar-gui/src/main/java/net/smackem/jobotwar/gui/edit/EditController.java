@@ -123,7 +123,10 @@ public class EditController {
         final EditRobotViewModel robot = new EditRobotViewModel();
         robot.nameProperty().set("Robot" + (this.robots.size() + 1));
         robot.colorProperty().set(getNextRandomColor());
-        robot.sourceCodeProperty().set("");
+        robot.sourceCodeProperty().set("""
+                state main() {
+                    // your code here
+                }""");
         robot.languageProperty().set(Compiler.Language.V2);
         this.robots.add(robot);
         this.robotsListView.getSelectionModel().select(robot);
