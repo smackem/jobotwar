@@ -2,6 +2,8 @@ package net.smackem.jobotwar.lang;
 
 import org.junit.Test;
 
+import java.util.Locale;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class CompilerV2Test {
@@ -379,7 +381,7 @@ public class CompilerV2Test {
 
     @Test
     public void testBuiltInFunctions() {
-        final String source = String.format("""
+        final String source = String.format(Locale.ROOT, """
                 state main() {
                     @log(sign(100))
                     @log(sign(-100))

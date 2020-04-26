@@ -4,7 +4,7 @@
     <groupId>net.smackem.jobotwar</groupId>
     <artifactId>jobotwar</artifactId>
     <packaging>pom</packaging>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
 
     <modules>
         <module>jobotwar-model</module>
