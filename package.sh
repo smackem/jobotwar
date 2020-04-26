@@ -1,8 +1,8 @@
 # package.sh builds a standalone jobotwar macosx or linux package
 # remember to use jdk 14
 
-JAR=jobotwar-gui-1.0-SNAPSHOT.jar
-VERSION='1.2'
+JAR=jobotwar-gui-1.0.jar
+VERSION='1.0'
 
 # note:
 # macosx (.dmg) works fine
