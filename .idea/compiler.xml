@@ -6,13 +6,15 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="jobotwar-gui" />
         <module name="jobotwar-model" />
+        <module name="jobotwar-gui" />
+        <module name="jobotwar-io" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel target="14">
       <module name="jobotwar" target="14" />
       <module name="jobotwar-gui" target="14" />
+      <module name="jobotwar-io" target="14" />
       <module name="jobotwar-model" target="14" />
     </bytecodeTargetLevel>
   </component>
