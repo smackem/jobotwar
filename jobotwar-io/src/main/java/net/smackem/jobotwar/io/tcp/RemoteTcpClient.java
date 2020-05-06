@@ -1,4 +1,4 @@
-package net.smackem.jobotwar.io.server;
+package net.smackem.jobotwar.io.tcp;
 
 import java.io.IOException;
 import java.net.SocketAddress;
@@ -6,13 +6,13 @@ import java.nio.ByteBuffer;
 import java.nio.channels.Channel;
 import java.nio.channels.SocketChannel;
 
-class RemoteClient<TMessage> implements AutoCloseable {
+class RemoteTcpClient<TMessage> implements AutoCloseable {
     private final SocketChannel channel;
     private final Protocol<TMessage> protocol;
-    private final LocalServer<TMessage> server;
+    private final LocalTcpServer<TMessage> server;
     private final SocketAddress remoteAddress;
 
-    RemoteClient(SocketChannel channel, Protocol<TMessage> protocol, LocalServer<TMessage> server) {
+    RemoteTcpClient(SocketChannel channel, Protocol<TMessage> protocol, LocalTcpServer<TMessage> server) {
         this.channel = channel;
         this.protocol = protocol;
         this.server = server;

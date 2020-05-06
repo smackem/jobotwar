@@ -1,4 +1,4 @@
-package net.smackem.jobotwar.io.server;
+package net.smackem.jobotwar.io.tcp;
 
 import java.nio.ByteBuffer;
 

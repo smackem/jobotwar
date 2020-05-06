@@ -1,4 +1,4 @@
-package net.smackem.jobotwar.io.server;
+package net.smackem.jobotwar.io.tcp;
 
 import net.smackem.jobotwar.io.events.EventPublisher;
 import net.smackem.jobotwar.io.events.SimpleEventPublisher;
@@ -21,8 +21,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-public class LocalServer<TMessage> implements AutoCloseable {
-    private final Logger log = LoggerFactory.getLogger(LocalServer.class);
+public class LocalTcpServer<TMessage> implements AutoCloseable {
+    private final Logger log = LoggerFactory.getLogger(LocalTcpServer.class);
     private final Object monitor = new Object();
     private final SimpleEventPublisher<TMessage> messageReceived = new SimpleEventPublisher<>();
     private final SimpleEventPublisher<SocketAddress> clientConnected = new SimpleEventPublisher<>();
@@ -31,13 +31,13 @@ public class LocalServer<TMessage> implements AutoCloseable {
     private final Selector selector;
     private final ServerSocketChannel acceptChannel;
     private final ByteBuffer buffer = ByteBuffer.allocateDirect(16 * 1024);
-    private final Collection<RemoteClient<TMessage>> clients = new ArrayList<>();
+    private final Collection<RemoteTcpClient<TMessage>> clients = new ArrayList<>();
     private final ExecutorService ioExecutorService;
     private final Supplier<Protocol<TMessage>> protocolFactory;
     private final Boolean tcpNoDelay;
     private volatile boolean closed;
 
-    public LocalServer(int port, Supplier<Protocol<TMessage>> protocolFactory, boolean tcpNoDelay) throws IOException {
+    public LocalTcpServer(int port, Supplier<Protocol<TMessage>> protocolFactory, boolean tcpNoDelay) throws IOException {
         this.port = port;
         this.protocolFactory = Objects.requireNonNull(protocolFactory);
         this.tcpNoDelay = tcpNoDelay;
@@ -50,7 +50,7 @@ public class LocalServer<TMessage> implements AutoCloseable {
         this.ioExecutorService.submit(this::run);
     }
 
-    public LocalServer(int port, Supplier<Protocol<TMessage>> protocolFactory) throws IOException {
+    public LocalTcpServer(int port, Supplier<Protocol<TMessage>> protocolFactory) throws IOException {
         this(port, protocolFactory, false);
     }
 
@@ -69,7 +69,7 @@ public class LocalServer<TMessage> implements AutoCloseable {
     public Collection<SocketAddress> connectedClients() {
         synchronized (this.monitor) {
             return this.clients.stream()
-                    .map(RemoteClient::address)
+                    .map(RemoteTcpClient::address)
                     .collect(Collectors.toList());
         }
     }
@@ -113,7 +113,7 @@ public class LocalServer<TMessage> implements AutoCloseable {
                 addClient(clientChannel);
             } else if (key.isReadable()) {
                 @SuppressWarnings("unchecked")
-                final RemoteClient<TMessage> client = (RemoteClient<TMessage>) key.attachment();
+                final RemoteTcpClient<TMessage> client = (RemoteTcpClient<TMessage>) key.attachment();
                 assert client.channel() == key.channel();
                 if (client.read(this.buffer)) {
                     log.debug("read {} bytes from {}", this.buffer.position(), client);
@@ -128,7 +128,7 @@ public class LocalServer<TMessage> implements AutoCloseable {
     }
 
     private void addClient(SocketChannel channel) {
-        final RemoteClient<TMessage> client = new RemoteClient<>(channel, this.protocolFactory.get(), this);
+        final RemoteTcpClient<TMessage> client = new RemoteTcpClient<>(channel, this.protocolFactory.get(), this);
         try {
             channel.setOption(StandardSocketOptions.TCP_NODELAY, this.tcpNoDelay)
                     .configureBlocking(false)
@@ -144,7 +144,7 @@ public class LocalServer<TMessage> implements AutoCloseable {
         this.clientConnected.submit(client.address());
     }
 
-    private void closeClient(RemoteClient<TMessage> client) {
+    private void closeClient(RemoteTcpClient<TMessage> client) {
         log.debug("close client {}", client);
         try {
             client.close();
@@ -157,20 +157,20 @@ public class LocalServer<TMessage> implements AutoCloseable {
         this.clientDisconnected.submit(client.address());
     }
 
-    void handleMessage(TMessage message, RemoteClient<TMessage> origin) {
+    void handleMessage(TMessage message, RemoteTcpClient<TMessage> origin) {
         this.messageReceived.submit(message);
-        final Collection<RemoteClient<TMessage>> clients;
+        final Collection<RemoteTcpClient<TMessage>> clients;
         synchronized (this.monitor) {
             clients = List.copyOf(this.clients);
         }
-        for (final RemoteClient<TMessage> client : clients) {
+        for (final RemoteTcpClient<TMessage> client : clients) {
             if (client != origin) {
                 writeMessage(message, client);
             }
         }
     }
 
-    void writeMessage(TMessage message, RemoteClient<TMessage> destination) {
+    void writeMessage(TMessage message, RemoteTcpClient<TMessage> destination) {
         try {
             destination.write(message);
         } catch (IOException e) {
@@ -184,7 +184,7 @@ public class LocalServer<TMessage> implements AutoCloseable {
         this.closed = true;
         this.acceptChannel.close();
         synchronized (this.monitor) {
-            for (final RemoteClient<TMessage> client : this.clients) {
+            for (final RemoteTcpClient<TMessage> client : this.clients) {
                 try {
                     client.close();
                 } catch (IOException ignored) {

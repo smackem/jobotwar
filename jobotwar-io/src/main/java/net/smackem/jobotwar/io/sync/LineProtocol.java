@@ -1,4 +1,6 @@
-package net.smackem.jobotwar.io.server;
+package net.smackem.jobotwar.io.sync;
+
+import net.smackem.jobotwar.io.tcp.Protocol;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
