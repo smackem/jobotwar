@@ -27,6 +27,10 @@ public class TurnMessage extends Message {
             this.robotStateChanges.put(robotId, robotStateChange);
             return this;
         }
+
+        public TurnMessage build() {
+            return new TurnMessage(this);
+        }
     }
 
     public Map<UUID, RobotStateChange> robotStateChanges() {

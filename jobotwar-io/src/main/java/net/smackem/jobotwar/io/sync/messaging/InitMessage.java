@@ -20,6 +20,10 @@ public class InitMessage extends Message {
             this.robots.put(robotId, robotInfo);
             return this;
         }
+
+        public InitMessage build() {
+            return new InitMessage(this);
+        }
     }
 
     public Map<UUID, RobotInfo> robots() {
@@ -32,11 +36,12 @@ public class InitMessage extends Message {
         json.writeStartObject("robots");
         for (final var entry : this.robots.entrySet()) {
             final RobotInfo robot = entry.getValue();
-            json.writeStartObject(entry.getKey().toString())
-                    .write("name", robot.name())
-                    .write("color", robot.color());
+            json.writeStartObject(entry.getKey().toString());
+            robot.name().ifPresent(v -> json.write("name", v));
+            robot.color().ifPresent(v -> json.write("color", v));
             robot.x().ifPresent(v -> json.write("x", v));
             robot.y().ifPresent(v -> json.write("y", v));
+            robot.isReady().ifPresent(v -> json.write("ready", v));
             json.writeEnd();
         }
         json.writeEnd();
