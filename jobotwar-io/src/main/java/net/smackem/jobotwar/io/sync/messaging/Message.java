@@ -3,13 +3,11 @@ package net.smackem.jobotwar.io.sync.messaging;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.json.Json;
-import javax.json.JsonNumber;
-import javax.json.JsonObject;
-import javax.json.JsonReader;
+import javax.json.*;
 import javax.json.stream.JsonGenerator;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Objects;
 import java.util.UUID;
 
 public abstract class Message {
@@ -59,7 +57,8 @@ public abstract class Message {
                     case "color" -> robotBuilder.color(value.toString());
                     case "x" -> robotBuilder.x(((JsonNumber)value).doubleValue());
                     case "y" -> robotBuilder.y(((JsonNumber)value).doubleValue());
-                    default -> log.warn("ignoring unknown robot info key '{}'", entry.getKey());
+                    case "ready" -> robotBuilder.ready(Objects.equals(value, JsonValue.TRUE));
+                    default -> log.warn("ignoring unknown robot info key '{}'", robotEntry.getKey());
                 }
             }
             builder.addRobot(robotId, robotBuilder.build());
