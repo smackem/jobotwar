@@ -53,8 +53,8 @@ public abstract class Message {
             for (final var robotEntry : robotJson.entrySet()) {
                 final var value = robotEntry.getValue();
                 switch (robotEntry.getKey()) {
-                    case "name" -> robotBuilder.name(value.toString());
-                    case "color" -> robotBuilder.color(value.toString());
+                    case "name" -> robotBuilder.name(((JsonString)value).getString());
+                    case "color" -> robotBuilder.color(((JsonString)value).getString());
                     case "x" -> robotBuilder.x(((JsonNumber)value).doubleValue());
                     case "y" -> robotBuilder.y(((JsonNumber)value).doubleValue());
                     case "ready" -> robotBuilder.ready(Objects.equals(value, JsonValue.TRUE));

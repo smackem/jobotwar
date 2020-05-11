@@ -2,6 +2,7 @@ package net.smackem.jobotwar.io.sync.messaging;
 
 import org.junit.Test;
 
+import java.io.ByteArrayInputStream;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -48,5 +49,22 @@ public class InitMessageTest {
 
     @Test
     public void encode() {
+        final byte[] bytes = MessageTests.encodeMessage(new InitMessage.Builder()
+                .addRobot(UUID.randomUUID(), new RobotInfo.Builder()
+                        .name("gurke")
+                        .x(100.125)
+                        .ready(false)
+                        .build())
+                .addRobot(UUID.randomUUID(), new RobotInfo.Builder()
+                        .name("sellerie")
+                        .color("#55dd33")
+                        .y(554.25)
+                        .build())
+                .build());
+        final Message decodedMessage = Message.decode(new ByteArrayInputStream(bytes));
+        assertThat(decodedMessage).isNotNull();
+        assertThat(decodedMessage).isInstanceOf(InitMessage.class);
+        final InitMessage init = (InitMessage) decodedMessage;
+        assertThat(init.robots().get(UUID.randomUUID())).isNull();
     }
 }
