@@ -77,5 +77,23 @@ public class TurnMessageTest {
         final Message decodedMessage = Message.decode(new ByteArrayInputStream(bytes));
         assertThat(decodedMessage).isNotNull();
         assertThat(decodedMessage).isInstanceOf(TurnMessage.class);
+        final TurnMessage turn = (TurnMessage) decodedMessage;
+        assertThat(turn.turnId()).isEqualTo(2);
+        final RobotStateChange robot1 = turn.robotStateChanges().get(robotId1);
+        assertThat(robot1).isNotNull();
+        assertThat(robot1.aim()).isPresent().hasValue(1.5);
+        assertThat(robot1.radar()).isPresent().hasValue(2.5);
+        assertThat(robot1.random()).isPresent().hasValue(3.5);
+        assertThat(robot1.shot()).isPresent().hasValue(4.5);
+        assertThat(robot1.speedX()).isPresent().hasValue(5.5);
+        assertThat(robot1.speedY()).isPresent().hasValue(6.5);
+        final RobotStateChange robot2 = turn.robotStateChanges().get(robotId2);
+        assertThat(robot2).isNotNull();
+        assertThat(robot2.aim()).isPresent().hasValue(77.0);
+        assertThat(robot2.radar()).isNotPresent();
+        assertThat(robot2.random()).isNotPresent();
+        assertThat(robot2.shot()).isPresent().hasValue(99.0);
+        assertThat(robot2.speedX()).isNotPresent();
+        assertThat(robot2.speedY()).isNotPresent();
     }
 }
