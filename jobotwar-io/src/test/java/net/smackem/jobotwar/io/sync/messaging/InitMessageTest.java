@@ -45,17 +45,28 @@ public class InitMessageTest {
         assertThat(robot1.x()).isPresent().hasValue(100.3);
         assertThat(robot1.y()).isPresent().hasValue(200.6);
         assertThat(robot1.isReady()).isPresent().hasValue(true);
+        final RobotInfo robot2 = init.robots().get(UUID.fromString("c60dcff1-3ba9-4ba6-bbe1-8d529f4ab95b"));
+        assertThat(robot2).isNotNull();
+    }
+
+    @Test
+    public void decodeRepeatedly() {
+        for (int i = 0; i < 1000; i++) {
+            decode();
+        }
     }
 
     @Test
     public void encode() {
+        final UUID robotId1 = UUID.randomUUID();
+        final UUID robotId2 = UUID.randomUUID();
         final byte[] bytes = MessageTests.encodeMessage(new InitMessage.Builder()
-                .addRobot(UUID.randomUUID(), new RobotInfo.Builder()
+                .addRobot(robotId1, new RobotInfo.Builder()
                         .name("gurke")
                         .x(100.125)
                         .ready(false)
                         .build())
-                .addRobot(UUID.randomUUID(), new RobotInfo.Builder()
+                .addRobot(robotId2, new RobotInfo.Builder()
                         .name("sellerie")
                         .color("#55dd33")
                         .y(554.25)
@@ -66,5 +77,19 @@ public class InitMessageTest {
         assertThat(decodedMessage).isInstanceOf(InitMessage.class);
         final InitMessage init = (InitMessage) decodedMessage;
         assertThat(init.robots().get(UUID.randomUUID())).isNull();
+        final RobotInfo robot1 = init.robots().get(robotId1);
+        assertThat(robot1).isNotNull();
+        assertThat(robot1.name()).isPresent().hasValue("gurke");
+        assertThat(robot1.color()).isNotPresent();
+        assertThat(robot1.x()).isPresent().hasValue(100.125);
+        assertThat(robot1.y()).isNotPresent();
+        assertThat(robot1.isReady()).isPresent().hasValue(false);
+        final RobotInfo robot2 = init.robots().get(robotId2);
+        assertThat(robot2).isNotNull();
+        assertThat(robot2.name()).isPresent().hasValue("sellerie");
+        assertThat(robot2.color()).isPresent().hasValue("#55dd33");
+        assertThat(robot2.x()).isNotPresent();
+        assertThat(robot2.y()).isPresent().hasValue(554.25);
+        assertThat(robot2.isReady()).isNotPresent();
     }
 }
