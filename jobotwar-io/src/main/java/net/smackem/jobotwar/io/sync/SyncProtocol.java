@@ -9,8 +9,8 @@ import java.nio.ByteBuffer;
 
 public class SyncProtocol implements Protocol<Message> {
 
-    private static final byte STX = 0x02;
-    private static final byte ETX = 0x03;
+    static final byte STX = 0x02;
+    static final byte ETX = 0x03;
     private final ByteArrayOutputStream bos = new ByteArrayOutputStream();
     private boolean inBody;
 
