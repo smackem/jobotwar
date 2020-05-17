@@ -21,10 +21,18 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+/**
+ * An asynchronous tcp listener that manages an unlimited number of clients.
+ *
+ * @param <TMessage>
+ *     The type that implements the communication protocol.
+ *
+ * @implNote All public methods of this class are thread-safe.
+ */
 public class LocalTcpServer<TMessage> implements AutoCloseable {
     private final Logger log = LoggerFactory.getLogger(LocalTcpServer.class);
     private final Object monitor = new Object();
-    private final SimpleEventPublisher<TMessage> messageReceived = new SimpleEventPublisher<>();
+    private final SimpleEventPublisher<ReceivedMessage<TMessage>> messageReceived = new SimpleEventPublisher<>();
     private final SimpleEventPublisher<SocketAddress> clientConnected = new SimpleEventPublisher<>();
     private final SimpleEventPublisher<SocketAddress> clientDisconnected = new SimpleEventPublisher<>();
     private final int port;
@@ -37,6 +45,22 @@ public class LocalTcpServer<TMessage> implements AutoCloseable {
     private final Boolean tcpNoDelay;
     private volatile boolean closed;
 
+    /**
+     * Initializes a new instance of {@link LocalTcpServer}.
+     *
+     * @param port
+     *      The TCP port to listen on.
+     *
+     * @param protocolFactory
+     *      A {@link java.util.function.Consumer} that creates a {@link Protocol} object.
+     *      For every client that connects, one protocol object is created.
+     *
+     * @param tcpNoDelay
+     *      {@code true} if the client sockets should be configured for instant transmission,
+     *      otherwise {@code false}.
+     *
+     * @throws IOException if the tcp listener could not be created.
+     */
     public LocalTcpServer(int port, Supplier<Protocol<TMessage>> protocolFactory, boolean tcpNoDelay) throws IOException {
         this.port = port;
         this.protocolFactory = Objects.requireNonNull(protocolFactory);
@@ -50,22 +74,53 @@ public class LocalTcpServer<TMessage> implements AutoCloseable {
         this.ioExecutorService.submit(this::run);
     }
 
+    /**
+     * Initializes a new instance of {@link LocalTcpServer} with instant transmission disabled
+     * (the tcpNoDelay flag is false).
+     *
+     * @param port
+     *      The TCP port to listen on.
+     *
+     * @param protocolFactory
+     *      A {@link java.util.function.Consumer} that creates a {@link Protocol} object.
+     *      For every client that connects, one protocol object is created.
+     *
+     * @throws IOException if the tcp listener could not be created.
+     */
     public LocalTcpServer(int port, Supplier<Protocol<TMessage>> protocolFactory) throws IOException {
         this(port, protocolFactory, false);
     }
 
-    public final EventPublisher<TMessage> messageReceivedEvent() {
+    /**
+     * @return An event publisher that publishes an event every time a message has been received.
+     */
+    public final EventPublisher<ReceivedMessage<TMessage>> messageReceivedEvent() {
         return this.messageReceived;
     }
 
+    /**
+     * Record that contains information about a received message.
+     * @param <TMessage> The message type.
+     */
+    public record ReceivedMessage<TMessage>(SocketAddress origin, TMessage message) {}
+
+    /**
+     * @return An event publisher that publishes an event every time a client connects to the server.
+     */
     public final EventPublisher<SocketAddress> clientConnectedEvent() {
         return this.clientConnected;
     }
 
+    /**
+     * @return An event publisher that publishes an event every time a client disconnects from the server.
+     */
     public final EventPublisher<SocketAddress> clientDisconnectedEvent() {
         return this.clientDisconnected;
     }
 
+    /**
+     * @return A collection containing the remote addresses of all currently connected clients.
+     */
     public Collection<SocketAddress> connectedClients() {
         synchronized (this.monitor) {
             return this.clients.stream()
@@ -74,12 +129,45 @@ public class LocalTcpServer<TMessage> implements AutoCloseable {
         }
     }
 
+    /**
+     * @return A value indicating whether this tcp server accepts new client connection or not.
+     */
     public boolean isAccepting() {
         return this.acceptChannel.isOpen();
     }
 
-    public void stopAccepting() throws IOException {
-        this.acceptChannel.close();
+    /**
+     * Stops accepting new client connections.
+     */
+    public void stopAccepting() {
+        log.info("stopped accepting new client connections");
+        try {
+            this.acceptChannel.close();
+        } catch (IOException e) {
+            log.warn("attempted to close accept channel that already was broken", e);
+        }
+    }
+
+    /**
+     * Sends a message to all connected client.
+     *
+     * @param message
+     *      The message to send.
+     *
+     * @param except
+     *      If not {@code null}, excludes the client with the given address from the
+     *      broadcast.
+     */
+    public void broadcastMessage(TMessage message, SocketAddress except) {
+        final Collection<RemoteTcpClient<TMessage>> clients;
+        synchronized (this.monitor) {
+            clients = List.copyOf(this.clients);
+        }
+        for (final RemoteTcpClient<TMessage> client : clients) {
+            if (Objects.equals(client.address(), except) == false) {
+                writeMessage(message, client);
+            }
+        }
     }
 
     private void run() {
@@ -158,19 +246,10 @@ public class LocalTcpServer<TMessage> implements AutoCloseable {
     }
 
     void handleMessage(TMessage message, RemoteTcpClient<TMessage> origin) {
-        this.messageReceived.submit(message);
-        final Collection<RemoteTcpClient<TMessage>> clients;
-        synchronized (this.monitor) {
-            clients = List.copyOf(this.clients);
-        }
-        for (final RemoteTcpClient<TMessage> client : clients) {
-            if (client != origin) {
-                writeMessage(message, client);
-            }
-        }
+        this.messageReceived.submit(new ReceivedMessage<>(origin.address(), message));
     }
 
-    void writeMessage(TMessage message, RemoteTcpClient<TMessage> destination) {
+    private void writeMessage(TMessage message, RemoteTcpClient<TMessage> destination) {
         try {
             destination.write(message);
         } catch (IOException e) {
@@ -179,10 +258,20 @@ public class LocalTcpServer<TMessage> implements AutoCloseable {
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
+        if (this.closed) {
+            return;
+        }
         log.info("close server");
         this.closed = true;
-        this.acceptChannel.close();
+        this.messageReceived.close();
+        this.clientConnected.close();
+        this.clientDisconnected.close();
+        try {
+            this.acceptChannel.close();
+        } catch (IOException ignored) {
+            // nothing to do
+        }
         synchronized (this.monitor) {
             for (final RemoteTcpClient<TMessage> client : this.clients) {
                 try {
@@ -193,12 +282,16 @@ public class LocalTcpServer<TMessage> implements AutoCloseable {
             }
             this.clients.clear();
         }
-        this.selector.close();
+        try {
+            this.selector.close();
+        } catch (IOException ignored) {
+            // nothing to do
+        }
         this.ioExecutorService.shutdown();
         try {
             this.ioExecutorService.awaitTermination(10, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            log.info("interrupted while awaiting io-executor termination", e);
         }
     }
 

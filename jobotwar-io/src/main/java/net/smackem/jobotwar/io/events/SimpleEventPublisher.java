@@ -7,7 +7,7 @@ import java.util.Objects;
 import java.util.concurrent.Flow;
 import java.util.function.Consumer;
 
-public class SimpleEventPublisher<T> implements EventPublisher<T> {
+public class SimpleEventPublisher<T> implements EventPublisher<T>, AutoCloseable {
 
     private final Object monitor = new Object();
     private final Collection<SimpleEventSubscription<T>> subscriptions = new ArrayList<>();
@@ -49,6 +49,13 @@ public class SimpleEventPublisher<T> implements EventPublisher<T> {
     void cancelSubscription(SimpleEventSubscription<T> subscription) {
         synchronized (monitor) {
             subscriptions.remove(subscription);
+        }
+    }
+
+    @Override
+    public void close() {
+        synchronized (this.monitor) {
+            this.subscriptions.clear();
         }
     }
 }

@@ -23,7 +23,7 @@ public class LocalTcpServerTest {
         final CountDownLatch latch = new CountDownLatch(1);
         try (final LocalTcpServer<TestMessage.Base> server = new LocalTcpServer<>(PORT, TestProtocol::new)) {
             server.messageReceivedEvent().subscribe(item -> {
-                receivedMessages.add(item);
+                receivedMessages.add(item.message());
                 if (receivedMessages.size() % 500 == 0) {
                     System.out.printf("%d messages received\n", receivedMessages.size());
                 }
@@ -41,7 +41,8 @@ public class LocalTcpServerTest {
     public void testLocalServerDispatchToClient() throws IOException, InterruptedException {
         final Collection<TestMessage.Base> messagesToSend = generateMessages(10_000);
         Collection<TestMessage.Base> receivedMessages;
-        try (final LocalTcpServer<TestMessage.Base> ignored = new LocalTcpServer<>(PORT, TestProtocol::new)) {
+        try (final LocalTcpServer<TestMessage.Base> server = new LocalTcpServer<>(PORT, TestProtocol::new)) {
+            server.messageReceivedEvent().subscribe(msg -> server.broadcastMessage(msg.message(), msg.origin()));
             final var future = connectAndRead(messagesToSend.size());
             connectAndWrite(messagesToSend);
             try {
