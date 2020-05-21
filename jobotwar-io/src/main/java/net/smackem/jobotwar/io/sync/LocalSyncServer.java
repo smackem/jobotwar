@@ -21,13 +21,13 @@ public class LocalSyncServer implements AutoCloseable {
         this.tcpServer.messageReceivedEvent().subscribe(this::onMessageReceived);
     }
 
-    private void onClientConnected(SocketAddress socketAddress) {
+    private void onClientConnected(SocketAddress addr) {
     }
 
-    private void onClientDisconnected(SocketAddress socketAddress) {
+    private void onClientDisconnected(SocketAddress addr) {
     }
 
-    private void onMessageReceived(LocalTcpServer.ReceivedMessage<Message> messageReceivedMessage) {
+    private void onMessageReceived(LocalTcpServer.ReceivedMessage<Message> msg) {
     }
 
     @Override
