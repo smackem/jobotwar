@@ -6,6 +6,7 @@
       <module fileurl="file://$PROJECT_DIR$/jobotwar-gui/jobotwar-gui.iml" filepath="$PROJECT_DIR$/jobotwar-gui/jobotwar-gui.iml" />
       <module fileurl="file://$PROJECT_DIR$/jobotwar-io/jobotwar-io.iml" filepath="$PROJECT_DIR$/jobotwar-io/jobotwar-io.iml" />
       <module fileurl="file://$PROJECT_DIR$/jobotwar-model/jobotwar-model.iml" filepath="$PROJECT_DIR$/jobotwar-model/jobotwar-model.iml" />
+      <module fileurl="file://$PROJECT_DIR$/jobotwar-web/jobotwar-web.iml" filepath="$PROJECT_DIR$/jobotwar-web/jobotwar-web.iml" />
     </modules>
   </component>
 </project>
