@@ -299,7 +299,6 @@ public class LocalTcpServer<TMessage> implements AutoCloseable {
     public String toString() {
         return "LocalServer{" +
                "port=" + port +
-               ", client_count=" + clients.size() +
                '}';
     }
 }
