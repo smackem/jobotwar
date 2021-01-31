@@ -11,7 +11,7 @@ import java.io.InputStreamReader;
 public class WebApp implements AutoCloseable {
     private final Javalin app;
 
-    private WebApp(int port) {
+    WebApp(int port) {
         this.app = Javalin.create().start(port);
         app.get("/play", this::onPlay);
     }
