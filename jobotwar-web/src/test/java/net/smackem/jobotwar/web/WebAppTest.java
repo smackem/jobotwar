@@ -31,7 +31,7 @@ public class WebAppTest {
     public void play() throws IOException, InterruptedException {
         final HttpClient http = HttpClient.newHttpClient();
         final HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:" + PORT))
+                .uri(URI.create("http://localhost:%d/play".formatted(PORT)))
                 .POST(HttpRequest.BodyPublishers.ofString("""
                         {
                             "boardWidth":100.0,
@@ -49,6 +49,7 @@ public class WebAppTest {
                         """))
                 .build();
         final HttpResponse<String> response = http.send(request, HttpResponse.BodyHandlers.ofString());
+        assertThat(response.statusCode()).isEqualTo(200);
         assertThat(response.body()).isNotNull();
     }
 }
