@@ -2,6 +2,7 @@ package net.smackem.jobotwar.web;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -14,12 +15,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class WebAppTest {
 
-    private static final int PORT = 55666;
+    private static final int port = 55666;
+    private static final String baseUri = "http://localhost:" + port + "/";
     private WebApp remoteServer;
 
     @Before
     public void setUp() {
-        this.remoteServer = new WebApp(PORT);
+        this.remoteServer = new WebApp(port);
     }
 
     @After
@@ -31,18 +33,25 @@ public class WebAppTest {
     public void play() throws IOException, InterruptedException {
         final HttpClient http = HttpClient.newHttpClient();
         final HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:%d/play".formatted(PORT)))
+                .uri(URI.create(baseUri + "play"))
                 .POST(HttpRequest.BodyPublishers.ofString("""
                         {
-                            "boardWidth":100.0,
-                            "boardHeight":80.0,
+                            "boardWidth":500,
+                            "boardHeight":500,
                             "robots":[
                                 {
                                     "name":"loser",
                                     "code":"state main() {}",
                                     "language":"V2",
-                                    "x":10.0,
-                                    "y":10.0
+                                    "x":50.0,
+                                    "y":50.0
+                                },
+                                {
+                                    "name":"loser",
+                                    "code":"500 -> SPEEDX",
+                                    "language":"V1",
+                                    "x":50.0,
+                                    "y":100.0
                                 }
                             ]
                         }
