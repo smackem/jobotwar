@@ -1,4 +1,4 @@
-package net.smackem.jobotwar.web;
+package net.smackem.jobotwar.web.beans;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -6,7 +6,7 @@ import net.smackem.jobotwar.lang.Compiler;
 
 import java.util.Objects;
 
-class RobotDto {
+public class InstantMatchRobot {
     @JsonProperty private final String name;
     @JsonProperty private String code;
     @JsonProperty private Compiler.Language language = Compiler.Language.V2;
@@ -14,11 +14,11 @@ class RobotDto {
     @JsonProperty private double y;
 
     @JsonCreator
-    private RobotDto() {
+    private InstantMatchRobot() {
         this.name = null;
     }
 
-    public RobotDto(String name) {
+    public InstantMatchRobot(String name) {
         this.name = name;
     }
 
@@ -30,7 +30,7 @@ class RobotDto {
         return this.code;
     }
 
-    public RobotDto code(String code) {
+    public InstantMatchRobot code(String code) {
         this.code = code;
         return this;
     }
@@ -39,7 +39,7 @@ class RobotDto {
         return this.language;
     }
 
-    public RobotDto language(Compiler.Language language) {
+    public InstantMatchRobot language(Compiler.Language language) {
         this.language = language;
         return this;
     }
@@ -48,7 +48,7 @@ class RobotDto {
         return this.x;
     }
 
-    public RobotDto x(double x) {
+    public InstantMatchRobot x(double x) {
         this.x = x;
         return this;
     }
@@ -57,7 +57,7 @@ class RobotDto {
         return this.y;
     }
 
-    public RobotDto y(double y) {
+    public InstantMatchRobot y(double y) {
         this.y = y;
         return this;
     }
@@ -66,7 +66,7 @@ class RobotDto {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        RobotDto robotDto = (RobotDto) o;
+        InstantMatchRobot robotDto = (InstantMatchRobot) o;
         return Double.compare(robotDto.x, x) == 0 && Double.compare(robotDto.y, y) == 0 && Objects.equals(name, robotDto.name) && Objects.equals(code, robotDto.code) && language == robotDto.language;
     }
 

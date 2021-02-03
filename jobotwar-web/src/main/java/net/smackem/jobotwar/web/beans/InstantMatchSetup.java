@@ -1,4 +1,4 @@
-package net.smackem.jobotwar.web;
+package net.smackem.jobotwar.web.beans;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -8,17 +8,17 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
-class PlayRequest {
+public class InstantMatchSetup {
     @JsonProperty private int maxDurationMillis;
     @JsonProperty private int boardWidth;
     @JsonProperty private int boardHeight;
-    @JsonProperty private final Collection<RobotDto> robots = new ArrayList<>();
+    @JsonProperty private final Collection<InstantMatchRobot> robots = new ArrayList<>();
 
     public int boardWidth() {
         return this.boardWidth;
     }
 
-    public PlayRequest boardWidth(int boardWidth) {
+    public InstantMatchSetup boardWidth(int boardWidth) {
         this.boardWidth = boardWidth;
         return this;
     }
@@ -27,16 +27,16 @@ class PlayRequest {
         return this.boardHeight;
     }
 
-    public PlayRequest boardHeight(int boardHeight) {
+    public InstantMatchSetup boardHeight(int boardHeight) {
         this.boardHeight = boardHeight;
         return this;
     }
 
-    public Collection<RobotDto> robots() {
+    public Collection<InstantMatchRobot> robots() {
         return this.robots;
     }
 
-    public PlayRequest addRobots(RobotDto... robots) {
+    public InstantMatchSetup addRobots(InstantMatchRobot... robots) {
         this.robots.addAll(List.of(robots));
         return this;
     }
@@ -45,7 +45,7 @@ class PlayRequest {
         return Duration.ofMillis(this.maxDurationMillis);
     }
 
-    public PlayRequest maxDuration(Duration maxDurationMillis) {
+    public InstantMatchSetup maxDuration(Duration maxDurationMillis) {
         this.maxDurationMillis = (int) maxDurationMillis.toMillis();
         return this;
     }
@@ -54,7 +54,7 @@ class PlayRequest {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        PlayRequest that = (PlayRequest) o;
+        InstantMatchSetup that = (InstantMatchSetup) o;
         return maxDurationMillis == that.maxDurationMillis && boardWidth == that.boardWidth && boardHeight == that.boardHeight && Objects.equals(robots, that.robots);
     }
 

@@ -1,21 +1,21 @@
-package net.smackem.jobotwar.web;
+package net.smackem.jobotwar.web.beans;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Objects;
 
-class GameEventDto {
+public class MatchEvent {
     @JsonProperty private final int gameTimeMillis;
     @JsonProperty private final String event;
 
     @JsonCreator
-    private GameEventDto() {
+    private MatchEvent() {
         this.gameTimeMillis = 0;
         this.event = null;
     }
 
-    public GameEventDto(int gameTimeMillis, String event) {
+    public MatchEvent(int gameTimeMillis, String event) {
         this.gameTimeMillis = gameTimeMillis;
         this.event = event;
     }
@@ -32,7 +32,7 @@ class GameEventDto {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        GameEventDto that = (GameEventDto) o;
+        MatchEvent that = (MatchEvent) o;
         return gameTimeMillis == that.gameTimeMillis && Objects.equals(event, that.event);
     }
 
