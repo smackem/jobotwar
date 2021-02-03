@@ -2,9 +2,12 @@ package net.smackem.jobotwar.web.beans;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import net.smackem.jobotwar.lang.Compiler;
 
 import java.time.OffsetDateTime;
+import java.util.Objects;
 
 public class RobotBean extends PersistableBean {
     @JsonProperty private String code;
@@ -12,8 +15,14 @@ public class RobotBean extends PersistableBean {
     @JsonProperty private String name;
     @JsonProperty private double acceleration;
     @JsonProperty private int rgb;
-    @JsonProperty private OffsetDateTime dateCreated;
-    @JsonProperty private OffsetDateTime dateModified;
+
+    @JsonSerialize(using = OffsetDateTimeSerializer.class)
+    @JsonDeserialize(using = OffsetDateTimeDeserializer.class)
+    private OffsetDateTime dateCreated;
+
+    @JsonSerialize(using = OffsetDateTimeSerializer.class)
+    @JsonDeserialize(using = OffsetDateTimeDeserializer.class)
+    private OffsetDateTime dateModified;
 
     @JsonCreator
     private RobotBean() {
@@ -84,5 +93,25 @@ public class RobotBean extends PersistableBean {
     public RobotBean dateModified(OffsetDateTime dateModified) {
         this.dateModified = dateModified;
         return this;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        final RobotBean robotBean = (RobotBean) o;
+        return Double.compare(robotBean.acceleration, acceleration) == 0 &&
+               rgb == robotBean.rgb &&
+               Objects.equals(code, robotBean.code) &&
+               language == robotBean.language &&
+               Objects.equals(name, robotBean.name) &&
+               Objects.equals(dateCreated, robotBean.dateCreated) &&
+               Objects.equals(dateModified, robotBean.dateModified);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), code, language, name, acceleration, rgb, dateCreated, dateModified);
     }
 }
