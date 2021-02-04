@@ -7,11 +7,11 @@ import net.smackem.jobotwar.lang.Compiler;
 import net.smackem.jobotwar.web.beans.RobotBean;
 import net.smackem.jobotwar.web.persist.BeanRepository;
 import net.smackem.jobotwar.web.persist.ConstraintViolationException;
+import net.smackem.jobotwar.web.persist.NoSuchBeanException;
 import org.eclipse.jetty.http.HttpStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.OffsetDateTime;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class RobotController extends Controller<RobotBean> implements CrudHandler {
@@ -34,22 +34,32 @@ public class RobotController extends Controller<RobotBean> implements CrudHandle
     public void create(@NotNull Context ctx) {
         final RobotBean robot = ctx.bodyAsClass(RobotBean.class);
         robot.dateCreated(OffsetDateTime.now());
-        final Compiler compiler = new Compiler();
-        final Compiler.Result result = compiler.compile(Strings.nullToEmpty(robot.code()), robot.language());
-        if (result.hasErrors()) {
-            ctx.status(HttpStatus.BAD_REQUEST_400)
-                    .result("compilation error: " + String.join("\n", result.errors()));
+        if (compileRobotProgram(ctx, robot) == false) {
             return;
         }
         try {
             this.repository().put(robot.freeze());
         } catch (ConstraintViolationException e) {
-            ctx.status(400).result(e.getMessage());
+            ctx.status(HttpStatus.BAD_REQUEST_400).result(e.getMessage());
         }
     }
 
     @Override
     public void update(@NotNull Context ctx, @NotNull String id) {
+        final RobotBean robot = ctx.bodyAsClass(RobotBean.class);
+        robot.dateModified(OffsetDateTime.now());
+        if (robot.dateCreated() == null) {
+            ctx.status(HttpStatus.BAD_REQUEST_400).result("missing attribute 'dateCreated'");
+            return;
+        }
+        if (compileRobotProgram(ctx, robot) == false) {
+            return;
+        }
+        try {
+            this.repository().update(robot);
+        } catch (NoSuchBeanException e) {
+            ctx.status(HttpStatus.BAD_REQUEST_400).result(e.getMessage());
+        }
     }
 
     @Override
@@ -57,5 +67,16 @@ public class RobotController extends Controller<RobotBean> implements CrudHandle
         if (this.repository().delete(id).isEmpty()) {
             ctx.status(HttpStatus.NOT_FOUND_404);
         }
+    }
+
+    private static boolean compileRobotProgram(Context ctx, RobotBean robot) {
+        final Compiler compiler = new Compiler();
+        final Compiler.Result result = compiler.compile(Strings.nullToEmpty(robot.code()), robot.language());
+        if (result.hasErrors()) {
+            ctx.status(HttpStatus.BAD_REQUEST_400)
+                    .result("compilation error: " + String.join("\n", result.errors()));
+            return false;
+        }
+        return true;
     }
 }
