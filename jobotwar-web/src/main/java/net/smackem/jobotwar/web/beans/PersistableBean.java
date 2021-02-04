@@ -1,12 +1,14 @@
 package net.smackem.jobotwar.web.beans;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Objects;
 
 public abstract class PersistableBean {
     @JsonProperty private final String id;
+    @JsonIgnore private transient boolean frozen;
 
     @JsonCreator
     PersistableBean() {
@@ -19,6 +21,22 @@ public abstract class PersistableBean {
 
     public String id() {
         return this.id;
+    }
+
+    public boolean isFrozen() {
+        return this.frozen;
+    }
+
+    public <T extends PersistableBean> T freeze() {
+        this.frozen = true;
+        //noinspection unchecked
+        return (T) this;
+    }
+
+    protected void assertMutable() {
+        if (this.frozen) {
+            throw new UnsupportedOperationException("this object is frozen and cannot me modified.");
+        }
     }
 
     @Override

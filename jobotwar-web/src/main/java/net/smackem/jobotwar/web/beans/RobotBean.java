@@ -1,10 +1,12 @@
 package net.smackem.jobotwar.web.beans;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import net.smackem.jobotwar.lang.Compiler;
+import net.smackem.jobotwar.runtime.RobotProgram;
 
 import java.time.OffsetDateTime;
 import java.util.Objects;
@@ -37,6 +39,7 @@ public class RobotBean extends PersistableBean {
     }
 
     public RobotBean code(String code) {
+        assertMutable();
         this.code = code;
         return this;
     }
@@ -46,6 +49,7 @@ public class RobotBean extends PersistableBean {
     }
 
     public RobotBean language(Compiler.Language language) {
+        assertMutable();
         this.language = language;
         return this;
     }
@@ -55,6 +59,7 @@ public class RobotBean extends PersistableBean {
     }
 
     public RobotBean name(String name) {
+        assertMutable();
         this.name = name;
         return this;
     }
@@ -64,6 +69,7 @@ public class RobotBean extends PersistableBean {
     }
 
     public RobotBean acceleration(double acceleration) {
+        assertMutable();
         this.acceleration = acceleration;
         return this;
     }
@@ -73,6 +79,7 @@ public class RobotBean extends PersistableBean {
     }
 
     public RobotBean rgb(int rgb) {
+        assertMutable();
         this.rgb = rgb;
         return this;
     }
@@ -82,6 +89,7 @@ public class RobotBean extends PersistableBean {
     }
 
     public RobotBean dateCreated(OffsetDateTime dateCreated) {
+        assertMutable();
         this.dateCreated = dateCreated;
         return this;
     }
@@ -91,6 +99,7 @@ public class RobotBean extends PersistableBean {
     }
 
     public RobotBean dateModified(OffsetDateTime dateModified) {
+        assertMutable();
         this.dateModified = dateModified;
         return this;
     }

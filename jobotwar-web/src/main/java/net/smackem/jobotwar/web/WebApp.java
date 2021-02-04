@@ -2,6 +2,10 @@ package net.smackem.jobotwar.web;
 
 import com.google.common.base.Strings;
 import io.javalin.Javalin;
+import net.smackem.jobotwar.web.beans.MatchBean;
+import net.smackem.jobotwar.web.beans.RobotBean;
+import net.smackem.jobotwar.web.persist.BeanRepositories;
+import net.smackem.jobotwar.web.persist.BeanRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,14 +20,23 @@ public class WebApp implements AutoCloseable {
     private final Javalin app;
     private final PlayController playController;
     private final RobotController robotController;
+    private final MatchController matchController;
+    private final BeanRepository<MatchBean> matchRepo = BeanRepositories.inMemory();
+    private final BeanRepository<RobotBean> robotRepo = BeanRepositories.inMemory();
 
     WebApp(int port) {
         this.app = Javalin.create().start(port);
         this.playController = new PlayController();
-        this.robotController = new RobotController();
+        this.matchController = new MatchController(this.matchRepo, this.robotRepo);
+        this.robotController = new RobotController(this.robotRepo);
         app.routes(() -> {
             path("play", () -> post(this.playController::create));
             crud("robot/:robot-id", this.robotController);
+            path("match", () -> {
+                get(this.matchController::getAll);
+                post(this.matchController::create);
+                get(":match-id", this.matchController::get);
+            });
         });
     }
 
@@ -49,5 +62,9 @@ public class WebApp implements AutoCloseable {
     @Override
     public void close() {
         this.app.stop();
+        System.out.printf("""
+                #robots: %d
+                #matches: %d
+                """, this.robotRepo.count(), this.matchRepo.count());
     }
 }

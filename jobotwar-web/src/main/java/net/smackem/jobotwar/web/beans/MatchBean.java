@@ -37,6 +37,7 @@ public class MatchBean extends PersistableBean {
     }
 
     public MatchBean boardWidth(int boardWidth) {
+        assertMutable();
         this.boardWidth = boardWidth;
         return this;
     }
@@ -46,6 +47,7 @@ public class MatchBean extends PersistableBean {
     }
 
     public MatchBean boardHeight(int boardHeight) {
+        assertMutable();
         this.boardHeight = boardHeight;
         return this;
     }
@@ -55,6 +57,7 @@ public class MatchBean extends PersistableBean {
     }
 
     public MatchBean maxDuration(Duration maxDurationMillis) {
+        assertMutable();
         this.maxDurationMillis = (int) maxDurationMillis.toMillis();
         return this;
     }
@@ -64,6 +67,7 @@ public class MatchBean extends PersistableBean {
     }
 
     public MatchBean outcome(SimulationResult.Outcome outcome) {
+        assertMutable();
         this.outcome = outcome;
         return this;
     }
@@ -73,6 +77,7 @@ public class MatchBean extends PersistableBean {
     }
 
     public MatchBean winnerId(String winnerId) {
+        assertMutable();
         this.winnerId = winnerId;
         return this;
     }
@@ -82,6 +87,7 @@ public class MatchBean extends PersistableBean {
     }
 
     public MatchBean duration(Duration duration) {
+        assertMutable();
         this.durationMillis = duration.toMillis();
         return this;
     }
@@ -91,6 +97,7 @@ public class MatchBean extends PersistableBean {
     }
 
     public MatchBean addEvents(MatchEvent... events) {
+        assertMutable();
         this.eventLog.addAll(List.of(events));
         return this;
     }
@@ -100,6 +107,7 @@ public class MatchBean extends PersistableBean {
     }
 
     public MatchBean dateStarted(OffsetDateTime dateStarted) {
+        assertMutable();
         this.dateStarted = dateStarted;
         return this;
     }
@@ -109,6 +117,7 @@ public class MatchBean extends PersistableBean {
     }
 
     public MatchBean addRobotIds(String... robotIds) {
+        assertMutable();
         this.robotIds.addAll(List.of(robotIds));
         return this;
     }

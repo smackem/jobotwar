@@ -9,10 +9,7 @@ import net.smackem.jobotwar.runtime.RobotProgramContext;
 import net.smackem.jobotwar.runtime.simulation.SimulationEvent;
 import net.smackem.jobotwar.runtime.simulation.SimulationResult;
 import net.smackem.jobotwar.runtime.simulation.SimulationRunner;
-import net.smackem.jobotwar.web.beans.InstantMatchResult;
-import net.smackem.jobotwar.web.beans.InstantMatchRobot;
-import net.smackem.jobotwar.web.beans.InstantMatchSetup;
-import net.smackem.jobotwar.web.beans.MatchEvent;
+import net.smackem.jobotwar.web.beans.*;
 import org.eclipse.jetty.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,8 +19,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class PlayController extends Controller {
+public class PlayController extends Controller<PersistableBean> {
     private final static Logger log = LoggerFactory.getLogger(PlayController.class);
+
+    PlayController() {
+        super(null);
+    }
 
     public void create(Context ctx) {
         final InstantMatchSetup body = ctx.bodyAsClass(InstantMatchSetup.class);
