@@ -13,27 +13,13 @@ import java.net.http.HttpResponse;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class WebAppTest {
-
-    private static final int port = 55666;
-    private static final String baseUri = "http://localhost:" + port + "/";
-    private WebApp remoteServer;
-
-    @Before
-    public void setUp() {
-        this.remoteServer = new WebApp(port);
-    }
-
-    @After
-    public void tearDown() {
-        this.remoteServer.close();
-    }
+public class PlayControllerTest extends ControllerTest {
 
     @Test
     public void play() throws IOException, InterruptedException {
         final HttpClient http = HttpClient.newHttpClient();
         final HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(baseUri + "play"))
+                .uri(baseUri("play"))
                 .POST(HttpRequest.BodyPublishers.ofString("""
                         {
                             "boardWidth":500,

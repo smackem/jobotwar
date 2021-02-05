@@ -4,10 +4,12 @@ import com.google.common.base.Strings;
 import io.javalin.apibuilder.CrudHandler;
 import io.javalin.http.Context;
 import net.smackem.jobotwar.lang.Compiler;
+import net.smackem.jobotwar.web.beans.IdGenerator;
 import net.smackem.jobotwar.web.beans.RobotBean;
 import net.smackem.jobotwar.web.persist.BeanRepository;
 import net.smackem.jobotwar.web.persist.ConstraintViolationException;
 import net.smackem.jobotwar.web.persist.NoSuchBeanException;
+import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.http.HttpStatus;
 import org.jetbrains.annotations.NotNull;
 
@@ -33,6 +35,7 @@ public class RobotController extends Controller<RobotBean> implements CrudHandle
     @Override
     public void create(@NotNull Context ctx) {
         final RobotBean robot = ctx.bodyAsClass(RobotBean.class);
+        robot.id(IdGenerator.next());
         robot.dateCreated(OffsetDateTime.now());
         if (compileRobotProgram(ctx, robot) == false) {
             return;
@@ -42,6 +45,7 @@ public class RobotController extends Controller<RobotBean> implements CrudHandle
         } catch (ConstraintViolationException e) {
             ctx.status(HttpStatus.BAD_REQUEST_400).result(e.getMessage());
         }
+        ctx.status(HttpStatus.CREATED_201).header(HttpHeader.LOCATION.asString(), ctx.url() + "/" + robot.id());
     }
 
     @Override

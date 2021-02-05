@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Objects;
 
 public abstract class PersistableBean {
-    @JsonProperty private final String id;
+    @JsonProperty private String id;
     @JsonIgnore private transient boolean frozen;
 
     @JsonCreator
@@ -21,6 +21,12 @@ public abstract class PersistableBean {
 
     public String id() {
         return this.id;
+    }
+
+    public <T extends PersistableBean> T id(String id) {
+        this.id = id;
+        //noinspection unchecked
+        return (T) this;
     }
 
     public boolean isFrozen() {
