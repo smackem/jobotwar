@@ -10,6 +10,7 @@ class Robots {
      * Builds a new, 100% health {@link Robot} that has the same program, built-in parameters and position
      * as the specified {@link Robot}. The damage state is NOT copied.
      * The passed robot has to be controlled by a {@link CompiledProgram}.
+     *
      * @param robot The original {@link Robot} to use as template.
      * @param ctx The new context to hook in.
      *            If {@code null}, the original messageLogger is also used for the new robot.

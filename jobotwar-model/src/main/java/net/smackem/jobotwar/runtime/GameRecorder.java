@@ -4,6 +4,9 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+/**
+ * Records or replays a match.
+ */
 public final class GameRecorder implements RobotProgramContext {
     private final Random random;
     private final Board board;
@@ -12,6 +15,15 @@ public final class GameRecorder implements RobotProgramContext {
     private Consumer<RobotLogMessage> robotMessageLogger;
     private Mode mode;
 
+    /**
+     * Initializes a new instance of {@link GameRecorder}.
+     *
+     * @param random The random number generator to use when recording a match.
+     *               All generated numbers are fed into the running match via
+     *               the {@link RobotProgramContext} interface and stored for replay.
+     * @param boardFactory Factory function that receives the new {@link GameRecorder}
+     *                     as {@link RobotProgramContext} to create boards and robots.
+     */
     public GameRecorder(Random random, Function<RobotProgramContext, Board> boardFactory) {
         this.random = Objects.requireNonNull(random);
         this.board = Objects.requireNonNull(boardFactory).apply(this);
@@ -26,14 +38,28 @@ public final class GameRecorder implements RobotProgramContext {
 
     public enum Mode { RECORD, PLAY }
 
+    /**
+     * @return The current recorder mode.
+     */
     public Mode mode() {
         return this.mode;
     }
 
+    /**
+     * @return The initially cloned {@link Board} that is used for replaying the
+     *      recorded match. Modifying this board will destroy the replay.
+     */
     public Board replayBoard() {
         return this.replayBoard;
     }
 
+    /**
+     * Puts the {@link GameRecorder} into replay mode. The returned {@link Board} can
+     * be used by a game engine to replay the recorded match.
+     *
+     * @param robotMessageLogger A logger that receives the recorded in-game log messages.
+     * @return The {@link #replayBoard()}.
+     */
     public Board replay(Consumer<RobotLogMessage> robotMessageLogger) {
         this.mode = Mode.PLAY;
         this.robotMessageLogger = robotMessageLogger;

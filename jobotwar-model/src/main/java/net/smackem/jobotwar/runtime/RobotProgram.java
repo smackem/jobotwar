@@ -6,6 +6,7 @@ package net.smackem.jobotwar.runtime;
 public interface RobotProgram {
     /**
      * Advances the program up to a state defined by the implementing class (e.g. one instruction).
+     *
      * @return {@code true} if the program has more instructions to execute, {@code false} if
      *      it has ended.
      * @throws RobotProgramException There was a runtime error within the executing program.

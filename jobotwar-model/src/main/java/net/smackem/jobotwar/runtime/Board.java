@@ -20,6 +20,7 @@ public class Board {
 
     /**
      * Initializes a new instance of {@link Board}.
+     *
      * @param width The width of the board in pixels.
      * @param height The height of the board in pixels.
      * @param robots The {@link Robot}s on the board.
@@ -75,6 +76,7 @@ public class Board {
     /**
      * Creates a new {@link Board} with the same dimensions and {@link Robot}s that
      * have the same programs as the ones on the specified template board.
+     *
      * @param template The template board.
      * @param ctx The new {@link RobotProgramContext}.
      * @return A new {@link Board}.

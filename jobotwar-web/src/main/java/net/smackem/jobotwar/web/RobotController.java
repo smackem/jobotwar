@@ -9,6 +9,7 @@ import net.smackem.jobotwar.web.beans.RobotBean;
 import net.smackem.jobotwar.web.persist.BeanRepository;
 import net.smackem.jobotwar.web.persist.ConstraintViolationException;
 import net.smackem.jobotwar.web.persist.NoSuchBeanException;
+import net.smackem.jobotwar.web.query.Query;
 import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.http.HttpStatus;
 import org.jetbrains.annotations.NotNull;
@@ -24,7 +25,7 @@ public class RobotController extends Controller<RobotBean> implements CrudHandle
 
     @Override
     public void getAll(@NotNull Context ctx) {
-        ctx.json(this.repository().select().collect(Collectors.toList()));
+        ctx.json(this.repository().select(Query.ALL).collect(Collectors.toList()));
     }
 
     @Override

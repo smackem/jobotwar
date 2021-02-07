@@ -60,17 +60,10 @@ public final class Compiler {
      * @return A {@link Result} that contains the compilation result: the compiled program or error messages.
      */
     public Result compile(String source, Language language) {
-        final CompilerService compilerService;
-        switch (language) {
-            case V1:
-                compilerService = new CompilerV1();
-                break;
-            case V2:
-                compilerService = new CompilerV2();
-                break;
-            default:
-                throw new IllegalArgumentException("unsupported language: " + language);
-        }
+        final CompilerService compilerService = switch (language) {
+            case V1 -> new CompilerV1();
+            case V2 -> new CompilerV2();
+        };
         final Collection<String> errors = new ArrayList<>();
         final Program program = compilerService.compile(source, errors);
         return new Result(errors, program);

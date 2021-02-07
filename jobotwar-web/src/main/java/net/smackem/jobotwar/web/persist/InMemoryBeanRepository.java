@@ -1,8 +1,12 @@
 package net.smackem.jobotwar.web.persist;
 
 import net.smackem.jobotwar.web.beans.PersistableBean;
+import net.smackem.jobotwar.web.query.Query;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -20,7 +24,7 @@ class InMemoryBeanRepository<T extends PersistableBean> implements BeanRepositor
     }
 
     @Override
-    public Stream<T> select() {
+    public Stream<T> select(Query query) {
         return this.map.values().stream();
     }
 

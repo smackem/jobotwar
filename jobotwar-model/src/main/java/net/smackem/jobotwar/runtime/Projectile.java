@@ -13,6 +13,7 @@ public class Projectile {
 
     /**
      * Initializes a new instance of {@link Projectile}.
+     *
      * @param sourceRobot The robot that has fired the projectile.
      * @param destination The calculated destination of the projectile, where it should explode.
      * @param speed The speed of the projectile in pixels per tick.
