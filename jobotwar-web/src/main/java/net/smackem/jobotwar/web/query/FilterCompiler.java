@@ -13,6 +13,8 @@ import java.util.Collection;
  * Compiles the filter grammar PQuery.g4 into objects of type {@link Filter}.
  */
 public class FilterCompiler {
+    private FilterCompiler() {}
+
     /**
      * Compiles the given {@code source} into a {@link Filter}.
      *
@@ -20,7 +22,7 @@ public class FilterCompiler {
      * @return An object of type {@link Filter} if compilation was successful.
      * @throws ParseException if the given source was not in the correct format.
      */
-    public Filter compile(String source) throws ParseException {
+    public static Filter compile(String source) throws ParseException {
         final CharStream input = CharStreams.fromString(source);
         final PQueryLexer lexer = new PQueryLexer(input);
         final ErrorListener errorListener = new ErrorListener();
@@ -32,7 +34,7 @@ public class FilterCompiler {
         if (errorListener.errors.isEmpty() == false) {
             throw new ParseException(String.join("\n", errorListener.errors), 0);
         }
-        return tree.accept(new EmittingPQueryVisitor());
+        return tree.accept(new FilterEmittingVisitor());
     }
 
     private static class ErrorListener implements ANTLRErrorListener {

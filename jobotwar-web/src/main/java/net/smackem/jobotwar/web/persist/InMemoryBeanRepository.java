@@ -1,6 +1,7 @@
 package net.smackem.jobotwar.web.persist;
 
 import net.smackem.jobotwar.web.beans.PersistableBean;
+import net.smackem.jobotwar.web.query.Filter;
 import net.smackem.jobotwar.web.query.Query;
 
 import java.util.Collection;
@@ -25,7 +26,20 @@ class InMemoryBeanRepository<T extends PersistableBean> implements BeanRepositor
 
     @Override
     public Stream<T> select(Query query) {
-        return this.map.values().stream();
+        Stream<T> result = this.map.values().stream();
+        final Filter filter = Objects.requireNonNull(query).filter();
+        if (filter != null) {
+            result = result.filter(filter::matches);
+        }
+        final Optional<Long> offset = query.offset();
+        if (offset.isPresent()) {
+            result = result.skip(offset.get());
+        }
+        final Optional<Long> limit = query.limit();
+        if (limit.isPresent()) {
+            result = result.limit(limit.get());
+        }
+        return result;
     }
 
     @Override

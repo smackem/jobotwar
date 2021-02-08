@@ -13,8 +13,7 @@ public class QueryTest {
         final String source = """
                 name eq 'Bob'
                 """;
-        final FilterCompiler compiler = new FilterCompiler();
-        final Filter filter = compiler.compile(source);
+        final Filter filter = FilterCompiler.compile(source);
         assertThat(filter.matches(new TestBean())).isTrue();
     }
 
@@ -23,8 +22,7 @@ public class QueryTest {
         final String source = """
                 name eq 'Jim'
                 """;
-        final FilterCompiler compiler = new FilterCompiler();
-        final Filter filter = compiler.compile(source);
+        final Filter filter = FilterCompiler.compile(source);
         assertThat(filter.matches(new TestBean())).isFalse();
     }
 
@@ -33,8 +31,7 @@ public class QueryTest {
         final String source = """
                 name eq 'Jim' or familyName ne 'Murray'
                 """;
-        final FilterCompiler compiler = new FilterCompiler();
-        final Filter filter = compiler.compile(source);
+        final Filter filter = FilterCompiler.compile(source);
         assertThat(filter.matches(new TestBean())).isTrue();
     }
 

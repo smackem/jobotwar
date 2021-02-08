@@ -1,10 +1,12 @@
 package net.smackem.jobotwar.web.query;
 
+import com.google.common.base.CharMatcher;
+
 import java.lang.reflect.Field;
 import java.util.function.Function;
 import java.util.function.IntFunction;
 
-class EmittingPQueryVisitor extends PQueryBaseVisitor<Filter> {
+class FilterEmittingVisitor extends PQueryBaseVisitor<Filter> {
     @Override
     public Filter visitQuery(PQueryParser.QueryContext ctx) {
         return super.visitQuery(ctx);
@@ -16,7 +18,7 @@ class EmittingPQueryVisitor extends PQueryBaseVisitor<Filter> {
         int index = 1;
         for (final var ignored : ctx.Or()) {
             final Filter right = ctx.andCondition(index).accept(this);
-            filter = new BinaryFilter(filter, right, EmittingPQueryVisitor::or);
+            filter = new BinaryFilter(filter, right, FilterEmittingVisitor::or);
         }
         return filter;
     }
@@ -27,7 +29,7 @@ class EmittingPQueryVisitor extends PQueryBaseVisitor<Filter> {
         int index = 1;
         for (final var ignored : ctx.And()) {
             final Filter right = ctx.condition(index).accept(this);
-            filter = new BinaryFilter(filter, right, EmittingPQueryVisitor::and);
+            filter = new BinaryFilter(filter, right, FilterEmittingVisitor::and);
         }
         return filter;
     }
@@ -36,7 +38,7 @@ class EmittingPQueryVisitor extends PQueryBaseVisitor<Filter> {
     public Filter visitCondition(PQueryParser.ConditionContext ctx) {
         Filter filter = ctx.comparison().accept(this);
         if (ctx.Not() != null) {
-            filter = new UnaryFilter(filter, EmittingPQueryVisitor::not);
+            filter = new UnaryFilter(filter, FilterEmittingVisitor::not);
         }
         return filter;
     }
@@ -81,7 +83,7 @@ class EmittingPQueryVisitor extends PQueryBaseVisitor<Filter> {
             }
         }
         if (ctx.String() != null) {
-            final String s = ctx.String().getText().replace("'", "");
+            final String s = CharMatcher.is('\'').trimFrom(ctx.String().getText());
             return ignored -> s;
         }
         return null;
