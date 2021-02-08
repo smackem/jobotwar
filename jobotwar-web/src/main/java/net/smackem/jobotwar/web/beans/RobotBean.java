@@ -1,10 +1,11 @@
 package net.smackem.jobotwar.web.beans;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import net.smackem.jobotwar.lang.Compiler;
-import net.smackem.jobotwar.runtime.RobotProgram;
 
 import java.time.OffsetDateTime;
 import java.util.Objects;
