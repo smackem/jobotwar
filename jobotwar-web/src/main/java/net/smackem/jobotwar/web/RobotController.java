@@ -14,6 +14,7 @@ import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.http.HttpStatus;
 import org.jetbrains.annotations.NotNull;
 
+import java.text.ParseException;
 import java.time.OffsetDateTime;
 import java.util.stream.Collectors;
 
@@ -25,7 +26,15 @@ public class RobotController extends Controller<RobotBean> implements CrudHandle
 
     @Override
     public void getAll(@NotNull Context ctx) {
-        ctx.json(this.repository().select(Query.ALL).collect(Collectors.toList()));
+        final Query query;
+        try {
+            query = parseQuery(ctx);
+        } catch (ParseException e) {
+            ctx.status(HttpStatus.BAD_REQUEST_400);
+            ctx.result(e.getMessage());
+            return;
+        }
+        ctx.json(this.repository().select(query).collect(Collectors.toList()));
     }
 
     @Override
@@ -76,7 +85,13 @@ public class RobotController extends Controller<RobotBean> implements CrudHandle
 
     private static boolean compileRobotProgram(Context ctx, RobotBean robot) {
         final Compiler compiler = new Compiler();
-        final Compiler.Result result = compiler.compile(Strings.nullToEmpty(robot.code()), robot.language());
+        final Compiler.Result result;
+        try {
+            result = compiler.compile(Strings.nullToEmpty(robot.code()), robot.language());
+        } catch (Exception e) {
+            ctx.status(HttpStatus.BAD_REQUEST_400).result("compilation error: " + e.getMessage());
+            return false;
+        }
         if (result.hasErrors()) {
             ctx.status(HttpStatus.BAD_REQUEST_400)
                     .result("compilation error: " + String.join("\n", result.errors()));

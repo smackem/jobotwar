@@ -1,8 +1,6 @@
 package net.smackem.jobotwar.web.beans;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import net.smackem.jobotwar.lang.Compiler;
@@ -13,7 +11,7 @@ import java.util.Objects;
 
 public class RobotBean extends PersistableBean {
     @JsonProperty private String code;
-    @JsonProperty private Compiler.Language language;
+    @JsonProperty private Compiler.Language language = Compiler.Language.V1;
     @JsonProperty private String name;
     @JsonProperty private double acceleration;
     @JsonProperty private int rgb;
@@ -28,6 +26,11 @@ public class RobotBean extends PersistableBean {
 
     @JsonCreator
     private RobotBean() {
+    }
+
+    @JsonSetter("language")
+    private void setLanguage(Compiler.Language language) {
+        this.language = language != null ? language : Compiler.Language.V1;
     }
 
     public RobotBean(String id) {

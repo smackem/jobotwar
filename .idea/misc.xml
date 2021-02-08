@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="EntryPointsManager">
-    <list size="3">
+    <list size="4">
       <item index="0" class="java.lang.String" itemvalue="com.fasterxml.jackson.annotation.JsonCreator" />
-      <item index="1" class="java.lang.String" itemvalue="com.google.common.eventbus.Subscribe" />
-      <item index="2" class="java.lang.String" itemvalue="javafx.fxml.FXML" />
+      <item index="1" class="java.lang.String" itemvalue="com.fasterxml.jackson.annotation.JsonSetter" />
+      <item index="2" class="java.lang.String" itemvalue="com.google.common.eventbus.Subscribe" />
+      <item index="3" class="java.lang.String" itemvalue="javafx.fxml.FXML" />
     </list>
     <writeAnnotations>
       <writeAnnotation name="javafx.fxml.FXML" />
