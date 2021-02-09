@@ -10,20 +10,24 @@ import net.smackem.jobotwar.runtime.simulation.SimulationResult;
 import net.smackem.jobotwar.runtime.simulation.SimulationRunner;
 import net.smackem.jobotwar.web.beans.IdGenerator;
 import net.smackem.jobotwar.web.beans.MatchBean;
+import net.smackem.jobotwar.web.beans.MatchEvent;
 import net.smackem.jobotwar.web.beans.RobotBean;
 import net.smackem.jobotwar.web.persist.BeanRepository;
 import net.smackem.jobotwar.web.persist.ConstraintViolationException;
+import net.smackem.jobotwar.web.query.Query;
 import org.eclipse.jetty.http.HttpStatus;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.ParseException;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 public class MatchController extends Controller<MatchBean> {
     private final static Logger log = LoggerFactory.getLogger(MatchController.class);
@@ -53,9 +57,23 @@ public class MatchController extends Controller<MatchBean> {
         board.disperseRobots();
         final OffsetDateTime now = OffsetDateTime.now();
         final SimulationResult result = new SimulationRunner(board).runGame(match.maxDuration());
+        final String winnerId;
+        if (result.winner() != null) {
+            winnerId = robotBeans.stream()
+                    .map(RobotBean::name)
+                    .filter(name -> Objects.equals(name, result.winner().name()))
+                    .findFirst()
+                    .orElse(null);
+        } else {
+            winnerId = null;
+        }
         match.duration(result.duration())
                 .outcome(result.outcome())
                 .dateStarted(now)
+                .winnerId(winnerId)
+                .addEvents(result.eventLog().stream()
+                        .map(ev -> new MatchEvent(ev.gameTime().toMillis(), ev.event()))
+                        .toArray(MatchEvent[]::new))
                 .id(IdGenerator.next());
         try {
             this.repository().put(match.freeze());
@@ -65,9 +83,22 @@ public class MatchController extends Controller<MatchBean> {
     }
 
     public void getAll(@NotNull Context ctx) {
+        final Query query = createQuery(ctx);
+        try {
+            ctx.json(this.repository().select(query).collect(Collectors.toList()));
+        } catch (ParseException e) {
+            ctx.status(HttpStatus.BAD_REQUEST_400).result(e.getMessage());
+        }
     }
 
     public void get(@NotNull Context ctx) {
+        final String id = ctx.splat(0);
+        final List<MatchBean> result = this.repository().get(id);
+        if (result.isEmpty()) {
+            ctx.status(HttpStatus.NOT_FOUND_404);
+            return;
+        }
+        ctx.json(result.get(0));
     }
 
     private static Collection<Robot> buildRobots(Collection<RobotBean> beans) throws Exception {

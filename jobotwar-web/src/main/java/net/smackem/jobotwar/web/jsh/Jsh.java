@@ -3,7 +3,9 @@ package net.smackem.jobotwar.web.jsh;
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Splitter;
 import io.javalin.plugin.json.JavalinJson;
-import net.smackem.jobotwar.web.beans.*;
+import net.smackem.jobotwar.web.beans.MatchBean;
+import net.smackem.jobotwar.web.beans.PersistableBean;
+import net.smackem.jobotwar.web.beans.RobotBean;
 
 import java.io.IOException;
 import java.net.URI;
@@ -89,5 +91,13 @@ public class Jsh {
                 .DELETE()
                 .build();
         return http.send(request, HttpResponse.BodyHandlers.ofString());
+    }
+
+    public static RobotBean[] getRobots() throws Exception {
+        return JavalinJson.fromJson(get("robot").body(), RobotBean[].class);
+    }
+
+    public static MatchBean[] getMatches() throws Exception {
+        return JavalinJson.fromJson(get("match").body(), MatchBean[].class);
     }
 }

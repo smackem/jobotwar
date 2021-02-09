@@ -21,16 +21,22 @@ class RelationalFilter implements Filter {
 
     @Override
     public boolean matches(Object bean) {
-        final Object lvalue = left.apply(bean);
-        final Object rvalue = right.apply(bean);
+        Object lvalue = left.apply(bean);
+        Object rvalue = right.apply(bean);
+        if (lvalue instanceof Enum<?>) {
+            lvalue = ((Enum<?>) lvalue).name();
+        }
+        if (rvalue instanceof Enum<?>) {
+            rvalue = ((Enum<?>) rvalue).name();
+        }
         if (lvalue instanceof Comparable<?> == false) {
             throw new IllegalArgumentException("type " + lvalue.getClass() + " cannot be matched since it is not Comparable");
         }
         if (lvalue.getClass().isAssignableFrom(rvalue.getClass()) == false) {
             return false;
         }
-        //noinspection unchecked,rawtypes
-        final int result = ((Comparable) lvalue).compareTo(rvalue);
+        //noinspection unchecked
+        final int result = ((Comparable<Object>) lvalue).compareTo(rvalue);
         return this.matcher.apply(result);
     }
 }

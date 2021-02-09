@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Objects;
 
 public class MatchEvent {
-    @JsonProperty private final int gameTimeMillis;
+    @JsonProperty private final long gameTimeMillis;
     @JsonProperty private final String event;
 
     @JsonCreator
@@ -15,12 +15,12 @@ public class MatchEvent {
         this.event = null;
     }
 
-    public MatchEvent(int gameTimeMillis, String event) {
+    public MatchEvent(long gameTimeMillis, String event) {
         this.gameTimeMillis = gameTimeMillis;
         this.event = event;
     }
 
-    public int gameTimeMillis() {
+    public long gameTimeMillis() {
         return this.gameTimeMillis;
     }
 
