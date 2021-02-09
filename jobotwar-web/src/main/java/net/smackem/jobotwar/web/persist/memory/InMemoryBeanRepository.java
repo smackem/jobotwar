@@ -1,34 +1,36 @@
-package net.smackem.jobotwar.web.persist;
+package net.smackem.jobotwar.web.persist.memory;
 
 import net.smackem.jobotwar.web.beans.PersistableBean;
-import net.smackem.jobotwar.web.query.Filter;
+import net.smackem.jobotwar.web.persist.BeanRepository;
+import net.smackem.jobotwar.web.persist.ConstraintViolationException;
+import net.smackem.jobotwar.web.persist.NoSuchBeanException;
+import net.smackem.jobotwar.web.query.PQueryCompiler;
 import net.smackem.jobotwar.web.query.Query;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.text.ParseException;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-class InMemoryBeanRepository<T extends PersistableBean> implements BeanRepository<T> {
+public class InMemoryBeanRepository<T extends PersistableBean> implements BeanRepository<T> {
 
     private final Map<String, T> map;
 
-    InMemoryBeanRepository() {
+    public InMemoryBeanRepository() {
         this.map = new ConcurrentHashMap<>();
     }
 
-    InMemoryBeanRepository(Collection<T> beans) {
+    public InMemoryBeanRepository(Collection<T> beans) {
         this.map = beans.stream().collect(Collectors.toConcurrentMap(PersistableBean::id, bean -> bean));
     }
 
     @Override
-    public Stream<T> select(Query query) {
+    public Stream<T> select(Query query) throws ParseException {
         Stream<T> result = this.map.values().stream();
-        final Filter filter = Objects.requireNonNull(query).filter();
-        if (filter != null) {
+        final String filterSource = Objects.requireNonNull(query).filterSource();
+        if (filterSource != null) {
+            final Filter filter = PQueryCompiler.compile(filterSource, new FilterEmittingVisitor());
             result = result.filter(filter::matches);
         }
         final Optional<Long> offset = query.offset();
@@ -43,8 +45,10 @@ class InMemoryBeanRepository<T extends PersistableBean> implements BeanRepositor
     }
 
     @Override
-    public Optional<T> get(String id) {
-        return Optional.ofNullable(this.map.get(id));
+    public List<T> get(String... ids) {
+        return Arrays.stream(ids)
+                .map(this.map::get)
+                .collect(Collectors.toList());
     }
 
     @Override

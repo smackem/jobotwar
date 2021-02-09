@@ -16,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.text.ParseException;
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class RobotController extends Controller<RobotBean> implements CrudHandler {
@@ -26,20 +27,22 @@ public class RobotController extends Controller<RobotBean> implements CrudHandle
 
     @Override
     public void getAll(@NotNull Context ctx) {
-        final Query query;
+        final Query query = createQuery(ctx);
         try {
-            query = parseQuery(ctx);
+            ctx.json(this.repository().select(query).collect(Collectors.toList()));
         } catch (ParseException e) {
-            ctx.status(HttpStatus.BAD_REQUEST_400);
-            ctx.result(e.getMessage());
-            return;
+            ctx.status(HttpStatus.BAD_REQUEST_400).result(e.getMessage());
         }
-        ctx.json(this.repository().select(query).collect(Collectors.toList()));
     }
 
     @Override
     public void getOne(@NotNull Context ctx, @NotNull String id) {
-        this.repository().get(id).ifPresentOrElse(ctx::json, () -> ctx.status(HttpStatus.NOT_FOUND_404));
+        final List<RobotBean> result = this.repository().get(id);
+        if (result.isEmpty()) {
+            ctx.status(HttpStatus.NOT_FOUND_404);
+            return;
+        }
+        ctx.json(result.get(0));
     }
 
     @Override

@@ -1,4 +1,4 @@
-package net.smackem.jobotwar.web.query;
+package net.smackem.jobotwar.web.persist.memory;
 
 import java.util.Objects;
 import java.util.function.BinaryOperator;

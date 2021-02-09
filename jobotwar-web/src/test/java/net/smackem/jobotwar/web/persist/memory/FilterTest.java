@@ -1,5 +1,6 @@
-package net.smackem.jobotwar.web.query;
+package net.smackem.jobotwar.web.persist.memory;
 
+import net.smackem.jobotwar.web.query.PQueryCompiler;
 import org.junit.Test;
 
 import java.text.ParseException;
@@ -7,13 +8,13 @@ import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class QueryTest {
+public class FilterTest {
     @Test
     public void stringPropertyEq() throws ParseException {
         final String source = """
                 name eq 'Bob'
                 """;
-        final Filter filter = FilterCompiler.compile(source);
+        final Filter filter = PQueryCompiler.compile(source, new FilterEmittingVisitor());
         assertThat(filter.matches(new TestBean())).isTrue();
     }
 
@@ -22,7 +23,7 @@ public class QueryTest {
         final String source = """
                 name eq 'Jim'
                 """;
-        final Filter filter = FilterCompiler.compile(source);
+        final Filter filter = PQueryCompiler.compile(source, new FilterEmittingVisitor());
         assertThat(filter.matches(new TestBean())).isFalse();
     }
 
@@ -31,7 +32,7 @@ public class QueryTest {
         final String source = """
                 name eq 'Jim' or familyName ne 'Murray'
                 """;
-        final Filter filter = FilterCompiler.compile(source);
+        final Filter filter = PQueryCompiler.compile(source, new FilterEmittingVisitor());
         assertThat(filter.matches(new TestBean())).isTrue();
     }
 

@@ -1,10 +1,10 @@
-package net.smackem.jobotwar.web.query;
+package net.smackem.jobotwar.web.persist.memory;
 
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class RelationalFilterTest {
+class RelationalFilterTest {
     @Test
     public void basics() {
         final Filter trueFilter = new RelationalFilter(

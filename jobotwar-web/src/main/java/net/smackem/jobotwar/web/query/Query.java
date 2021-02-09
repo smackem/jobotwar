@@ -6,7 +6,7 @@ import java.util.Optional;
  * A query that can be used to filter, limit and sort bean searches.
  */
 public class Query {
-    private final Filter filter;
+    private final String filterSource;
     private final long offset;
     private final long limit;
 
@@ -16,7 +16,7 @@ public class Query {
     public static final Query ALL = new Builder().build();
 
     private Query(Builder builder) {
-        this.filter = builder.filter;
+        this.filterSource = builder.filterSource;
         this.offset = builder.offset;
         this.limit = builder.limit;
     }
@@ -25,12 +25,12 @@ public class Query {
      * Builder class for {@link Query}.
      */
     public static class Builder {
-        private Filter filter;
+        private String filterSource;
         private long offset = -1;
         private long limit = -1;
 
-        public Builder filter(Filter filter) {
-            this.filter = filter;
+        public Builder filterSource(String filterSource) {
+            this.filterSource = filterSource;
             return this;
         }
 
@@ -50,10 +50,10 @@ public class Query {
     }
 
     /**
-     * @return The {@link Filter} to use or {@code null} if no filter should be applied.
+     * @return The PQuery source code to translate into a filter expression or {@code null}.
      */
-    public Filter filter() {
-        return this.filter;
+    public String filterSource() {
+        return this.filterSource;
     }
 
     public Optional<Long> offset() {

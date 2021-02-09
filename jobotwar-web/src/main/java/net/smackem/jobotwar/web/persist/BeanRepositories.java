@@ -1,6 +1,7 @@
 package net.smackem.jobotwar.web.persist;
 
 import net.smackem.jobotwar.web.beans.PersistableBean;
+import net.smackem.jobotwar.web.persist.memory.InMemoryBeanRepository;
 
 import java.util.Collection;
 import java.util.Objects;
