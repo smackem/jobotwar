@@ -68,6 +68,15 @@ public class Jsh {
         return http.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
+    public static HttpResponse<String> patch(String path, PersistableBean bean) throws IOException, InterruptedException {
+        final String json = JavalinJson.toJson(bean);
+        final HttpRequest request = HttpRequest.newBuilder()
+                .uri(getUri(path))
+                .method("PATCH", HttpRequest.BodyPublishers.ofString(json))
+                .build();
+        return http.send(request, HttpResponse.BodyHandlers.ofString());
+    }
+
     public static HttpResponse<String> put(String path, PersistableBean bean) throws IOException, InterruptedException {
         final String json = JavalinJson.toJson(bean);
         final HttpRequest request = HttpRequest.newBuilder()

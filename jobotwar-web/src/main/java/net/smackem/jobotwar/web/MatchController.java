@@ -7,6 +7,7 @@ import net.smackem.jobotwar.web.beans.RobotBean;
 import net.smackem.jobotwar.web.persist.BeanRepository;
 import net.smackem.jobotwar.web.persist.ConstraintViolationException;
 import net.smackem.jobotwar.web.query.Query;
+import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.http.HttpStatus;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -42,7 +43,9 @@ public class MatchController extends Controller<MatchBean> {
         } catch (GameService.CompilationException | ConstraintViolationException e) {
             log.warn("error playing & storing match: {} [{}]", e.getMessage(), ctx.fullUrl());
             ctx.status(HttpStatus.BAD_REQUEST_400).result(e.getMessage());
+            return;
         }
+        ctx.status(HttpStatus.CREATED_201).header(HttpHeader.LOCATION.asString(), ctx.url() + "/" + match.id());
     }
 
     public void getAll(@NotNull Context ctx) {
