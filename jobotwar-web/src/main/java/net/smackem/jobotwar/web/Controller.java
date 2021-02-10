@@ -5,8 +5,6 @@ import net.smackem.jobotwar.web.beans.PersistableBean;
 import net.smackem.jobotwar.web.persist.BeanRepository;
 import net.smackem.jobotwar.web.query.Query;
 
-import java.text.ParseException;
-
 class Controller<T extends PersistableBean> {
 
     private final BeanRepository<T> repository;

@@ -62,7 +62,7 @@ public final class SimulationRunner {
             millis += tickMillis;
         } while (result.hasEnded() == false && millis < maxMillis);
 
-        final SimulationResult.Outcome outcome = result.isDraw()
+        final SimulationResult.Outcome outcome = result.isDraw() || millis >= maxMillis
                 ? SimulationResult.Outcome.DRAW
                 : SimulationResult.Outcome.WIN;
 

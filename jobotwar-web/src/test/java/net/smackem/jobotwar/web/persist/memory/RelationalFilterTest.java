@@ -4,7 +4,7 @@ import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class RelationalFilterTest {
+public class RelationalFilterTest {
     @Test
     public void basics() {
         final Filter trueFilter = new RelationalFilter(
