@@ -3,7 +3,6 @@ package net.smackem.jobotwar.web;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
@@ -13,10 +12,7 @@ public class PlayControllerTest extends ControllerTest {
 
     @Test
     public void play() throws IOException, InterruptedException {
-        final HttpClient http = HttpClient.newHttpClient();
-        final HttpRequest request = HttpRequest.newBuilder()
-                .uri(baseUri("play"))
-                .POST(HttpRequest.BodyPublishers.ofString("""
+        final HttpResponse<String> response = http.post("play", """
                         {
                             "boardWidth":500,
                             "boardHeight":500,
@@ -37,9 +33,7 @@ public class PlayControllerTest extends ControllerTest {
                                 }
                             ]
                         }
-                        """))
-                .build();
-        final HttpResponse<String> response = http.send(request, HttpResponse.BodyHandlers.ofString());
+                        """);
         assertThat(response.statusCode()).isEqualTo(200);
         assertThat(response.body()).isNotNull();
     }

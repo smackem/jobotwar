@@ -69,8 +69,10 @@ public class RobotController extends Controller<RobotBean> implements CrudHandle
         }
         try {
             this.gameService.compileRobotProgram(bean.name(), bean.code(), bean.language());
-            this.repository().update(bean.freeze());
-        } catch (NoSuchBeanException | GameService.CompilationException e) {
+            this.repository().update(bean.id(id).freeze());
+        } catch (NoSuchBeanException e) {
+            ctx.status(HttpStatus.NOT_FOUND_404);
+        } catch (GameService.CompilationException e) {
             ctx.status(HttpStatus.BAD_REQUEST_400).result(e.getMessage());
         }
     }

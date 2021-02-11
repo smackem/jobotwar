@@ -48,6 +48,7 @@ public class InMemoryBeanRepository<T extends PersistableBean> implements BeanRe
     public List<T> get(String... ids) {
         return Arrays.stream(ids)
                 .map(this.map::get)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 

@@ -7,7 +7,6 @@ import net.smackem.jobotwar.runtime.Board;
 import net.smackem.jobotwar.runtime.CompiledProgram;
 import net.smackem.jobotwar.runtime.Robot;
 import net.smackem.jobotwar.runtime.RobotProgramContext;
-import net.smackem.jobotwar.runtime.simulation.SimulationEvent;
 import net.smackem.jobotwar.runtime.simulation.SimulationResult;
 import net.smackem.jobotwar.runtime.simulation.SimulationRunner;
 import net.smackem.jobotwar.web.beans.*;
@@ -71,12 +70,8 @@ public class GameService {
                 .winner(result.winner() != null ? result.winner().name() : null)
                 .duration(result.duration())
                 .addEvents(result.eventLog().stream()
-                        .map(GameService::mapGameEvent)
+                        .map(ev -> new MatchEvent(ev.gameTime().toMillis(), ev.event()))
                         .toArray(MatchEvent[]::new));
-    }
-
-    private static MatchEvent mapGameEvent(SimulationEvent event) {
-        return new MatchEvent((int) event.gameTime().toMillis(), event.event());
     }
 
     private Collection<Robot> buildInstantMatchRobots(Collection<InstantMatchRobot> beans) throws CompilationException {
