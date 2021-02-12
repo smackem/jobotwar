@@ -47,27 +47,31 @@ class FilterEmittingVisitor extends PQueryBaseVisitor<Filter> {
 
     @Override
     public Filter visitComparison(PQueryParser.ComparisonContext ctx) {
+        if (ctx.orCondition() != null) {
+            return ctx.orCondition().accept(this);
+        }
         final PQueryParser.ComparatorContext comparator = ctx.comparator();
-        final IntFunction<Boolean> matcher;
+        final Function<Object, Object> left = internalVisitAtom(ctx.atom(0));
+        final Function<Object, Object> right = internalVisitAtom(ctx.atom(1));
+        final Filter filter;
         if (comparator.Eq() != null) {
-            matcher = n -> n == 0;
+            filter = new RelationalFilter(left, right, n -> n == 0);
         } else if (comparator.Ne() != null) {
-            matcher = n -> n != 0;
+            filter = new RelationalFilter(left, right, n -> n != 0);
         } else if (comparator.Gt() != null) {
-            matcher = n -> n > 0;
+            filter = new RelationalFilter(left, right, n -> n > 0);
         } else if (comparator.Ge() != null) {
-            matcher = n -> n >= 0;
+            filter = new RelationalFilter(left, right, n -> n >= 0);
         } else if (comparator.Lt() != null) {
-            matcher = n -> n < 0;
+            filter = new RelationalFilter(left, right, n -> n < 0);
         } else if (comparator.Le() != null) {
-            matcher = n -> n <= 0;
+            filter = new RelationalFilter(left, right, n -> n <= 0);
+        } else if (comparator.Match() != null) {
+            filter = new StringMatchFilter(left, right);
         } else {
             throw new IllegalStateException("unsupported operator");
         }
-        return new RelationalFilter(
-                internalVisitAtom(ctx.atom(0)),
-                internalVisitAtom(ctx.atom(1)),
-                matcher);
+        return filter;
     }
 
     private Function<Object, Object> internalVisitAtom(PQueryParser.AtomContext ctx) {

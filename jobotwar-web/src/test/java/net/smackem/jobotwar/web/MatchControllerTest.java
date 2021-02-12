@@ -57,14 +57,6 @@ public class MatchControllerTest extends ControllerTest {
         assertThat(bean.winnerId()).isEqualTo(shooterId);
     }
 
-    @Test
-    public void getAll() {
-    }
-
-    @Test
-    public void get() {
-    }
-
     private static String getPathSuffix(String path) {
         return path.substring(path.lastIndexOf('/') + 1);
     }

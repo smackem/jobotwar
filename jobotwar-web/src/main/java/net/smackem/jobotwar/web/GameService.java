@@ -14,9 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class GameService {
@@ -37,22 +35,15 @@ public class GameService {
     }
 
     public void playMatch(MatchBean match, Collection<RobotBean> robotBeans) throws CompilationException {
-        final Collection<Robot> robots = buildRobots(robotBeans);
-        final Board board = new Board(match.boardWidth(), match.boardHeight(), robots);
+        final Map<Robot, String> robots = buildRobots(robotBeans);
+        final Board board = new Board(match.boardWidth(), match.boardHeight(), robots.keySet());
         board.disperseRobots();
         final OffsetDateTime now = OffsetDateTime.now();
         final SimulationResult result = new SimulationRunner(board).runGame(match.maxDuration());
-        final String winnerId;
         final Robot winner = result.winner();
-        if (winner != null) {
-            winnerId = robotBeans.stream()
-                    .filter(bean -> Objects.equals(bean.name(), winner.name()))
-                    .map(RobotBean::id)
-                    .findFirst()
-                    .orElse(null);
-        } else {
-            winnerId = null;
-        }
+        final String winnerId = winner != null
+                ? robots.get(result.winner())
+                : null;
         match.duration(result.duration())
                 .outcome(result.outcome())
                 .dateStarted(now)
@@ -89,15 +80,15 @@ public class GameService {
         return robots;
     }
 
-    private Collection<Robot> buildRobots(Collection<RobotBean> robotBeans) throws CompilationException {
-        final Collection<Robot> robots = new ArrayList<>(robotBeans.size());
+    private Map<Robot, String> buildRobots(Collection<RobotBean> robotBeans) throws CompilationException {
+        final Map<Robot, String> robots = new HashMap<>();
         final RobotProgramContext ctx = createRobotProgramContext();
         for (final RobotBean robotBean : robotBeans) {
             final Program program = compileRobotProgram(robotBean.name(), robotBean.code(), robotBean.language());
             final Robot robot = new Robot.Builder(r -> new CompiledProgram(r, program, ctx))
                     .name(robotBean.name())
                     .build();
-            robots.add(robot);
+            robots.put(robot, robotBean.id());
         }
         return robots;
     }

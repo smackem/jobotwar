@@ -60,8 +60,7 @@ public class MatchController extends Controller<MatchBean> {
         }
     }
 
-    public void get(@NotNull Context ctx) {
-        final String id = ctx.splat(0);
+    public void get(@NotNull Context ctx, @NotNull String id) {
         log.info("get single match (id = {}): {}", id, ctx.fullUrl());
         final List<MatchBean> result = this.repository().get(id);
         if (result.isEmpty()) {

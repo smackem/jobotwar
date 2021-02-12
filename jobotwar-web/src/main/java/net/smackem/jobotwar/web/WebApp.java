@@ -35,7 +35,7 @@ public class WebApp implements AutoCloseable {
             path("match", () -> {
                 get(this.matchController::getAll);
                 post(this.matchController::create);
-                get(":match-id", this.matchController::get);
+                get(":match-id", ctx -> this.matchController.get(ctx, ctx.pathParam("match-id")));
             });
         });
     }
