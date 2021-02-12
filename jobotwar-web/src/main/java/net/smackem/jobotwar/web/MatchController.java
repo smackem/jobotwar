@@ -19,7 +19,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class MatchController extends Controller<MatchBean> {
-    private final static Logger log = LoggerFactory.getLogger(MatchController.class);
+    private static final Logger log = LoggerFactory.getLogger(MatchController.class);
     private final BeanRepository<RobotBean> robotRepo;
     private final GameService gameService = new GameService();
 
@@ -29,11 +29,12 @@ public class MatchController extends Controller<MatchBean> {
     }
 
     public void create(@NotNull Context ctx) {
-        log.info("new match: {}", ctx.fullUrl());
         final MatchBean match = ctx.bodyAsClass(MatchBean.class);
+        match.id(IdGenerator.next());
+        log.info("create match (id = {}) [{}]", match.id(), ctx.fullUrl());
         final List<RobotBean> robotBeans = this.robotRepo.get(match.robotIds().toArray(new String[0]));
         if (robotBeans.size() != match.robotIds().size()) {
-            log.warn("expected {} robots, found {} in repo [{}]", robotBeans.size(), match.robotIds().size(), ctx.fullUrl());
+            log.warn("expected {} robots, found {} in repo [{}]", match.robotIds().size(), robotBeans.size(), ctx.fullUrl());
             ctx.status(HttpStatus.BAD_REQUEST_400).result("not all robots were found");
             return;
         }
