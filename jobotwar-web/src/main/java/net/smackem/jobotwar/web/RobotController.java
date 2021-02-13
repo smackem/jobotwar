@@ -4,9 +4,9 @@ import io.javalin.apibuilder.CrudHandler;
 import io.javalin.http.Context;
 import net.smackem.jobotwar.web.beans.IdGenerator;
 import net.smackem.jobotwar.web.beans.RobotBean;
-import net.smackem.jobotwar.web.persist.BeanRepository;
 import net.smackem.jobotwar.web.persist.ConstraintViolationException;
 import net.smackem.jobotwar.web.persist.NoSuchBeanException;
+import net.smackem.jobotwar.web.persist.RobotDao;
 import net.smackem.jobotwar.web.query.Query;
 import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.http.HttpStatus;
@@ -17,14 +17,16 @@ import org.slf4j.LoggerFactory;
 import java.text.ParseException;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class RobotController extends Controller<RobotBean> implements CrudHandler {
+public class RobotController extends Controller implements CrudHandler {
     private static final Logger log = LoggerFactory.getLogger(RobotController.class);
     private final GameService gameService = new GameService();
+    private final RobotDao robotDao;
 
-    RobotController(BeanRepository<RobotBean> repository) {
-        super(repository);
+    RobotController(RobotDao robotDao) {
+        this.robotDao = Objects.requireNonNull(robotDao);
     }
 
     @Override
@@ -32,7 +34,7 @@ public class RobotController extends Controller<RobotBean> implements CrudHandle
         log.info("get robots: {}", ctx.fullUrl());
         final Query query = createQuery(ctx);
         try {
-            ctx.json(this.repository().select(query).collect(Collectors.toList()));
+            ctx.json(this.robotDao.select(query).collect(Collectors.toList()));
         } catch (ParseException e) {
             log.warn("error getting robots: {} [{}]", e.getMessage(), ctx.fullUrl());
             ctx.status(HttpStatus.BAD_REQUEST_400).result(e.getMessage());
@@ -42,7 +44,7 @@ public class RobotController extends Controller<RobotBean> implements CrudHandle
     @Override
     public void getOne(@NotNull Context ctx, @NotNull String id) {
         log.info("get single robot (id = {}): {}", id, ctx.fullUrl());
-        final List<RobotBean> result = this.repository().get(id);
+        final List<RobotBean> result = this.robotDao.get(id);
         if (result.isEmpty()) {
             log.info("robot {} not found [{}]", id, ctx.fullUrl());
             ctx.status(HttpStatus.NOT_FOUND_404);
@@ -59,7 +61,7 @@ public class RobotController extends Controller<RobotBean> implements CrudHandle
         log.info("create robot (id = {}) @ {} [{}]", bean.id(), bean.dateCreated(), ctx.fullUrl());
         try {
             this.gameService.compileRobotProgram(bean.name(), bean.code(), bean.language());
-            this.repository().put(bean.freeze());
+            this.robotDao.put(bean.freeze());
         } catch (ConstraintViolationException | GameService.CompilationException e) {
             log.warn("error creating robot: {} [{}]", e.getMessage(), ctx.fullUrl());
             ctx.status(HttpStatus.BAD_REQUEST_400).result(e.getMessage());
@@ -78,7 +80,7 @@ public class RobotController extends Controller<RobotBean> implements CrudHandle
         }
         try {
             this.gameService.compileRobotProgram(bean.name(), bean.code(), bean.language());
-            this.repository().update(bean.id(id).freeze());
+            this.robotDao.update(bean.id(id).freeze());
         } catch (NoSuchBeanException e) {
             log.warn("robot to update not found: {} [{}]", e.getMessage(), ctx.fullUrl());
             ctx.status(HttpStatus.NOT_FOUND_404);
@@ -91,7 +93,7 @@ public class RobotController extends Controller<RobotBean> implements CrudHandle
     @Override
     public void delete(@NotNull Context ctx, @NotNull String id) {
         log.info("delete robot (id = {}): {}", id, ctx.fullUrl());
-        if (this.repository().delete(id).isEmpty()) {
+        if (this.robotDao.delete(id).isEmpty()) {
             log.warn("robot to delete not found (id = {}) [{}]", id, ctx.fullUrl());
             ctx.status(HttpStatus.NOT_FOUND_404);
         }

@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class InMemoryBeanRepository<T extends PersistableBean> implements BeanRepository<T> {
+class InMemoryBeanRepository<T extends PersistableBean> implements BeanRepository<T> {
 
     private final Map<String, T> map;
 

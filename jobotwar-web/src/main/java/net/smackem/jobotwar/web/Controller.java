@@ -1,22 +1,9 @@
 package net.smackem.jobotwar.web;
 
 import io.javalin.http.Context;
-import net.smackem.jobotwar.web.beans.PersistableBean;
-import net.smackem.jobotwar.web.persist.BeanRepository;
 import net.smackem.jobotwar.web.query.Query;
 
-class Controller<T extends PersistableBean> {
-
-    private final BeanRepository<T> repository;
-
-    Controller(BeanRepository<T> repository) {
-        this.repository = repository;
-    }
-
-    BeanRepository<T> repository() {
-        return this.repository;
-    }
-
+class Controller {
     static Query createQuery(Context ctx) {
         final Query.Builder builder = new Query.Builder();
         final String filterSource = ctx.queryParam("filter");

@@ -4,8 +4,9 @@ import io.javalin.http.Context;
 import net.smackem.jobotwar.web.beans.IdGenerator;
 import net.smackem.jobotwar.web.beans.MatchBean;
 import net.smackem.jobotwar.web.beans.RobotBean;
-import net.smackem.jobotwar.web.persist.BeanRepository;
 import net.smackem.jobotwar.web.persist.ConstraintViolationException;
+import net.smackem.jobotwar.web.persist.MatchDao;
+import net.smackem.jobotwar.web.persist.RobotDao;
 import net.smackem.jobotwar.web.query.Query;
 import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.http.HttpStatus;
@@ -18,21 +19,22 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class MatchController extends Controller<MatchBean> {
+public class MatchController extends Controller {
     private static final Logger log = LoggerFactory.getLogger(MatchController.class);
-    private final BeanRepository<RobotBean> robotRepo;
+    private final MatchDao matchDao;
+    private final RobotDao robotDao;
     private final GameService gameService = new GameService();
 
-    MatchController(BeanRepository<MatchBean> repository, BeanRepository<RobotBean> robotRepo) {
-        super(repository);
-        this.robotRepo = Objects.requireNonNull(robotRepo);
+    MatchController(MatchDao matchDao, RobotDao robotDao) {
+        this.matchDao = Objects.requireNonNull(matchDao);
+        this.robotDao = Objects.requireNonNull(robotDao);
     }
 
     public void create(@NotNull Context ctx) {
         final MatchBean match = ctx.bodyAsClass(MatchBean.class);
         match.id(IdGenerator.next());
         log.info("create match (id = {}) [{}]", match.id(), ctx.fullUrl());
-        final List<RobotBean> robotBeans = this.robotRepo.get(match.robotIds().toArray(new String[0]));
+        final List<RobotBean> robotBeans = this.robotDao.get(match.robotIds().toArray(new String[0]));
         if (robotBeans.size() != match.robotIds().size()) {
             log.warn("expected {} robots, found {} in repo [{}]", match.robotIds().size(), robotBeans.size(), ctx.fullUrl());
             ctx.status(HttpStatus.BAD_REQUEST_400).result("not all robots were found");
@@ -40,7 +42,7 @@ public class MatchController extends Controller<MatchBean> {
         }
         try {
             this.gameService.playMatch(match, robotBeans);
-            this.repository().put(match.id(IdGenerator.next()).freeze());
+            this.matchDao.put(match.id(IdGenerator.next()).freeze());
         } catch (GameService.CompilationException | ConstraintViolationException e) {
             log.warn("error playing & storing match: {} [{}]", e.getMessage(), ctx.fullUrl());
             ctx.status(HttpStatus.BAD_REQUEST_400).result(e.getMessage());
@@ -53,7 +55,7 @@ public class MatchController extends Controller<MatchBean> {
         log.info("get matches: {}", ctx.fullUrl());
         final Query query = createQuery(ctx);
         try {
-            ctx.json(this.repository().select(query).collect(Collectors.toList()));
+            ctx.json(this.matchDao.select(query).collect(Collectors.toList()));
         } catch (ParseException e) {
             log.warn("error getting matches: {} [{}]", e.getMessage(), ctx.fullUrl());
             ctx.status(HttpStatus.BAD_REQUEST_400).result(e.getMessage());
@@ -62,7 +64,7 @@ public class MatchController extends Controller<MatchBean> {
 
     public void get(@NotNull Context ctx, @NotNull String id) {
         log.info("get single match (id = {}): {}", id, ctx.fullUrl());
-        final List<MatchBean> result = this.repository().get(id);
+        final List<MatchBean> result = this.matchDao.get(id);
         if (result.isEmpty()) {
             log.info("match {} not found [{}]", id, ctx.fullUrl());
             ctx.status(HttpStatus.NOT_FOUND_404);
