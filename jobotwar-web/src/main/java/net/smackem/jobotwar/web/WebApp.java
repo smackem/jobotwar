@@ -74,20 +74,6 @@ public class WebApp implements AutoCloseable {
         };
     }
 
-//    private static void testDb() {
-//        try (final HikariDataSource ds = new HikariDataSource(config)) {
-//            try (final Connection conn = ds.getConnection()) {
-//                final Statement stmt = conn.createStatement();
-//                final ResultSet rs = stmt.executeQuery("select id, name from robot");
-//                while (rs.next()) {
-//                    System.out.printf("%s %s\n", rs.getString(1), rs.getString(2));
-//                }
-//            } catch (SQLException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//    }
-
     private static void loop() {
         System.out.println("Enter to quit...");
         try (final var reader = new BufferedReader(new InputStreamReader(System.in))) {

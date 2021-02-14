@@ -75,8 +75,8 @@ class InMemoryBeanRepository<T extends PersistableBean> implements BeanRepositor
     }
 
     @Override
-    public Optional<T> delete(String id) {
-        return Optional.ofNullable(this.map.remove(id));
+    public boolean delete(String id) {
+        return this.map.remove(id) != null;
     }
 
     @Override

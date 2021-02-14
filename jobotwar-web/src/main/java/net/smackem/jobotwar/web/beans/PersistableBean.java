@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Objects;
 
-public abstract class PersistableBean {
+public abstract class PersistableBean extends FreezableBean {
     @JsonProperty private String id;
     @JsonIgnore private transient boolean frozen;
 
@@ -27,22 +27,6 @@ public abstract class PersistableBean {
         this.id = id;
         //noinspection unchecked
         return (T) this;
-    }
-
-    public boolean isFrozen() {
-        return this.frozen;
-    }
-
-    public <T extends PersistableBean> T freeze() {
-        this.frozen = true;
-        //noinspection unchecked
-        return (T) this;
-    }
-
-    protected void assertMutable() {
-        if (this.frozen) {
-            throw new UnsupportedOperationException("this object is frozen and cannot me modified.");
-        }
     }
 
     @Override

@@ -9,7 +9,6 @@ import net.smackem.jobotwar.web.query.Query;
 
 import java.text.ParseException;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 public class InMemoryRobotDao implements RobotDao {
@@ -36,7 +35,7 @@ public class InMemoryRobotDao implements RobotDao {
     }
 
     @Override
-    public Optional<RobotBean> delete(String id) {
+    public boolean delete(String id) {
         return this.repository.delete(id);
     }
 

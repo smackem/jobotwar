@@ -5,7 +5,6 @@ import net.smackem.jobotwar.web.query.Query;
 
 import java.text.ParseException;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 public interface BeanRepository<T extends PersistableBean> {
@@ -49,9 +48,9 @@ public interface BeanRepository<T extends PersistableBean> {
      * Deletes the bean with the given id from the repository.
      *
      * @param id The id of the bean to delete.
-     * @return The deleted bean or {@code null} if there was no such bean.
+     * @return {@code true} if the bean with the given id was deleted.
      */
-    Optional<T> delete(String id);
+    boolean delete(String id);
 
     /**
      * @return The total number of beans in the repository.

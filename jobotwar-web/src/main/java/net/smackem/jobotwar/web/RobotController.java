@@ -93,7 +93,7 @@ public class RobotController extends Controller implements CrudHandler {
     @Override
     public void delete(@NotNull Context ctx, @NotNull String id) {
         log.info("delete robot (id = {}): {}", id, ctx.fullUrl());
-        if (this.robotDao.delete(id).isEmpty()) {
+        if (this.robotDao.delete(id) == false) {
             log.warn("robot to delete not found (id = {}) [{}]", id, ctx.fullUrl());
             ctx.status(HttpStatus.NOT_FOUND_404);
         }

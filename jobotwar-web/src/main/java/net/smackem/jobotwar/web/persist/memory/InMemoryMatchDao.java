@@ -9,7 +9,6 @@ import net.smackem.jobotwar.web.query.Query;
 
 import java.text.ParseException;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 public class InMemoryMatchDao implements MatchDao {
@@ -36,7 +35,7 @@ public class InMemoryMatchDao implements MatchDao {
     }
 
     @Override
-    public Optional<MatchBean> delete(String id) {
+    public boolean delete(String id) {
         return this.repository.delete(id);
     }
 

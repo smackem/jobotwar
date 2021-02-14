@@ -123,6 +123,12 @@ public class MatchBean extends PersistableBean {
     }
 
     @Override
+    public <T extends FreezableBean> T freeze() {
+        // TODO: freeze MatchRobots
+        return super.freeze();
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -142,5 +148,20 @@ public class MatchBean extends PersistableBean {
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), robotIds, eventLog, durationMillis, dateStarted, boardWidth, boardHeight, maxDurationMillis, winnerId, outcome);
+    }
+
+    @Override
+    public String toString() {
+        return "MatchBean{" +
+               "robotIds=" + robotIds +
+               ", eventLog=" + eventLog +
+               ", durationMillis=" + durationMillis +
+               ", boardWidth=" + boardWidth +
+               ", boardHeight=" + boardHeight +
+               ", maxDurationMillis=" + maxDurationMillis +
+               ", winnerId='" + winnerId + '\'' +
+               ", outcome=" + outcome +
+               ", dateStarted=" + dateStarted +
+               '}';
     }
 }

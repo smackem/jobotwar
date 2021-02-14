@@ -7,6 +7,8 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
@@ -26,6 +28,14 @@ class SqlDao {
     RuntimeException handleSQLException(SQLException e) {
         log.error("database error", e);
         return new RuntimeException(e);
+    }
+
+    static <T> List<T> loadResultSet(ResultSet rs, BeanLoader<T> loader) throws SQLException {
+        final List<T> beans = new ArrayList<>();
+        while (rs.next()) {
+            beans.add(loader.load(rs));
+        }
+        return beans;
     }
 
     <T> Stream<T> streamQueryResults(String sql, BeanLoader<T> loader) {
