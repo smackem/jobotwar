@@ -2,6 +2,7 @@ package net.smackem.jobotwar.web.persist;
 
 import net.smackem.jobotwar.web.persist.memory.InMemoryMatchDao;
 import net.smackem.jobotwar.web.persist.memory.InMemoryRobotDao;
+import net.smackem.jobotwar.web.persist.sql.SqlRobotDao;
 
 import java.sql.Connection;
 import java.util.function.Supplier;
@@ -26,6 +27,16 @@ public class DaoFactories {
     }
 
     public static DaoFactory sql(Supplier<Connection> connectionSupplier) {
-        return null;
+        return new DaoFactory() {
+            @Override
+            public RobotDao getRobotDao() {
+                return new SqlRobotDao(connectionSupplier);
+            }
+
+            @Override
+            public MatchDao getMatchDao() {
+                return new InMemoryMatchDao();
+            }
+        };
     }
 }
