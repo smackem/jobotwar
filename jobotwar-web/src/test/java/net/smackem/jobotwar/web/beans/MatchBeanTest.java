@@ -19,7 +19,7 @@ public class MatchBeanTest {
                 .maxDuration(Duration.ofSeconds(8))
                 .duration(Duration.ofSeconds(5))
                 .outcome(SimulationResult.Outcome.WIN)
-                .addRobotIds("1001", "1002")
+                .addRobots(new MatchRobot("1001"), new MatchRobot("1002"))
                 .addEvents(
                         new MatchEvent(100, "nothing happened"),
                         new MatchEvent(2000, "2002 got killed"))
@@ -35,7 +35,7 @@ public class MatchBeanTest {
                 .boardHeight(800)
                 .boardWidth(600)
                 .maxDuration(Duration.ofSeconds(8))
-                .addRobotIds("1001", "1002")
+                .addRobots(new MatchRobot("1001"), new MatchRobot("1002"))
                 .freeze();
         final String json = JavalinJson.toJson(bean);
         final MatchBean bean2 = JavalinJson.fromJson(json, MatchBean.class);

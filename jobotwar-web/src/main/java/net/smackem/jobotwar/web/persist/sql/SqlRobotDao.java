@@ -7,6 +7,7 @@ import net.smackem.jobotwar.web.beans.RobotBean;
 import net.smackem.jobotwar.web.persist.ConstraintViolationException;
 import net.smackem.jobotwar.web.persist.NoSuchBeanException;
 import net.smackem.jobotwar.web.persist.RobotDao;
+import net.smackem.jobotwar.web.query.PQueryCompiler;
 import net.smackem.jobotwar.web.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,9 +29,10 @@ public class SqlRobotDao extends SqlDao implements RobotDao {
 
     @Override
     public Stream<RobotBean> select(Query query) throws ParseException {
+        final String whereClause = PQueryCompiler.compile(query.filterSource(), new SqlEmittingVisitor("robot"));
         try (final Connection conn = connect()) {
             final Statement stmt = conn.createStatement();
-            final ResultSet rs = stmt.executeQuery("select * from robot");
+            final ResultSet rs = stmt.executeQuery("select * from robot where " + whereClause);
             return loadResultSet(rs, SqlRobotDao::loadRobotBean).stream();
         } catch (SQLException e) {
             throw handleSQLException(e);

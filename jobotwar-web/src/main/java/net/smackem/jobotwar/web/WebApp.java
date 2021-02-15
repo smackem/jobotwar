@@ -12,9 +12,8 @@ import org.slf4j.LoggerFactory;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.function.Supplier;
+import java.util.Objects;
 
 import static io.javalin.apibuilder.ApiBuilder.*;
 
@@ -24,11 +23,10 @@ public class WebApp implements AutoCloseable {
     private final PlayController playController;
     private final RobotController robotController;
     private final MatchController matchController;
-    private final HikariDataSource dataSource;
+    private final DaoFactory daoFactory;
 
-    WebApp(int port) {
-        this.dataSource = createDataSource();
-        final DaoFactory daoFactory = DaoFactories.sql(createConnectionSupplier());
+    WebApp(int port, DaoFactory daoFactory) {
+        this.daoFactory = Objects.requireNonNull(daoFactory);
         this.playController = new PlayController();
         this.matchController = new MatchController(daoFactory.getMatchDao(), daoFactory.getRobotDao());
         this.robotController = new RobotController(daoFactory.getRobotDao());
@@ -49,29 +47,28 @@ public class WebApp implements AutoCloseable {
         final int port = Strings.isNullOrEmpty(portStr)
                 ? 8666
                 : Integer.parseInt(portStr);
-        try (final WebApp ignored = new WebApp(port)) {
+        try (final WebApp ignored = new WebApp(port, createSqlDaoFactory())) {
             loop();
+        } catch (Exception e) {
+            log.warn("error shutting down application", e);
         }
     }
 
-    private HikariDataSource createDataSource() {
+    private static DaoFactory createSqlDaoFactory() {
         // Required VM args:
         // -Djdbc.drivers=org.postgresql.Driver
         // -Ddb.url=jdbc:postgresql://localhost/jobotwar?user=philip
         final HikariConfig config = new HikariConfig();
         config.setJdbcUrl(System.getProperty("db.url"));
-        return new HikariDataSource(config);
-    }
-
-    private Supplier<Connection> createConnectionSupplier() {
-        return () -> {
+        final HikariDataSource dataSource = new HikariDataSource(config);
+        return DaoFactories.sql(() -> {
             try {
-                return this.dataSource.getConnection();
+                return dataSource.getConnection();
             } catch (SQLException e) {
                 log.error("error getting sql connection", e);
                 throw new RuntimeException(e);
             }
-        };
+        }, dataSource);
     }
 
     private static void loop() {
@@ -84,8 +81,8 @@ public class WebApp implements AutoCloseable {
     }
 
     @Override
-    public void close() {
+    public void close() throws Exception {
         this.app.stop();
-        this.dataSource.close();
+        this.daoFactory.close();
     }
 }

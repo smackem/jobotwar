@@ -1,5 +1,6 @@
 package net.smackem.jobotwar.web;
 
+import net.smackem.jobotwar.web.persist.DaoFactories;
 import org.junit.After;
 import org.junit.Before;
 
@@ -11,12 +12,12 @@ public class ControllerTest {
 
     @Before
     public void setUp() {
-        this.remoteServer = new WebApp(port);
+        this.remoteServer = new WebApp(port, DaoFactories.inMemory());
         this.http = new RestClient(baseUri);
     }
 
     @After
-    public void tearDown() {
+    public void tearDown() throws Exception {
         this.remoteServer.close();
     }
 }

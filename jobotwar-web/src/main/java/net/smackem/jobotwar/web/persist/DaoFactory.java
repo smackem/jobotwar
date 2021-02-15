@@ -1,6 +1,6 @@
 package net.smackem.jobotwar.web.persist;
 
-public interface DaoFactory {
+public interface DaoFactory extends AutoCloseable {
     RobotDao getRobotDao();
     MatchDao getMatchDao();
 }

@@ -3,6 +3,7 @@ package net.smackem.jobotwar.web;
 import io.javalin.http.Context;
 import net.smackem.jobotwar.web.beans.IdGenerator;
 import net.smackem.jobotwar.web.beans.MatchBean;
+import net.smackem.jobotwar.web.beans.MatchRobot;
 import net.smackem.jobotwar.web.beans.RobotBean;
 import net.smackem.jobotwar.web.persist.ConstraintViolationException;
 import net.smackem.jobotwar.web.persist.MatchDao;
@@ -34,9 +35,11 @@ public class MatchController extends Controller {
         final MatchBean match = ctx.bodyAsClass(MatchBean.class);
         match.id(IdGenerator.next());
         log.info("create match (id = {}) [{}]", match.id(), ctx.fullUrl());
-        final List<RobotBean> robotBeans = this.robotDao.get(match.robotIds().toArray(new String[0]));
-        if (robotBeans.size() != match.robotIds().size()) {
-            log.warn("expected {} robots, found {} in repo [{}]", match.robotIds().size(), robotBeans.size(), ctx.fullUrl());
+        final List<RobotBean> robotBeans = this.robotDao.get(match.robots().stream()
+                .map(MatchRobot::robotId)
+                .toArray(String[]::new));
+        if (robotBeans.size() != match.robots().size()) {
+            log.warn("expected {} robots, found {} in repo [{}]", match.robots().size(), robotBeans.size(), ctx.fullUrl());
             ctx.status(HttpStatus.BAD_REQUEST_400).result("not all robots were found");
             return;
         }

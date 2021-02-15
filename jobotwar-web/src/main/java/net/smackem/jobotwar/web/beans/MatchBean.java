@@ -11,7 +11,7 @@ import java.time.OffsetDateTime;
 import java.util.*;
 
 public class MatchBean extends PersistableBean {
-    @JsonProperty private final Collection<String> robotIds = new ArrayList<>();
+    @JsonProperty private final Collection<MatchRobot> robots = new ArrayList<>();
     @JsonProperty private final Collection<MatchEvent> eventLog = new ArrayList<>();
     @JsonProperty private long durationMillis;
     @JsonProperty private int boardWidth;
@@ -112,19 +112,21 @@ public class MatchBean extends PersistableBean {
         return this;
     }
 
-    public Collection<String> robotIds() {
-        return Collections.unmodifiableCollection(this.robotIds);
+    public Collection<MatchRobot> robots() {
+        return Collections.unmodifiableCollection(this.robots);
     }
 
-    public MatchBean addRobotIds(String... robotIds) {
+    public MatchBean addRobots(MatchRobot... robots) {
         assertMutable();
-        this.robotIds.addAll(List.of(robotIds));
+        this.robots.addAll(List.of(robots));
         return this;
     }
 
     @Override
     public <T extends FreezableBean> T freeze() {
-        // TODO: freeze MatchRobots
+        for (final MatchRobot matchRobot : this.robots) {
+            matchRobot.freeze();
+        }
         return super.freeze();
     }
 
@@ -138,7 +140,7 @@ public class MatchBean extends PersistableBean {
                boardWidth == matchBean.boardWidth &&
                boardHeight == matchBean.boardHeight &&
                maxDurationMillis == matchBean.maxDurationMillis &&
-               robotIds.equals(matchBean.robotIds) &&
+               robots.equals(matchBean.robots) &&
                eventLog.equals(matchBean.eventLog) &&
                Objects.equals(dateStarted, matchBean.dateStarted) &&
                Objects.equals(winnerId, matchBean.winnerId) &&
@@ -147,13 +149,13 @@ public class MatchBean extends PersistableBean {
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), robotIds, eventLog, durationMillis, dateStarted, boardWidth, boardHeight, maxDurationMillis, winnerId, outcome);
+        return Objects.hash(super.hashCode(), robots, eventLog, durationMillis, dateStarted, boardWidth, boardHeight, maxDurationMillis, winnerId, outcome);
     }
 
     @Override
     public String toString() {
         return "MatchBean{" +
-               "robotIds=" + robotIds +
+               "robotIds=" + robots +
                ", eventLog=" + eventLog +
                ", durationMillis=" + durationMillis +
                ", boardWidth=" + boardWidth +

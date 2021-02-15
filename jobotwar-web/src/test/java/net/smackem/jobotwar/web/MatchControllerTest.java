@@ -3,6 +3,7 @@ package net.smackem.jobotwar.web;
 import io.javalin.plugin.json.JavalinJson;
 import net.smackem.jobotwar.runtime.simulation.SimulationResult;
 import net.smackem.jobotwar.web.beans.MatchBean;
+import net.smackem.jobotwar.web.beans.MatchRobot;
 import net.smackem.jobotwar.web.beans.RobotBean;
 import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.http.HttpStatus;
@@ -46,7 +47,7 @@ public class MatchControllerTest extends ControllerTest {
                 .boardWidth(800)
                 .boardHeight(600)
                 .maxDuration(Duration.ofMinutes(5))
-                .addRobotIds(shooterId, targetId));
+                .addRobots(new MatchRobot(shooterId), new MatchRobot(targetId)));
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED_201);
         final String matchPath = response.headers().firstValue(HttpHeader.LOCATION.asString())
                 .map(h -> URI.create(h).getPath())

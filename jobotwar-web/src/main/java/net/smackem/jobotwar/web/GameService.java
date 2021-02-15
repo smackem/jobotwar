@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import java.time.OffsetDateTime;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 public class GameService {
     private final static Logger log = LoggerFactory.getLogger(GameService.class);
@@ -36,14 +37,24 @@ public class GameService {
 
     public void playMatch(MatchBean match, Collection<RobotBean> robotBeans) throws CompilationException {
         final Map<Robot, String> robots = buildRobots(robotBeans);
+        final Map<String, MatchRobot> matchRobotsById = match.robots().stream()
+                .collect(Collectors.toMap(MatchRobot::robotId, r -> r));
         final Board board = new Board(match.boardWidth(), match.boardHeight(), robots.keySet());
         board.disperseRobots();
+        // store robot positions in match.robots
+        for (final Robot r : board.robots()) {
+            final String robotId = robots.get(r);
+            final MatchRobot matchRobot = matchRobotsById.get(robotId);
+            matchRobot.x(r.getX()).y(r.getY());
+        }
+        // run simulation
         final OffsetDateTime now = OffsetDateTime.now();
         final SimulationResult result = new SimulationRunner(board).runGame(match.maxDuration());
         final Robot winner = result.winner();
         final String winnerId = winner != null
                 ? robots.get(result.winner())
                 : null;
+        // store simulation outcome in match
         match.duration(result.duration())
                 .outcome(result.outcome())
                 .dateStarted(now)
