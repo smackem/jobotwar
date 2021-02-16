@@ -9,6 +9,7 @@ import net.smackem.jobotwar.web.persist.NoSuchBeanException;
 import net.smackem.jobotwar.web.persist.RobotDao;
 import net.smackem.jobotwar.web.query.PQueryCompiler;
 import net.smackem.jobotwar.web.query.Query;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,9 +28,13 @@ public class SqlRobotDao extends SqlDao implements RobotDao {
         super(connectionSupplier);
     }
 
+    @NotNull
     @Override
-    public Stream<RobotBean> select(Query query) throws ParseException {
-        final String whereClause = PQueryCompiler.compile(query.filterSource(), new SqlEmittingVisitor("robot"));
+    public Stream<RobotBean> select(@NotNull Query query) throws ParseException {
+        final String filterSource = query.filterSource();
+        final String whereClause = filterSource != null
+                ? PQueryCompiler.compile(query.filterSource(), new SqlEmittingVisitor("robot"))
+                : "1=1";
         try (final Connection conn = connect()) {
             final Statement stmt = conn.createStatement();
             final ResultSet rs = stmt.executeQuery("select * from robot where " + whereClause);
@@ -39,8 +44,9 @@ public class SqlRobotDao extends SqlDao implements RobotDao {
         }
     }
 
+    @NotNull
     @Override
-    public List<RobotBean> get(String... ids) {
+    public List<RobotBean> get(@NotNull String... ids) {
         try (final Connection conn = connect()) {
             final PreparedStatement stmt = conn.prepareStatement("""
                 select * from robot where id in (%s)
@@ -56,7 +62,7 @@ public class SqlRobotDao extends SqlDao implements RobotDao {
     }
 
     @Override
-    public void put(RobotBean bean) throws ConstraintViolationException {
+    public void put(@NotNull RobotBean bean) throws ConstraintViolationException {
         try (final Connection conn = connect()) {
             final PreparedStatement stmt = conn.prepareStatement("""
                 insert into robot values(
@@ -86,7 +92,7 @@ public class SqlRobotDao extends SqlDao implements RobotDao {
     }
 
     @Override
-    public void update(RobotBean bean) throws NoSuchBeanException {
+    public void update(@NotNull RobotBean bean) throws NoSuchBeanException {
         try (final Connection conn = connect()) {
             final PreparedStatement stmt = conn.prepareStatement("""
                 update robot set
@@ -115,7 +121,7 @@ public class SqlRobotDao extends SqlDao implements RobotDao {
     }
 
     @Override
-    public boolean delete(String id) {
+    public boolean delete(@NotNull String id) {
         try (final Connection conn = connect()) {
             final PreparedStatement stmt = conn.prepareStatement("""
                 delete from robot where id = ?
@@ -156,9 +162,5 @@ public class SqlRobotDao extends SqlDao implements RobotDao {
             bean.dateModified(dateModified.toInstant().atOffset(ZoneOffset.UTC));
         }
         return bean.freeze();
-    }
-
-    private static String repeatCommaSeparated(String s, int count) {
-        return CharMatcher.is(',').trimTrailingFrom(Strings.repeat(s + ',', count));
     }
 }

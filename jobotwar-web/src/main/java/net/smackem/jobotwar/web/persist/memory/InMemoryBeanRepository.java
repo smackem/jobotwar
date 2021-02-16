@@ -6,6 +6,7 @@ import net.smackem.jobotwar.web.persist.ConstraintViolationException;
 import net.smackem.jobotwar.web.persist.NoSuchBeanException;
 import net.smackem.jobotwar.web.query.PQueryCompiler;
 import net.smackem.jobotwar.web.query.Query;
+import org.jetbrains.annotations.NotNull;
 
 import java.text.ParseException;
 import java.util.*;
@@ -25,8 +26,9 @@ class InMemoryBeanRepository<T extends PersistableBean> implements BeanRepositor
         this.map = beans.stream().collect(Collectors.toConcurrentMap(PersistableBean::id, bean -> bean));
     }
 
+    @NotNull
     @Override
-    public Stream<T> select(Query query) throws ParseException {
+    public Stream<T> select(@NotNull Query query) throws ParseException {
         Stream<T> result = this.map.values().stream();
         final String filterSource = Objects.requireNonNull(query).filterSource();
         if (filterSource != null) {
@@ -44,8 +46,9 @@ class InMemoryBeanRepository<T extends PersistableBean> implements BeanRepositor
         return result;
     }
 
+    @NotNull
     @Override
-    public List<T> get(String... ids) {
+    public List<T> get(@NotNull String... ids) {
         return Arrays.stream(ids)
                 .map(this.map::get)
                 .filter(Objects::nonNull)
@@ -53,7 +56,7 @@ class InMemoryBeanRepository<T extends PersistableBean> implements BeanRepositor
     }
 
     @Override
-    public void put(T bean) throws ConstraintViolationException {
+    public void put(@NotNull T bean) throws ConstraintViolationException {
         Objects.requireNonNull(bean);
         if (bean.isFrozen() == false) {
             throw new IllegalArgumentException("bean must be frozen to be persisted");
@@ -64,7 +67,7 @@ class InMemoryBeanRepository<T extends PersistableBean> implements BeanRepositor
     }
 
     @Override
-    public void update(T bean) throws NoSuchBeanException {
+    public void update(@NotNull T bean) throws NoSuchBeanException {
         Objects.requireNonNull(bean);
         if (bean.isFrozen() == false) {
             throw new IllegalArgumentException("bean must be frozen to be persisted");
@@ -75,7 +78,7 @@ class InMemoryBeanRepository<T extends PersistableBean> implements BeanRepositor
     }
 
     @Override
-    public boolean delete(String id) {
+    public boolean delete(@NotNull String id) {
         return this.map.remove(id) != null;
     }
 

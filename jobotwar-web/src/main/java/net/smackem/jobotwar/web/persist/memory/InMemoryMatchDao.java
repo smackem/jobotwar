@@ -6,6 +6,7 @@ import net.smackem.jobotwar.web.persist.ConstraintViolationException;
 import net.smackem.jobotwar.web.persist.MatchDao;
 import net.smackem.jobotwar.web.persist.NoSuchBeanException;
 import net.smackem.jobotwar.web.query.Query;
+import org.jetbrains.annotations.NotNull;
 
 import java.text.ParseException;
 import java.util.List;
@@ -14,28 +15,30 @@ import java.util.stream.Stream;
 public class InMemoryMatchDao implements MatchDao {
     private final BeanRepository<MatchBean> repository = new InMemoryBeanRepository<>();
 
+    @NotNull
     @Override
-    public Stream<MatchBean> select(Query query) throws ParseException {
+    public Stream<MatchBean> select(@NotNull Query query) throws ParseException {
         return this.repository.select(query);
     }
 
+    @NotNull
     @Override
-    public List<MatchBean> get(String... ids) {
+    public List<MatchBean> get(@NotNull String... ids) {
         return this.repository.get(ids);
     }
 
     @Override
-    public void put(MatchBean bean) throws ConstraintViolationException {
+    public void put(@NotNull MatchBean bean) throws ConstraintViolationException {
         this.repository.put(bean);
     }
 
     @Override
-    public void update(MatchBean bean) throws NoSuchBeanException {
+    public void update(@NotNull MatchBean bean) throws NoSuchBeanException {
         this.repository.update(bean);
     }
 
     @Override
-    public boolean delete(String id) {
+    public boolean delete(@NotNull String id) {
         return this.repository.delete(id);
     }
 

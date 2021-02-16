@@ -1,5 +1,7 @@
 package net.smackem.jobotwar.web.persist.sql;
 
+import com.google.common.base.CharMatcher;
+import com.google.common.base.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,8 +72,18 @@ class SqlDao {
         }
     }
 
+    static String repeatCommaSeparated(String s, int count) {
+        return CharMatcher.is(',').trimTrailingFrom(Strings.repeat(s + ',', count));
+    }
+
     @FunctionalInterface
     interface BeanLoader<T> {
         T load(ResultSet rs) throws SQLException;
+    }
+
+    static AutoCloseable disableAutoCommit(Connection conn) throws SQLException {
+        final boolean old = conn.getAutoCommit();
+        conn.setAutoCommit(false);
+        return () -> conn.setAutoCommit(old);
     }
 }
