@@ -27,6 +27,10 @@ class SqlDao {
         return this.connectionSupplier.get();
     }
 
+    Transaction beginTransaction() throws SQLException {
+        return new Transaction();
+    }
+
     RuntimeException handleSQLException(SQLException e) {
         log.error("database error", e);
         return new RuntimeException(e);
@@ -81,9 +85,37 @@ class SqlDao {
         T load(ResultSet rs) throws SQLException;
     }
 
-    static AutoCloseable disableAutoCommit(Connection conn) throws SQLException {
-        final boolean old = conn.getAutoCommit();
-        conn.setAutoCommit(false);
-        return () -> conn.setAutoCommit(old);
+    class Transaction implements AutoCloseable {
+        private final boolean wasAutoCommitEnabled;
+        private final Connection connection;
+
+        Transaction() throws SQLException {
+            this.connection = connect();
+            this.wasAutoCommitEnabled = this.connection.getAutoCommit();
+            this.connection.setAutoCommit(false);
+        }
+
+        public Connection connection() {
+            return this.connection;
+        }
+
+        @Override
+        public void close() {
+            try {
+                this.connection.commit();
+            } catch (SQLException e) {
+                log.error("error committing transaction", e);
+            }
+            try {
+                this.connection.setAutoCommit(this.wasAutoCommitEnabled);
+            } catch (SQLException e) {
+                log.error("error setting autocommit", e);
+            }
+            try {
+                this.connection.close();
+            } catch (SQLException e) {
+                throw handleSQLException(e);
+            }
+        }
     }
 }

@@ -47,11 +47,14 @@ public class SqlMatchDao extends SqlDao implements MatchDao {
 
     @Override
     public void put(@NotNull MatchBean bean) throws ConstraintViolationException {
-        try (final Connection conn = connect()) {
+        try (final Transaction transaction = beginTransaction()) {
+            final Connection conn = transaction.connection();
             final PreparedStatement stmt = conn.prepareStatement("""
-            insert into match (id, board_width, board_height, duration_millis, max_duration_millis, winner_id, outcome, date_started) 
-            values (?, ?, ?, ?, ?, ?, ?, ?)
-            """);
+                insert into match
+                    (id, board_width, board_height, duration_millis, max_duration_millis, winner_id, outcome, date_started) 
+                values
+                    (?, ?, ?, ?, ?, ?, ?, ?)
+                """);
         } catch (SQLException e) {
             throw handleSQLException(e);
         }
@@ -59,7 +62,6 @@ public class SqlMatchDao extends SqlDao implements MatchDao {
 
     @Override
     public void update(@NotNull MatchBean bean) throws NoSuchBeanException {
-
     }
 
     @Override
