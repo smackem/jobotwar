@@ -5,6 +5,7 @@ import net.smackem.jobotwar.web.query.Query;
 import org.jetbrains.annotations.NotNull;
 
 import java.text.ParseException;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -18,7 +19,8 @@ public interface BeanRepository<T extends PersistableBean> {
      * @throws ParseException If there was problem translating the {@code query} to the representation
      *      required by the repository implementation.
      */
-    @NotNull Stream<T> select(@NotNull Query query) throws ParseException;
+    @NotNull
+    Collection<T> select(@NotNull Query query) throws ParseException;
 
     /**
      * Gets the beans with the specified ids from the repo.
@@ -27,7 +29,8 @@ public interface BeanRepository<T extends PersistableBean> {
      * @return A list containing the beans with the specified ids. Only the beans found in the repository
      *      are returned, so an empty list means that none was found.
      */
-    @NotNull List<T> get(@NotNull String... ids);
+    @NotNull
+    List<T> get(@NotNull String... ids);
 
     /**
      * Puts the specified bean into the repository.

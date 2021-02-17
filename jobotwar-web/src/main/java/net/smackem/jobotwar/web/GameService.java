@@ -54,6 +54,7 @@ public class GameService {
         final String winnerId = winner != null
                 ? robots.get(result.winner())
                 : null;
+        log.info("match outcome: {}, winner: {}", result.outcome(), winner != null ? winner.name() : null);
         // store simulation outcome in match
         match.duration(result.duration())
                 .outcome(result.outcome())

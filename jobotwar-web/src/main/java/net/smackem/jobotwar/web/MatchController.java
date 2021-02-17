@@ -18,7 +18,6 @@ import org.slf4j.LoggerFactory;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class MatchController extends Controller {
     private static final Logger log = LoggerFactory.getLogger(MatchController.class);
@@ -26,7 +25,8 @@ public class MatchController extends Controller {
     private final RobotDao robotDao;
     private final GameService gameService = new GameService();
 
-    MatchController(MatchDao matchDao, RobotDao robotDao) {
+    MatchController(long selectedRowCountLimit, MatchDao matchDao, RobotDao robotDao) {
+        super(selectedRowCountLimit);
         this.matchDao = Objects.requireNonNull(matchDao);
         this.robotDao = Objects.requireNonNull(robotDao);
     }
@@ -58,7 +58,7 @@ public class MatchController extends Controller {
         log.info("get matches: {}", ctx.fullUrl());
         final Query query = createQuery(ctx);
         try {
-            ctx.json(this.matchDao.select(query).collect(Collectors.toList()));
+            ctx.json(this.matchDao.select(query));
         } catch (ParseException e) {
             log.warn("error getting matches: {} [{}]", e.getMessage(), ctx.fullUrl());
             ctx.status(HttpStatus.BAD_REQUEST_400).result(e.getMessage());

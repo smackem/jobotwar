@@ -9,15 +9,15 @@ import net.smackem.jobotwar.web.query.Query;
 import org.jetbrains.annotations.NotNull;
 
 import java.text.ParseException;
+import java.util.Collection;
 import java.util.List;
-import java.util.stream.Stream;
 
 public class InMemoryRobotDao implements RobotDao {
     private final BeanRepository<RobotBean> repository = new InMemoryBeanRepository<>();
 
     @NotNull
     @Override
-    public Stream<RobotBean> select(@NotNull Query query) throws ParseException {
+    public Collection<RobotBean> select(@NotNull Query query) throws ParseException {
         return this.repository.select(query);
     }
 

@@ -4,7 +4,17 @@ import io.javalin.http.Context;
 import net.smackem.jobotwar.web.query.Query;
 
 class Controller {
-    static Query createQuery(Context ctx) {
+    private final long selectedRowCountLimit;
+
+    Controller(long selectedRowCountLimit) {
+        this.selectedRowCountLimit = selectedRowCountLimit;
+    }
+
+    long selectedRowCountLimit() {
+        return this.selectedRowCountLimit;
+    }
+
+    Query createQuery(Context ctx) {
         final Query.Builder builder = new Query.Builder();
         final String filterSource = ctx.queryParam("filter");
         if (filterSource != null) {
@@ -16,7 +26,9 @@ class Controller {
         }
         final String limit = ctx.queryParam("limit");
         if (limit != null) {
-            builder.limit(Long.parseLong(limit));
+            builder.limit(Math.min(Long.parseLong(limit), this.selectedRowCountLimit));
+        } else {
+            builder.limit(this.selectedRowCountLimit);
         }
         return builder.build();
     }

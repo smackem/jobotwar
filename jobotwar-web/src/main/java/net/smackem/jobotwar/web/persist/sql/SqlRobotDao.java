@@ -1,7 +1,5 @@
 package net.smackem.jobotwar.web.persist.sql;
 
-import com.google.common.base.CharMatcher;
-import com.google.common.base.Strings;
 import net.smackem.jobotwar.lang.Compiler;
 import net.smackem.jobotwar.web.beans.RobotBean;
 import net.smackem.jobotwar.web.persist.ConstraintViolationException;
@@ -16,10 +14,10 @@ import org.slf4j.LoggerFactory;
 import java.sql.*;
 import java.text.ParseException;
 import java.time.ZoneOffset;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 public class SqlRobotDao extends SqlDao implements RobotDao {
     private static final Logger log = LoggerFactory.getLogger(SqlRobotDao.class);
@@ -30,15 +28,17 @@ public class SqlRobotDao extends SqlDao implements RobotDao {
 
     @NotNull
     @Override
-    public Stream<RobotBean> select(@NotNull Query query) throws ParseException {
+    public Collection<RobotBean> select(@NotNull Query query) throws ParseException {
         final String filterSource = query.filterSource();
         final String whereClause = filterSource != null
                 ? PQueryCompiler.compile(query.filterSource(), new SqlEmittingVisitor("robot"))
                 : "1=1";
+        final String offsetClause = query.offset().map(offset -> " offset " + offset).orElse("");
+        final String limitClause = query.limit().map(limit -> " limit " + limit).orElse("");
         try (final Connection conn = connect()) {
             final Statement stmt = conn.createStatement();
-            final ResultSet rs = stmt.executeQuery("select * from robot where " + whereClause);
-            return loadResultSet(rs, SqlRobotDao::loadRobotBean).stream();
+            final ResultSet rs = stmt.executeQuery("select * from robot where " + whereClause + offsetClause + limitClause);
+            return loadResultSet(rs, SqlRobotDao::loadRobotBean);
         } catch (SQLException e) {
             throw handleSQLException(e);
         }
@@ -63,6 +63,9 @@ public class SqlRobotDao extends SqlDao implements RobotDao {
 
     @Override
     public void put(@NotNull RobotBean bean) throws ConstraintViolationException {
+        if (bean.isFrozen() == false) {
+            throw new IllegalArgumentException("bean must be frozen to be persisted");
+        }
         try (final Connection conn = connect()) {
             final PreparedStatement stmt = conn.prepareStatement("""
                 insert into robot values(
@@ -93,6 +96,9 @@ public class SqlRobotDao extends SqlDao implements RobotDao {
 
     @Override
     public void update(@NotNull RobotBean bean) throws NoSuchBeanException {
+        if (bean.isFrozen() == false) {
+            throw new IllegalArgumentException("bean must be frozen to be persisted");
+        }
         try (final Connection conn = connect()) {
             final PreparedStatement stmt = conn.prepareStatement("""
                 update robot set

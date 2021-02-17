@@ -1,0 +1,44 @@
+### ~follower~ / ~batteringram~ / ~stingingbee~
+POST http://localhost:5666/match
+Content-Type: application/json
+
+{
+  "maxDurationMillis": 120000,
+  "boardWidth": 800,
+  "boardHeight": 600,
+  "robots": [
+    {
+      "robotId": "785cbc2e-43cf-416b-a13e-fc9a1d510639"
+    },
+    {
+      "robotId": "0ae58660-5c94-423c-b3e1-86f8b14be9d7"
+    },
+    {
+      "robotId": "0e2c9843-7874-4514-848b-457cbc803009"
+    }
+  ]
+}
+
+### Shooter / target / Mover / Patrol++
+POST http://localhost:5666/match
+Content-Type: application/json
+
+{
+  "maxDurationMillis": 120000,
+  "boardWidth": 800,
+  "boardHeight": 600,
+  "robots": [
+    {
+      "robotId": "3fc309a7-ee7c-4f52-8ede-324d98db528e"
+    },
+    {
+      "robotId": "2484d1bb-cff0-4a8c-af1e-6f8eb9de95bb"
+    },
+    {
+      "robotId": "04b73638-191c-4b3e-9f1a-b6f36c287c27"
+    },
+    {
+      "robotId": "3dc3de7e-1695-4757-84c5-845932ec7b12"
+    }
+  ]
+}

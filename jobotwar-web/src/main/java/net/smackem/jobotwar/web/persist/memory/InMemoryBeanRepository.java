@@ -28,7 +28,7 @@ class InMemoryBeanRepository<T extends PersistableBean> implements BeanRepositor
 
     @NotNull
     @Override
-    public Stream<T> select(@NotNull Query query) throws ParseException {
+    public Collection<T> select(@NotNull Query query) throws ParseException {
         Stream<T> result = this.map.values().stream();
         final String filterSource = Objects.requireNonNull(query).filterSource();
         if (filterSource != null) {
@@ -43,7 +43,7 @@ class InMemoryBeanRepository<T extends PersistableBean> implements BeanRepositor
         if (limit.isPresent()) {
             result = result.limit(limit.get());
         }
-        return result;
+        return result.collect(Collectors.toList());
     }
 
     @NotNull

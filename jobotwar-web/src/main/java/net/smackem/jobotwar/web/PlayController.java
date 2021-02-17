@@ -11,7 +11,9 @@ public class PlayController extends Controller {
     private final static Logger log = LoggerFactory.getLogger(PlayController.class);
     private final GameService gameService = new GameService();
 
-    PlayController() {}
+    PlayController() {
+        super(0); // select is not supported
+    }
 
     public void create(Context ctx) {
         log.info("play instant match: {}", ctx.fullUrl());

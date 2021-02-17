@@ -27,8 +27,8 @@ class SqlDao {
         return this.connectionSupplier.get();
     }
 
-    Transaction beginTransaction() throws SQLException {
-        return new Transaction();
+    Transaction beginTransaction(String transactionLabel) throws SQLException {
+        return new Transaction(transactionLabel);
     }
 
     RuntimeException handleSQLException(SQLException e) {
@@ -86,10 +86,13 @@ class SqlDao {
     }
 
     class Transaction implements AutoCloseable {
+        private final String label;
         private final boolean wasAutoCommitEnabled;
         private final Connection connection;
+        private boolean complete;
 
-        Transaction() throws SQLException {
+        Transaction(String label) throws SQLException {
+            this.label = label;
             this.connection = connect();
             this.wasAutoCommitEnabled = this.connection.getAutoCommit();
             this.connection.setAutoCommit(false);
@@ -99,12 +102,22 @@ class SqlDao {
             return this.connection;
         }
 
+        public void complete() {
+            this.complete = true;
+        }
+
         @Override
         public void close() {
             try {
-                this.connection.commit();
+                if (this.complete) {
+                    log.debug("commit transaction '{}'", this.label);
+                    this.connection.commit();
+                } else {
+                    log.warn("rollback transaction '{}'", this.label);
+                    this.connection.rollback();
+                }
             } catch (SQLException e) {
-                log.error("error committing transaction", e);
+                log.error("error committing/rolling back transaction", e);
             }
             try {
                 this.connection.setAutoCommit(this.wasAutoCommitEnabled);

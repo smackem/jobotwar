@@ -19,6 +19,7 @@ import static io.javalin.apibuilder.ApiBuilder.*;
 
 public class WebApp implements AutoCloseable {
     private final static Logger log = LoggerFactory.getLogger(WebApp.class);
+    private final static long selectedRowCountLimit = 10_000;
     private final Javalin app;
     private final PlayController playController;
     private final RobotController robotController;
@@ -28,8 +29,8 @@ public class WebApp implements AutoCloseable {
     WebApp(int port, DaoFactory daoFactory) {
         this.daoFactory = Objects.requireNonNull(daoFactory);
         this.playController = new PlayController();
-        this.matchController = new MatchController(daoFactory.getMatchDao(), daoFactory.getRobotDao());
-        this.robotController = new RobotController(daoFactory.getRobotDao());
+        this.matchController = new MatchController(selectedRowCountLimit, daoFactory.getMatchDao(), daoFactory.getRobotDao());
+        this.robotController = new RobotController(selectedRowCountLimit, daoFactory.getRobotDao());
         this.app = Javalin.create().start(port);
         app.routes(() -> {
             path("play", () -> post(this.playController::create));

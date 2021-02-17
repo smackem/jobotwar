@@ -18,14 +18,14 @@ import java.text.ParseException;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class RobotController extends Controller implements CrudHandler {
     private static final Logger log = LoggerFactory.getLogger(RobotController.class);
     private final GameService gameService = new GameService();
     private final RobotDao robotDao;
 
-    RobotController(RobotDao robotDao) {
+    RobotController(long selectedRowCountLimit, RobotDao robotDao) {
+        super(selectedRowCountLimit);
         this.robotDao = Objects.requireNonNull(robotDao);
     }
 
@@ -34,7 +34,7 @@ public class RobotController extends Controller implements CrudHandler {
         log.info("get robots: {}", ctx.fullUrl());
         final Query query = createQuery(ctx);
         try {
-            ctx.json(this.robotDao.select(query).collect(Collectors.toList()));
+            ctx.json(this.robotDao.select(query));
         } catch (ParseException e) {
             log.warn("error getting robots: {} [{}]", e.getMessage(), ctx.fullUrl());
             ctx.status(HttpStatus.BAD_REQUEST_400).result(e.getMessage());

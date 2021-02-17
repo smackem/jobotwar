@@ -9,15 +9,15 @@ import net.smackem.jobotwar.web.query.Query;
 import org.jetbrains.annotations.NotNull;
 
 import java.text.ParseException;
+import java.util.Collection;
 import java.util.List;
-import java.util.stream.Stream;
 
 public class InMemoryMatchDao implements MatchDao {
     private final BeanRepository<MatchBean> repository = new InMemoryBeanRepository<>();
 
     @NotNull
     @Override
-    public Stream<MatchBean> select(@NotNull Query query) throws ParseException {
+    public Collection<MatchBean> select(@NotNull Query query) throws ParseException {
         return this.repository.select(query);
     }
 
