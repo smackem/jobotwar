@@ -42,3 +42,27 @@ Content-Type: application/json
     }
   ]
 }
+
+### ~stingingbee~ ~shooterbee~ Shooter Shooter++
+POST http://localhost:5666/match
+Content-Type: application/json
+
+{
+  "maxDurationMillis": 120000,
+  "boardWidth": 800,
+  "boardHeight": 600,
+  "robots": [
+    {
+      "robotId": "0e2c9843-7874-4514-848b-457cbc803009"
+    },
+    {
+      "robotId": "4369aafe-e097-46c5-8c11-5d617a035d60"
+    },
+    {
+      "robotId": "2484d1bb-cff0-4a8c-af1e-6f8eb9de95bb"
+    },
+    {
+      "robotId": "594c6ab0-da49-401a-a883-5b2f5d6b986f"
+    }
+  ]
+}
