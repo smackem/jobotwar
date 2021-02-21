@@ -14,7 +14,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.OffsetDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
@@ -119,7 +122,7 @@ public class GameService {
         return new RobotProgramContext() {
             @Override
             public void logMessage(Robot robot, String category, double value) {
-                log.info("{} {} {}", robot.name(), category, value);
+                log.debug("{} {} {}", robot.name(), category, value);
             }
 
             @Override

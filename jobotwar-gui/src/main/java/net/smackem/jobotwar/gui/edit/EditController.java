@@ -289,8 +289,7 @@ public class EditController {
         final var widget = (MenuItem)source;
         final String resourceName = (String)widget.getUserData();
         final EditRobotViewModel robot;
-        try (final InputStream stream = getClass().getResourceAsStream("robots/" + resourceName);
-             final InputStreamReader reader = new InputStreamReader(stream)) {
+        try (final InputStream stream = getClass().getResourceAsStream("robots/" + resourceName)) {
             robot = PersistableRobots.load(EditRobotViewModel::new, stream);
         } catch (Exception ignored) {
             return;

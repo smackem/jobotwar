@@ -2,6 +2,7 @@ package net.smackem.jobotwar.web;
 
 import io.javalin.apibuilder.CrudHandler;
 import io.javalin.http.Context;
+import net.smackem.jobotwar.runtime.Constants;
 import net.smackem.jobotwar.web.beans.IdGenerator;
 import net.smackem.jobotwar.web.beans.RobotBean;
 import net.smackem.jobotwar.web.persist.ConstraintViolationException;
@@ -58,6 +59,9 @@ public class RobotController extends Controller implements CrudHandler {
         final RobotBean bean = ctx.bodyAsClass(RobotBean.class);
         bean.id(IdGenerator.next());
         bean.dateCreated(OffsetDateTime.now());
+        if (bean.acceleration() <= 0) {
+            bean.acceleration(Constants.DEFAULT_ROBOT_ACCELERATION);
+        }
         log.info("create robot (id = {}) @ {} [{}]", bean.id(), bean.dateCreated(), ctx.fullUrl());
         try {
             this.gameService.compileRobotProgram(bean.name(), bean.code(), bean.language());

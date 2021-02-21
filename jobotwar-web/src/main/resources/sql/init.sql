@@ -1,17 +1,9 @@
 -----------------------------------------------------------
--- clean up
------------------------------------------------------------
-drop table match_event;
-drop table match_robot;
-drop table match;
-drop table robot;
-
------------------------------------------------------------
 -- create tables
 -----------------------------------------------------------
 create table robot (
     id uuid primary key,
-    name varchar(100),
+    name varchar(100) not null,
     language varchar(20),
     code text,
     acceleration real,

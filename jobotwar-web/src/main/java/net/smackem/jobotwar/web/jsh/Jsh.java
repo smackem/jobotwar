@@ -26,8 +26,11 @@ import java.util.stream.Stream;
 
 @SuppressWarnings("WeakerAccess") // allow public access for jshell
 public class Jsh {
-    public static RestClient http = new RestClient("http://localhost:5666/");
+    public static RestClient http = new RestClient("http://localhost:8666/");
 
+    public static void connect(String baseUri) {
+        http = new RestClient(baseUri.endsWith("/") ? baseUri : baseUri + "/");
+    }
     public static RobotBean[] getRobots() throws Exception {
         return JavalinJson.fromJson(http.get("robot").body(), RobotBean[].class);
     }

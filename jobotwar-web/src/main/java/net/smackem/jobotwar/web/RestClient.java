@@ -2,7 +2,6 @@ package net.smackem.jobotwar.web;
 
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Splitter;
-import com.google.common.collect.Streams;
 import io.javalin.plugin.json.JavalinJson;
 import net.smackem.jobotwar.web.beans.PersistableBean;
 
@@ -15,10 +14,6 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 /**
  * REST client class used for jshell and unit tests.
@@ -107,5 +102,12 @@ public class RestClient {
                 .DELETE()
                 .build();
         return this.http.send(request, HttpResponse.BodyHandlers.ofString());
+    }
+
+    @Override
+    public String toString() {
+        return "RestClient{" +
+               "baseUri='" + baseUri + '\'' +
+               '}';
     }
 }

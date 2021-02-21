@@ -32,7 +32,7 @@ public class WebApp implements AutoCloseable {
         this.matchController = new MatchController(selectedRowCountLimit, daoFactory.getMatchDao(), daoFactory.getRobotDao());
         this.robotController = new RobotController(selectedRowCountLimit, daoFactory.getRobotDao());
         this.app = Javalin.create().start(port);
-        app.routes(() -> {
+        this.app.routes(() -> {
             path("play", () -> post(this.playController::create));
             crud("robot/:robot-id", this.robotController);
             path("match", () -> {

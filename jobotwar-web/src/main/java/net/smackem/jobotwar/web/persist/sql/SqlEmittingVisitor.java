@@ -1,5 +1,6 @@
 package net.smackem.jobotwar.web.persist.sql;
 
+import com.google.common.base.CaseFormat;
 import com.google.common.base.CharMatcher;
 import net.smackem.jobotwar.web.query.PQueryBaseVisitor;
 import net.smackem.jobotwar.web.query.PQueryParser;
@@ -75,14 +76,12 @@ public class SqlEmittingVisitor extends PQueryBaseVisitor<String> {
         return filter;
     }
 
-    private static String translateWildcards(String s) {
-        return CharMatcher.anyOf("*?").replaceFrom(s, '%');
-    }
-
     @Override
     public String visitAtom(PQueryParser.AtomContext ctx) {
         if (ctx.Ident() != null) {
-            return this.tableName + '.' + ctx.Ident().getText();
+            final String attributeName = ctx.Ident().getText();
+            final String columnName = sanitizeColumnName(attributeName);
+            return this.tableName + '.' + columnName;
         }
         if (ctx.number() != null) {
             if (ctx.number().Integer() != null) {
@@ -96,5 +95,17 @@ public class SqlEmittingVisitor extends PQueryBaseVisitor<String> {
             return ctx.String().getText(); // keep ' delimiters
         }
         return null;
+    }
+
+    private static String translateWildcards(String s) {
+        return CharMatcher.anyOf("*?").replaceFrom(s, '%');
+    }
+
+    private static String sanitizeColumnName(String columnName) {
+        columnName = CharMatcher.forPredicate(Character::isLetterOrDigit)
+                .or(CharMatcher.is('_'))
+                .negate()
+                .removeFrom(columnName);
+        return CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, columnName);
     }
 }
