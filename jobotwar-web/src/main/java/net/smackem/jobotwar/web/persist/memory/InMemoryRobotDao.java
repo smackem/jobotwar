@@ -1,6 +1,7 @@
 package net.smackem.jobotwar.web.persist.memory;
 
 import net.smackem.jobotwar.web.beans.RobotBean;
+import net.smackem.jobotwar.web.beans.RobotWinStats;
 import net.smackem.jobotwar.web.persist.BeanRepository;
 import net.smackem.jobotwar.web.persist.ConstraintViolationException;
 import net.smackem.jobotwar.web.persist.NoSuchBeanException;
@@ -11,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import java.text.ParseException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 public class InMemoryRobotDao implements RobotDao {
     private final BeanRepository<RobotBean> repository = new InMemoryBeanRepository<>();
@@ -45,5 +47,15 @@ public class InMemoryRobotDao implements RobotDao {
     @Override
     public long count() {
         return this.repository.count();
+    }
+
+    @Override
+    public Collection<RobotWinStats> getWinStats(Query query) {
+        throw new UnsupportedOperationException("not implemented");
+    }
+
+    @Override
+    public Optional<RobotWinStats> getWinStats(String robotId) {
+        throw new UnsupportedOperationException("not implemented");
     }
 }
