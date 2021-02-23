@@ -33,6 +33,6 @@ public class RobotStatsController extends Controller {
             ctx.status(HttpStatus.NOT_FOUND_404);
             return;
         }
-        ctx.json(this.robotDao.getWinStats(id));
+        ctx.json(winStats.get());
     }
 }

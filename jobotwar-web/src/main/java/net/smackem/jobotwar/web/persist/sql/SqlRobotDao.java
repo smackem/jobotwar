@@ -165,10 +165,10 @@ public class SqlRobotDao extends SqlDao implements RobotDao {
                     join robot r on r.id = mr.robot_id
                     group by r.id, r.name
                 ), matches_won as (
-                    select r.id as robot_id, r.name as robot_name, count(*) as win_count
+                    select r.id as robot_id, count(*) as win_count
                     from match m
                     join robot r on r.id = m.winner_id
-                    group by robot_id, robot_name
+                    group by robot_id
                 )
                 select
                     matches_played.robot_id,
@@ -195,26 +195,32 @@ public class SqlRobotDao extends SqlDao implements RobotDao {
     public Optional<RobotWinStats> getWinStats(String robotId) {
         try (final Connection conn = connect()) {
             final PreparedStatement stmt = conn.prepareStatement("""
-                    with matches_played as (
+                    with robot_info as (
+                        select r.id robot_id, r.name robot_name
+                        from robot r 
+                        where r.id = ?
+                    ), matches_played as (
                         select count(m) play_count
                         from match m
                         join match_robot mr on m.id = mr.match_id
                         where mr.robot_id = ?
                     ), matches_won as (
-                        select count(*) win_count
+                        select count(m) win_count
                         from match m
                         where m.winner_id = ?
                     )
                     select
+                        robot_info.robot_id,
+                        robot_info.robot_name,
                         matches_played.play_count,
                         matches_won.win_count,
                         matches_won.win_count * 100.0 / matches_played.play_count as win_percent
-                    from matches_played,
-                         matches_won
+                    from robot_info, matches_played, matches_won
                     """);
             final UUID robotUUID = UUID.fromString(robotId);
             stmt.setObject(1, robotUUID);
             stmt.setObject(2, robotUUID);
+            stmt.setObject(3, robotUUID);
             final ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 return Optional.of(loadWinStats(rs));

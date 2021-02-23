@@ -11,6 +11,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" scope="TEST" name="Maven: junit:junit:4.11" level="project" />
     <orderEntry type="module" module-name="jobotwar-model" />
     <orderEntry type="library" name="Maven: org.antlr:antlr4-runtime:4.7.2" level="project" />
     <orderEntry type="library" name="Maven: javax.json:javax.json-api:1.1" level="project" />
