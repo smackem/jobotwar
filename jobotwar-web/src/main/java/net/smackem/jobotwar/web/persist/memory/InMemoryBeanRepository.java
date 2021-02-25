@@ -1,6 +1,6 @@
 package net.smackem.jobotwar.web.persist.memory;
 
-import net.smackem.jobotwar.web.beans.PersistableBean;
+import net.smackem.jobotwar.web.beans.EntityBean;
 import net.smackem.jobotwar.web.persist.BeanRepository;
 import net.smackem.jobotwar.web.persist.ConstraintViolationException;
 import net.smackem.jobotwar.web.persist.NoSuchBeanException;
@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-class InMemoryBeanRepository<T extends PersistableBean> implements BeanRepository<T> {
+class InMemoryBeanRepository<T extends EntityBean> implements BeanRepository<T> {
 
     private final Map<String, T> map;
 
@@ -23,7 +23,7 @@ class InMemoryBeanRepository<T extends PersistableBean> implements BeanRepositor
     }
 
     public InMemoryBeanRepository(Collection<T> beans) {
-        this.map = beans.stream().collect(Collectors.toConcurrentMap(PersistableBean::id, bean -> bean));
+        this.map = beans.stream().collect(Collectors.toConcurrentMap(EntityBean::id, bean -> bean));
     }
 
     @NotNull

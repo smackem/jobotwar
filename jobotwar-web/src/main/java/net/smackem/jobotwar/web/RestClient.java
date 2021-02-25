@@ -3,7 +3,7 @@ package net.smackem.jobotwar.web;
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Splitter;
 import io.javalin.plugin.json.JavalinJson;
-import net.smackem.jobotwar.web.beans.PersistableBean;
+import net.smackem.jobotwar.web.beans.EntityBean;
 
 import java.io.IOException;
 import java.net.URI;
@@ -53,7 +53,7 @@ public class RestClient {
         return URI.create(sb.toString());
     }
 
-    public HttpResponse<String> post(String path, PersistableBean bean, String... queryParams) throws IOException, InterruptedException {
+    public HttpResponse<String> post(String path, EntityBean bean, String... queryParams) throws IOException, InterruptedException {
         final String json = JavalinJson.toJson(bean);
         final HttpRequest request = HttpRequest.newBuilder()
                 .uri(getUri(path, queryParams))
@@ -70,7 +70,7 @@ public class RestClient {
         return this.http.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
-    public HttpResponse<String> patch(String path, PersistableBean bean, String... queryParams) throws IOException, InterruptedException {
+    public HttpResponse<String> patch(String path, EntityBean bean, String... queryParams) throws IOException, InterruptedException {
         final String json = JavalinJson.toJson(bean);
         final HttpRequest request = HttpRequest.newBuilder()
                 .uri(getUri(path, queryParams))
@@ -79,7 +79,7 @@ public class RestClient {
         return this.http.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
-    public HttpResponse<String> put(String path, PersistableBean bean, String... queryParams) throws IOException, InterruptedException {
+    public HttpResponse<String> put(String path, EntityBean bean, String... queryParams) throws IOException, InterruptedException {
         final String json = JavalinJson.toJson(bean);
         final HttpRequest request = HttpRequest.newBuilder()
                 .uri(getUri(path, queryParams))

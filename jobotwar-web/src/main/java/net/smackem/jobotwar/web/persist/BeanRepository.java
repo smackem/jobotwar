@@ -1,6 +1,6 @@
 package net.smackem.jobotwar.web.persist;
 
-import net.smackem.jobotwar.web.beans.PersistableBean;
+import net.smackem.jobotwar.web.beans.EntityBean;
 import net.smackem.jobotwar.web.query.Query;
 import org.jetbrains.annotations.NotNull;
 
@@ -9,7 +9,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
 
-public interface BeanRepository<T extends PersistableBean> {
+public interface BeanRepository<T extends EntityBean> {
 
     /**
      * Selects the beans matching the specified query from the repository.

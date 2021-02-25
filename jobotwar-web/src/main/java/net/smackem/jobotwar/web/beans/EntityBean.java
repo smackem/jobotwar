@@ -1,21 +1,19 @@
 package net.smackem.jobotwar.web.beans;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Objects;
 
-public abstract class PersistableBean extends FreezableBean {
+public abstract class EntityBean extends FreezableBean {
     @JsonProperty private String id;
-    @JsonIgnore private transient boolean frozen;
 
     @JsonCreator
-    PersistableBean() {
+    EntityBean() {
         this.id = null;
     }
 
-    public PersistableBean(String id) {
+    public EntityBean(String id) {
         this.id = id;
     }
 
@@ -23,7 +21,7 @@ public abstract class PersistableBean extends FreezableBean {
         return this.id;
     }
 
-    public <T extends PersistableBean> T id(String id) {
+    public <T extends EntityBean> T id(String id) {
         this.id = id;
         //noinspection unchecked
         return (T) this;
@@ -33,7 +31,7 @@ public abstract class PersistableBean extends FreezableBean {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        final PersistableBean that = (PersistableBean) o;
+        final EntityBean that = (EntityBean) o;
         return Objects.equals(id, that.id);
     }
 

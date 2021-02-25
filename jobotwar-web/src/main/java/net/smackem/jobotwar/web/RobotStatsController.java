@@ -35,4 +35,20 @@ public class RobotStatsController extends Controller {
         }
         ctx.json(winStats.get());
     }
+
+    public void getAllVsCount(@NotNull Context ctx, @NotNull Integer count) {
+        log.info("get robot win stats in matches with {} robots: {}", count, ctx.fullUrl());
+        ctx.json(this.robotDao.getWinStatsVsCount(count, createQuery(ctx)));
+    }
+
+    public void getVsCount(@NotNull Context ctx, @NotNull Integer count, @NotNull String id) {
+        log.info("get robot win stats in matches with {} robots: {}", count, ctx.fullUrl());
+        final Optional<RobotWinStats> winStats = this.robotDao.getWinStatsVsCount(count, id);
+        if (winStats.isEmpty()) {
+            log.info("stats for robot {} not found [{}]", id, ctx.fullUrl());
+            ctx.status(HttpStatus.NOT_FOUND_404);
+            return;
+        }
+        ctx.json(winStats.get());
+    }
 }

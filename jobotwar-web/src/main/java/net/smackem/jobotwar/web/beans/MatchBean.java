@@ -10,7 +10,7 @@ import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.*;
 
-public class MatchBean extends PersistableBean {
+public class MatchBean extends EntityBean {
     @JsonProperty private final Collection<MatchRobot> robots = new ArrayList<>();
     @JsonProperty private final Collection<MatchEvent> eventLog = new ArrayList<>();
     @JsonProperty private long durationMillis;

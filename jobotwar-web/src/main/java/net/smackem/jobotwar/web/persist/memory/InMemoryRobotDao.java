@@ -58,4 +58,14 @@ public class InMemoryRobotDao implements RobotDao {
     public Optional<RobotWinStats> getWinStats(String robotId) {
         throw new UnsupportedOperationException("not implemented");
     }
+
+    @Override
+    public Collection<RobotWinStats> getWinStatsVsCount(int count, Query query) {
+        throw new UnsupportedOperationException("not implemented");
+    }
+
+    @Override
+    public Optional<RobotWinStats> getWinStatsVsCount(int count, String robotId) {
+        throw new UnsupportedOperationException("not implemented");
+    }
 }

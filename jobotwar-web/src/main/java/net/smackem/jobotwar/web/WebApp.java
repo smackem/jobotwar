@@ -38,14 +38,24 @@ public class WebApp implements AutoCloseable {
             path("play", () ->
                 post(this.playController::create));
             crud("robot/:robot-id", this.robotController);
-            path("robot_stats", () -> {
-                get("win", this.robotStatsController::getAll);
-                get("win/:robot-id", ctx -> this.robotStatsController.get(ctx, ctx.pathParam("robot-id")));
-            });
             path("match", () -> {
                 get(this.matchController::getAll);
                 post(this.matchController::create);
                 get(":match-id", ctx -> this.matchController.get(ctx, ctx.pathParam("match-id")));
+            });
+            path("robot_stats/win", () -> {
+                get(this.robotStatsController::getAll);
+                get(":robot-id", ctx ->
+                        this.robotStatsController.get(ctx, ctx.pathParam("robot-id")));
+                path("vs_count", () -> {
+                    get(":count", ctx ->
+                            this.robotStatsController.getAllVsCount(ctx,
+                                    ctx.pathParam("count", Integer.class).get()));
+                    get(":count/:robot-id", ctx ->
+                            this.robotStatsController.getVsCount(ctx,
+                                    ctx.pathParam("count", Integer.class).get(),
+                                    ctx.pathParam("robot-id")));
+                });
             });
         });
     }

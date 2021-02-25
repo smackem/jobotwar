@@ -10,7 +10,7 @@ import net.smackem.jobotwar.lang.Compiler;
 import java.time.OffsetDateTime;
 import java.util.Objects;
 
-public class RobotBean extends PersistableBean {
+public class RobotBean extends EntityBean {
     @JsonProperty private String code;
     @JsonProperty private Compiler.Language language = Compiler.Language.V1;
     @JsonProperty private String name;

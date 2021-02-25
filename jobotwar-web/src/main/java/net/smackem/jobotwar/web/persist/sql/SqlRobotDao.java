@@ -231,6 +231,102 @@ public class SqlRobotDao extends SqlDao implements RobotDao {
         }
     }
 
+    @Override
+    public Collection<RobotWinStats> getWinStatsVsCount(int count, Query query) {
+        try (final Connection conn = connect()) {
+            final PreparedStatement stmt = conn.prepareStatement("""
+                with matches_of_any as (
+                    select m.id, m.winner_id, count(mr) as robot_count
+                    from match m
+                    join match_robot mr on m.id = mr.match_id
+                    group by m.id, m.winner_id
+                ), matches_of_n as (
+                    select *
+                    from matches_of_any
+                    where robot_count = ?
+                ), matches_played as (
+                    select r.id as robot_id, r.name as robot_name, count(m) as play_count
+                    from matches_of_n m
+                    join match_robot mr on m.id = mr.match_id
+                    join robot r on r.id = mr.robot_id
+                    group by r.id, r.name
+                ), matches_won as (
+                    select r.id as robot_id, r.name as robot_name, count(*) as win_count
+                    from matches_of_n m
+                    join robot r on r.id = m.winner_id
+                    group by robot_id, robot_name
+                )
+                select matches_played.robot_id,
+                       matches_played.robot_name,
+                       matches_played.play_count,
+                       matches_won.win_count,
+                       matches_won.win_count * 100.0 / matches_played.play_count as win_percent
+                from matches_played
+                join matches_won on matches_played.robot_id = matches_won.robot_id
+                order by win_percent desc
+                offset ?
+                limit ?
+                """);
+            stmt.setInt(1, count);
+            stmt.setLong(2, query.offset().orElse(0L));
+            stmt.setLong(3, query.limit().orElse(Long.MAX_VALUE));
+            final ResultSet rs = stmt.executeQuery();
+            return loadResultSet(rs, SqlRobotDao::loadWinStats);
+        } catch (SQLException e) {
+            throw handleSQLException(e);
+        }
+    }
+
+    @Override
+    public Optional<RobotWinStats> getWinStatsVsCount(int count, String robotId) {
+        try (final Connection conn = connect()) {
+            final PreparedStatement stmt = conn.prepareStatement("""
+                with robot_info as (
+                    select r.id robot_id, r.name robot_name
+                    from robot r 
+                    where r.id = ?
+                ), matches_of_any as (
+                    select m.id, m.winner_id, count(mr) as robot_count
+                    from match m
+                    join match_robot mr on m.id = mr.match_id
+                    group by m.id, m.winner_id
+                ), matches_of_n as (
+                    select *
+                    from matches_of_any
+                    where robot_count = ?
+                ), matches_played as (
+                    select count(m) play_count
+                    from matches_of_n m
+                    join match_robot mr on m.id = mr.match_id
+                    where mr.robot_id = ?
+                ), matches_won as (
+                    select count(*) win_count
+                    from matches_of_n m
+                    where m.winner_id = ?
+                )
+                select robot_info.robot_id,
+                       robot_info.robot_name,
+                       matches_played.play_count,
+                       matches_won.win_count,
+                       matches_won.win_count * 100.0 / matches_played.play_count as win_percent
+                from matches_played,
+                     matches_won;
+                    """);
+            final UUID robotUUID = UUID.fromString(robotId);
+            stmt.setObject(1, robotUUID);
+            stmt.setObject(2, count);
+            stmt.setObject(3, robotUUID);
+            stmt.setObject(4, robotUUID);
+            final ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return Optional.of(loadWinStats(rs));
+            }
+            return Optional.empty();
+        } catch (SQLException e) {
+            throw handleSQLException(e);
+        }
+    }
+
     private static RobotWinStats loadWinStats(ResultSet rs) throws SQLException {
         final RobotWinStats bean = new RobotWinStats(rs.getString(1), rs.getString(2));
         bean.playCount(rs.getInt(3));
