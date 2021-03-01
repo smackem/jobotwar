@@ -309,9 +309,10 @@ public class SqlRobotDao extends SqlDao implements RobotDao {
                        matches_played.play_count,
                        matches_won.win_count,
                        matches_won.win_count * 100.0 / matches_played.play_count as win_percent
-                from matches_played,
+                from robot_info,
+                     matches_played,
                      matches_won;
-                    """);
+                """);
             final UUID robotUUID = UUID.fromString(robotId);
             stmt.setObject(1, robotUUID);
             stmt.setObject(2, count);
