@@ -190,6 +190,32 @@ with match_lost as (
 select avg(robot_count_in_match_lost.robot_count)
 from robot_count_in_match_lost;
 
+-- get win percent where start position matches some criteria
+with param as (
+    select r.id as robot_id
+    from robot r
+    where r.name = 'Corner++'
+), matches_started_at_corner as (
+    select m.id, m.winner_id
+    from match m
+    join match_robot mr on m.id = mr.match_id
+    join param p on mr.robot_id = p.robot_id
+    where (mr.x_pos < 100 or mr.x_pos > 500) and (mr.y_pos < 100 or mr.y_pos > 400)
+), matches_played as (
+    select count(m) play_count
+    from matches_started_at_corner m
+), matches_won as (
+    select count(m) win_count
+    from matches_started_at_corner m
+    join param p on m.winner_id = p.robot_id
+)
+select
+    param.robot_id,
+    matches_played.play_count,
+    matches_won.win_count,
+    matches_won.win_count * 100.0 / matches_played.play_count as win_percent
+from param, matches_played, matches_won;
+
 -------------------------------------------
 -- match statistics
 -------------------------------------------
