@@ -92,7 +92,7 @@ public class WebApp implements AutoCloseable {
     private static void loop() {
         System.out.println("Enter to quit...");
         try (final var reader = new BufferedReader(new InputStreamReader(System.in))) {
-            reader.readLine();
+            while (true) { }
         } catch (IOException ignored) {
             // won't happen
         }
