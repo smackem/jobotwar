@@ -12,5 +12,6 @@ ENV DBURL="jdbc:h2:mem:jobotwar;INIT=RUNSCRIPT FROM 'classpath:sql/init.sql'"
 RUN adduser -u 5678 appuser && chown -R appuser /app
 USER appuser
 
-COPY --from=build /src/app/jobotwar-web/target .
+COPY --from=build /src/app/jobotwar-web/target/*.jar .
+COPY --from=build /src/app/jobotwar-web/target/lib ./lib
 ENTRYPOINT java -Ddb.url="${DBURL}" -jar /app/jobotwar-web-2.0-SNAPSHOT.jar

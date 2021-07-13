@@ -1,0 +1,13 @@
+{
+    "robots": [
+        {
+            "robotId": "594c6ab0-da49-401a-a883-5b2f5d6b986f"
+        },
+        {
+            "robotId": "c3bc9059-193a-4f6b-b22b-f2fc64bbb011"
+        }
+    ],
+    "boardWidth": 800,
+    "boardHeight": 600,
+    "maxDurationMillis": 300000
+}

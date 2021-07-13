@@ -90,11 +90,22 @@ public class WebApp implements AutoCloseable {
     }
 
     private static void loop() {
-        System.out.println("Enter to quit...");
-        try (final var reader = new BufferedReader(new InputStreamReader(System.in))) {
-            while (true) { }
-        } catch (IOException ignored) {
-            // won't happen
+        if (Boolean.parseBoolean(System.getProperty("srv.interactive"))) {
+            System.out.println("Enter to quit...");
+            try (final var reader = new BufferedReader(new InputStreamReader(System.in))) {
+                reader.readLine();
+            } catch (IOException ignored) {
+                // won't happen
+            }
+            return;
+        }
+
+        while (true) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException ignored) {
+                // ignore and continue
+            }
         }
     }
 
