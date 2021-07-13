@@ -13,4 +13,4 @@ RUN adduser -u 5678 appuser && chown -R appuser /app
 USER appuser
 
 COPY --from=build /src/app/jobotwar-web/target .
-ENTRYPOINT ["java", "-Ddb.url=${DBURL}", "-jar", "/app/jobotwar-web-2.0-SNAPSHOT.jar"]
+ENTRYPOINT java -Ddb.url="${DBURL}" -jar /app/jobotwar-web-2.0-SNAPSHOT.jar
