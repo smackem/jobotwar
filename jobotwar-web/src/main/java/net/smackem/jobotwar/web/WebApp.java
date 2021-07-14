@@ -65,10 +65,14 @@ public class WebApp implements AutoCloseable {
         final int port = Strings.isNullOrEmpty(portStr)
                 ? 8666
                 : Integer.parseInt(portStr);
-        try (final WebApp ignored = new WebApp(port, createSqlDaoFactory())) {
-            loop();
-        } catch (Exception e) {
-            log.warn("error shutting down application", e);
+
+        final WebApp app = new WebApp(port, createSqlDaoFactory());
+        if (Boolean.parseBoolean(System.getProperty("srv.interactive"))) {
+            try (app) {
+                loop();
+            } catch (Exception e) {
+                log.warn("error shutting down application", e);
+            }
         }
     }
 
@@ -90,23 +94,13 @@ public class WebApp implements AutoCloseable {
     }
 
     private static void loop() {
-        if (Boolean.parseBoolean(System.getProperty("srv.interactive"))) {
-            System.out.println("Enter to quit...");
-            try (final var reader = new BufferedReader(new InputStreamReader(System.in))) {
-                reader.readLine();
-            } catch (IOException ignored) {
-                // won't happen
-            }
-            return;
+        System.out.println("Enter to quit...");
+        try (final var reader = new BufferedReader(new InputStreamReader(System.in))) {
+            reader.readLine();
+        } catch (IOException ignored) {
+            // won't happen
         }
-
-        while (true) {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException ignored) {
-                // ignore and continue
-            }
-        }
+        return;
     }
 
     @Override

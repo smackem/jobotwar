@@ -14,4 +14,4 @@ USER appuser
 
 COPY --from=build /src/app/jobotwar-web/target/*.jar .
 COPY --from=build /src/app/jobotwar-web/target/lib ./lib
-ENTRYPOINT java -Ddb.url="${DBURL}" -jar /app/jobotwar-web-2.0-SNAPSHOT.jar
+ENTRYPOINT java -Djdbc.drivers=org.postgresql.Driver -Ddb.url="${DBURL}" -jar /app/jobotwar-web-2.0-SNAPSHOT.jar

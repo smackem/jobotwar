@@ -1,0 +1,13 @@
+version: '3.4'
+
+services:
+    jobotwar:
+        image: jobotwar
+        build:
+            context: .
+            dockerfile: ./Dockerfile
+        environment:
+            JAVA_OPTS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005,quiet=y
+        ports:
+            - 8666:8666
+            - 5005:5005
