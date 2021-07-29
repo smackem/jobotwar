@@ -32,7 +32,7 @@ public class ControllerTest {
     private static DaoFactory createInMemorySqlDaoFactory() throws ClassNotFoundException {
         final HikariConfig config = new HikariConfig();
         //no longer needed: Class.forName("org.h2.Driver");
-        config.setJdbcUrl("jdbc:h2:mem:jobotwar;INIT=RUNSCRIPT FROM 'classpath:sql/init.sql'");
+        config.setJdbcUrl("jdbc:h2:mem:jobotwar;INIT=RUNSCRIPT FROM 'classpath:sql/init/init.sql'");
         final HikariDataSource dataSource = new HikariDataSource(config);
         return DaoFactories.sql(() -> {
             try {

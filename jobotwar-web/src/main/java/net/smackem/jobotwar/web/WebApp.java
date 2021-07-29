@@ -1,6 +1,7 @@
 package net.smackem.jobotwar.web;
 
 import com.google.common.base.Strings;
+import com.google.common.util.concurrent.Uninterruptibles;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import io.javalin.Javalin;
@@ -13,6 +14,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.SQLException;
+import java.time.Duration;
 import java.util.Objects;
 
 import static io.javalin.apibuilder.ApiBuilder.*;
@@ -77,12 +79,7 @@ public class WebApp implements AutoCloseable {
     }
 
     private static DaoFactory createSqlDaoFactory() {
-        // Required VM args:
-        // -Djdbc.drivers=org.postgresql.Driver
-        // -Ddb.url=jdbc:postgresql://localhost/jobotwar?user=philip
-        final HikariConfig config = new HikariConfig();
-        config.setJdbcUrl(System.getProperty("db.url"));
-        final HikariDataSource dataSource = new HikariDataSource(config);
+        final HikariDataSource dataSource = createDataSource();
         return DaoFactories.sql(() -> {
             try {
                 return dataSource.getConnection();
@@ -93,6 +90,22 @@ public class WebApp implements AutoCloseable {
         }, dataSource);
     }
 
+    private static HikariDataSource createDataSource() {
+        // Required VM args:
+        // -Djdbc.drivers=org.postgresql.Driver
+        // -Ddb.url=jdbc:postgresql://localhost/jobotwar?user=philip
+        final HikariConfig config = new HikariConfig();
+        config.setJdbcUrl(System.getProperty("db.url"));
+        while (true) {
+            try {
+                return new HikariDataSource(config);
+            } catch (Throwable e) {
+                log.info("reconnecting in 5 seconds...");
+                Uninterruptibles.sleepUninterruptibly(Duration.ofSeconds(5));
+            }
+        }
+    }
+
     private static void loop() {
         System.out.println("Enter to quit...");
         try (final var reader = new BufferedReader(new InputStreamReader(System.in))) {
@@ -100,7 +113,6 @@ public class WebApp implements AutoCloseable {
         } catch (IOException ignored) {
             // won't happen
         }
-        return;
     }
 
     @Override

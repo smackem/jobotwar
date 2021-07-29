@@ -12,12 +12,12 @@
         <module name="jobotwar-web" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel target="14">
+    <bytecodeTargetLevel target="16">
       <module name="jobotwar" target="16" />
-      <module name="jobotwar-gui" target="15" />
-      <module name="jobotwar-io" target="15" />
-      <module name="jobotwar-model" target="15" />
-      <module name="jobotwar-web" target="15" />
+      <module name="jobotwar-gui" target="16" />
+      <module name="jobotwar-io" target="16" />
+      <module name="jobotwar-model" target="16" />
+      <module name="jobotwar-web" target="16" />
     </bytecodeTargetLevel>
   </component>
 </project>
