@@ -8,6 +8,8 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -42,6 +44,21 @@ public final class SimulationRunner {
      *         specified {@code maxDuration}.
      */
     public SimulationResult runGame(Duration maxDuration) {
+        return runGame(maxDuration, null);
+    }
+
+    /**
+     * Simulates a game and returns the winner. Simulation means running the game unrestricted by
+     * frame rate. Frames (aka ticks) are calculated in a tight loop, so simulation is much faster.
+     * @param maxDuration The maximum simulated duration in game time (as if run based upon the
+     *                    standard frame rate {@link Constants#TICK_DURATION}).
+     * @param tickCallback A function that is called after every game engine tick with the produced
+     *                     {@link GameEngine.TickResult}.
+     * @return A {@link SimulationResult} with the winning {@link Robot} or {@code null} if no winner could be determined.
+     *         This may be the case when both robots just sit or don't hit each other within the
+     *         specified {@code maxDuration}.
+     */
+    public SimulationResult runGame(Duration maxDuration, Consumer<GameEngine.TickResult> tickCallback) {
         final long tickMillis = Constants.TICK_DURATION.toMillis();
         final long maxMillis = Objects.requireNonNull(maxDuration).toMillis();
         final Collection<SimulationEvent> eventLog = new ArrayList<>();
@@ -59,6 +76,9 @@ public final class SimulationRunner {
                 eventLog.add(new SimulationEvent(millis, String.format("%s got killed", r.name())));
             }
 
+            if (tickCallback != null) {
+                tickCallback.accept(result);
+            }
             millis += tickMillis;
         } while (result.hasEnded() == false && millis < maxMillis);
 
