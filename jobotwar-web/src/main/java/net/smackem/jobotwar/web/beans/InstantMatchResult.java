@@ -7,11 +7,12 @@ import net.smackem.jobotwar.runtime.simulation.SimulationResult;
 import java.time.Duration;
 import java.util.*;
 
-public class InstantMatchResult {
+public class InstantMatchResult extends FreezableBean {
     @JsonProperty private final SimulationResult.Outcome outcome;
     @JsonProperty private String winner;
     @JsonProperty private int durationMillis;
     @JsonProperty private final Collection<MatchEvent> eventLog = new ArrayList<>();
+    @JsonProperty private final Collection<MatchFrame> frames = new ArrayList<>();
 
     @JsonCreator
     private InstantMatchResult() {
@@ -40,6 +41,7 @@ public class InstantMatchResult {
     }
 
     public InstantMatchResult duration(Duration duration) {
+        assertMutable();
         this.durationMillis = (int) duration.toMillis();
         return this;
     }
@@ -49,7 +51,18 @@ public class InstantMatchResult {
     }
 
     public InstantMatchResult addEvents(MatchEvent... events) {
+        assertMutable();
         this.eventLog.addAll(List.of(events));
+        return this;
+    }
+
+    public Collection<MatchFrame> frames() {
+        return Collections.unmodifiableCollection(this.frames);
+    }
+
+    public InstantMatchResult addFrames(MatchFrame... frames) {
+        assertMutable();
+        this.frames.addAll(List.of(frames));
         return this;
     }
 

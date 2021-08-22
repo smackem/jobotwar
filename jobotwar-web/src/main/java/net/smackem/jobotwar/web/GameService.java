@@ -1,12 +1,10 @@
 package net.smackem.jobotwar.web;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Streams;
 import net.smackem.jobotwar.lang.Compiler;
 import net.smackem.jobotwar.lang.Program;
-import net.smackem.jobotwar.runtime.Board;
-import net.smackem.jobotwar.runtime.CompiledProgram;
-import net.smackem.jobotwar.runtime.Robot;
-import net.smackem.jobotwar.runtime.RobotProgramContext;
+import net.smackem.jobotwar.runtime.*;
 import net.smackem.jobotwar.runtime.simulation.SimulationResult;
 import net.smackem.jobotwar.runtime.simulation.SimulationRunner;
 import net.smackem.jobotwar.web.beans.*;
@@ -71,13 +69,40 @@ public class GameService {
     public InstantMatchResult playInstantMatch(InstantMatchSetup setup) throws CompilationException {
         final Collection<Robot> robots = buildInstantMatchRobots(setup.robots());
         final Board board = new Board(setup.boardWidth(), setup.boardHeight(), robots);
-        final SimulationResult result = new SimulationRunner(board).runGame(setup.maxDuration());
+        final Collection<MatchFrame> frames = new ArrayList<>();
+        final SimulationResult result = new SimulationRunner(board).runGame(
+                setup.maxDuration(),
+                tick -> frames.add(createFrameFromTickResult(board, tick)));
         return new InstantMatchResult(result.outcome())
                 .winner(result.winner() != null ? result.winner().name() : null)
                 .duration(result.duration())
                 .addEvents(result.eventLog().stream()
                         .map(ev -> new MatchEvent(ev.gameTime().toMillis(), ev.event()))
-                        .toArray(MatchEvent[]::new));
+                        .toArray(MatchEvent[]::new))
+                .addFrames(frames.toArray(MatchFrame[]::new));
+    }
+
+    private static MatchFrame createFrameFromTickResult(Board board, GameEngine.TickResult tick) {
+        return new MatchFrame(0)
+                .addRobots(board.robots().stream()
+                        .map(r -> new RobotVisual(r.getX(), r.getY(), r.name(), String.format("%06X", r.rgb())))
+                        .toArray(RobotVisual[]::new))
+                .addProjectiles(board.projectiles().stream()
+                        .map(p -> new ProjectileVisual(p.position().x(), p.position().y()))
+                        .toArray(ProjectileVisual[]::new))
+                .addRadarBeams(tick.radarBeams().stream()
+                        .map(rb -> new RadarBeamVisual(
+                                rb.sourceRobot().getX(),
+                                rb.sourceRobot().getY(),
+                                rb.hitPosition().x(),
+                                rb.hitPosition().y(),
+                                rb.hitKind()))
+                        .toArray(RadarBeamVisual[]::new))
+                .addExplosions(Streams.concat(
+                        tick.collisionPositions().stream().map(v -> new ExplosionVisual(v.x(), v.y(), ExplosionVisualKind.COLLISION)),
+                        tick.explodedProjectiles().stream().map(p -> new ExplosionVisual(p.position().x(), p.position().y(), ExplosionVisualKind.COLLISION)),
+                        tick.killedRobots().stream().map(r -> new ExplosionVisual(r.getX(), r.getY(), ExplosionVisualKind.KILLED_ROBOT)))
+                        .toArray(ExplosionVisual[]::new));
     }
 
     private Collection<Robot> buildInstantMatchRobots(Collection<InstantMatchRobot> beans) throws CompilationException {
