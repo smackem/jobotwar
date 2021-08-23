@@ -25,3 +25,5 @@ hs_err_pid*
 /target/
 /jobotwar-*/target/
 /jobotwar-*.dmg
+/jobotwar-webapp/**/bin/
+/jobotwar-webapp/**/obj/

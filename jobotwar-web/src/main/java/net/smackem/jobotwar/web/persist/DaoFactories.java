@@ -5,7 +5,6 @@ import net.smackem.jobotwar.web.persist.memory.InMemoryRobotDao;
 import net.smackem.jobotwar.web.persist.sql.SqlMatchDao;
 import net.smackem.jobotwar.web.persist.sql.SqlRobotDao;
 
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.util.function.Supplier;
 
