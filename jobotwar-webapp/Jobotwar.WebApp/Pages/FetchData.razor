@@ -1,6 +1,6 @@
 ﻿@page "/fetchdata"
-@using System.Text.Json.Serialization
-@inject HttpClient Http
+@using Jobotwar.WebApp.Services
+@inject HttpClientProvider Http
 
 <h1>Weather forecast</h1>
 
@@ -40,7 +40,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>("sample-data/weather.json");
+        forecasts = await Http.WwwRoot.GetFromJsonAsync<WeatherForecast[]>("sample-data/weather.json");
     }
 
     public class WeatherForecast
@@ -51,14 +51,6 @@ else
 
         public string? Summary { get; set; }
 
-        public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-    }
-
-    public record WeatherForecast2(
-        [property:JsonPropertyName("date")] string Date,
-        [property:JsonPropertyName("temperatureC")] int TemperatureC,
-        [property:JsonPropertyName("summary")] string? Summary)
-    {
         public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
     }
 }

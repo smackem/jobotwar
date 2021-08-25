@@ -5,6 +5,7 @@ import com.google.common.util.concurrent.Uninterruptibles;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import io.javalin.Javalin;
+import io.javalin.core.JavalinConfig;
 import net.smackem.jobotwar.web.persist.DaoFactories;
 import net.smackem.jobotwar.web.persist.DaoFactory;
 import org.slf4j.Logger;
@@ -35,7 +36,7 @@ public class WebApp implements AutoCloseable {
         this.matchController = new MatchController(selectedRowCountLimit, daoFactory.getMatchDao(), daoFactory.getRobotDao());
         this.robotController = new RobotController(selectedRowCountLimit, daoFactory.getRobotDao());
         this.robotStatsController = new RobotStatsController(selectedRowCountLimit, daoFactory.getRobotDao());
-        this.app = Javalin.create().start(port);
+        this.app = Javalin.create(JavalinConfig::enableCorsForAllOrigins).start(port);
         this.app.routes(() -> {
             path("play", () ->
                 post(this.playController::create));
