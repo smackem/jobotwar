@@ -14,10 +14,10 @@ namespace Jobotwar.WebApp
     {
         public static async Task Main(string[] args)
         {
-            System.Console.WriteLine("wasgeht?");
-
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.RootComponents.Add<App>("#app");
+
+            System.Console.WriteLine($"BaseAddress: {builder.HostEnvironment.BaseAddress}");
 
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 

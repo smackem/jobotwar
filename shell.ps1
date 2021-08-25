@@ -2,7 +2,7 @@ $random = [System.Random]::new()
 $circler = ConvertFrom-Json (get-content ./src/site/circler.jobot)
 $batteringram = ConvertFrom-Json (get-content ./src/site/batteringramV2.jobot)
 
-function match1v1([string] $robot1Name, [string] $robot1, [string] $robot2Name, [string] $robot2) {
+function match1v1([string] $robot1Name, $robot1, [string] $robot2Name, $robot2) {
     return @{
         maxDurationMillis = 1000*60*5
         boardWidth = 640

@@ -17,7 +17,7 @@
       <module name="jobotwar-gui" target="16" />
       <module name="jobotwar-io" target="16" />
       <module name="jobotwar-model" target="16" />
-      <module name="jobotwar-web" target="16" />
+      <module name="jobotwar-web" target="15" />
     </bytecodeTargetLevel>
   </component>
 </project>
