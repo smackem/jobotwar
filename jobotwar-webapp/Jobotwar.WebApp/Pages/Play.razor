@@ -1,13 +1,71 @@
 ﻿@page "/play"
+@using Blazor.Extensions
+@using Blazor.Extensions.Canvas.Canvas2D
+@using Features.Api
 @using Jobotwar.WebApp.Services
 @inject HttpClientProvider Http
 
 <h3>Play</h3>
 
+<BECanvas Width="@BoardWidth" Height="@BoardHeight" @ref="_canvas" ></BECanvas>
+
 @code {
+    private const int BoardWidth = 640;
+    private const int BoardHeight = 480;
+
+    private Canvas2DContext? _gc;
+    protected BECanvasComponent? _canvas;
+
     protected override async Task OnInitializedAsync()
     {
-        var response = await Http.Api.PostAsJsonAsync<object>("/play", new object());
-        var result = await response.Content.ReadFromJsonAsync<object>();
+        var fastShooterCode = @"
+            state main() {
+                def angle
+                while true {
+                    def r = @radar(angle)
+                    if r < 0 {
+                        @fire(angle, abs(r))
+                    } else {
+                        angle = angle + 7
+                    }
+                }
+            }";
+        var slowShooterCode = @"
+            def angle = 0
+            state main() {
+                def r = @radar(angle)
+                if r < 0 {
+                    @fire(angle, abs(r))
+                } else {
+                    angle = angle + 7
+                }
+            }";
+
+        var random = new Random();
+        var margin = 30;
+        var (width, height) = (BoardWidth, BoardHeight);
+        var (fastX, fastY) = (random.Next(margin, width - margin), random.Next(margin, height - margin));
+        var (slowX, slowY) = (random.Next(margin, width - margin), random.Next(margin, height - margin));
+
+        var api = new ApiClient(Http.Api);
+        var result = await api.Play(new InstantMatchSetup(5 * 60 * 1000, width, height,
+            new[]
+            {
+                new InstantMatchRobot("fast", fastShooterCode, "V2", fastX, fastY),
+                new InstantMatchRobot("slow", slowShooterCode, "V2", slowX, slowY)
+            }));
+
+        Console.WriteLine(result);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        _gc = await _canvas.CreateCanvas2DAsync();
+        await _gc.SetFillStyleAsync("green");
+
+        await _gc.FillRectAsync(0, 0, BoardWidth, BoardHeight);
+
+        await _gc.SetFontAsync("48px serif");
+        await _gc.StrokeTextAsync("Hello Blazor!!!", 10, 100);
     }
 }

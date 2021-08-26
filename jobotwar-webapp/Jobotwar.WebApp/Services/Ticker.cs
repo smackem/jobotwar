@@ -3,28 +3,39 @@ using System.Threading;
 
 namespace Jobotwar.WebApp.Services
 {
-    class Ticker : IDisposable
+    internal class Ticker : IDisposable
     {
-        private Timer? _timer;
+        private readonly Timer _timer;
+        private readonly Func<bool> _tick;
+        private volatile bool _disposed;
 
-        public TimeSpan Interval { get; init; } = TimeSpan.FromMilliseconds(100);
-
-        event EventHandler? Tick;
-
-        public void Start()
+        public Ticker(int intervalMillis, Func<bool> tick)
         {
-            Stop();
-            _timer = new Timer(_ => Tick?.Invoke(this, EventArgs.Empty), null, (int) Interval.TotalMilliseconds, (int) Interval.TotalMilliseconds);
+            if (intervalMillis < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(intervalMillis));
+            }
+
+            _tick = tick;
+            _timer = new Timer(TimerTick, null, intervalMillis, intervalMillis);
         }
 
-        public void Stop()
-        {
-            _timer?.Dispose();
-        }
+        public TimeSpan Interval { get; }
+
+        public bool IsDisposed => _disposed;
 
         public void Dispose()
         {
             _timer?.Dispose();
+            _disposed = true;
+        }
+
+        private void TimerTick(object? state)
+        {
+            if (_tick() == false)
+            {
+                Dispose();
+            }
         }
     }
 }

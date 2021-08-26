@@ -46,7 +46,7 @@ namespace Jobotwar.WebApp
                 new HttpClient { BaseAddress = baseUri },
                 new HttpClient { BaseAddress = apiUri }));
 
-            builder.Services.AddScoped(sp => new Ticker());
+            builder.Services.AddScoped(sp => new TickerFactory());
         }
     }
 }
