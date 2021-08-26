@@ -30,7 +30,7 @@ namespace Jobotwar.WebApp
                 {
                     while (cts.Token.IsCancellationRequested == false)
                     {
-                        await Task.Delay(1000);
+                        await Task.Delay(1000, cts.Token);
                         Console.WriteLine($"tick: {System.Environment.TickCount}");
                     }
                 }),

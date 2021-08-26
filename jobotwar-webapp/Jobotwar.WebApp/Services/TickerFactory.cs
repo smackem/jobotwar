@@ -14,7 +14,7 @@ namespace Jobotwar.WebApp.Services
 
             lock (_monitor)
             {
-                _tickers.RemoveAll(ticker => ticker.IsDisposed);
+                _tickers.RemoveAll(t => t.IsDisposed);
                 _tickers.Add(ticker);
             }
 

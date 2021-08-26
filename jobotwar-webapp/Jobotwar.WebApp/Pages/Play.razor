@@ -14,11 +14,11 @@
     private const int BoardHeight = 480;
 
     private Canvas2DContext? _gc;
-    protected BECanvasComponent? _canvas;
+    private BECanvasComponent? _canvas;
 
     protected override async Task OnInitializedAsync()
     {
-        var fastShooterCode = @"
+        const string fastShooterCode = @"
             state main() {
                 def angle
                 while true {
@@ -30,7 +30,7 @@
                     }
                 }
             }";
-        var slowShooterCode = @"
+        const string slowShooterCode = @"
             def angle = 0
             state main() {
                 def r = @radar(angle)
@@ -42,7 +42,7 @@
             }";
 
         var random = new Random();
-        var margin = 30;
+        const int margin = 30;
         var (width, height) = (BoardWidth, BoardHeight);
         var (fastX, fastY) = (random.Next(margin, width - margin), random.Next(margin, height - margin));
         var (slowX, slowY) = (random.Next(margin, width - margin), random.Next(margin, height - margin));
