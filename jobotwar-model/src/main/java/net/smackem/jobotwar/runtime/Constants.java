@@ -7,6 +7,7 @@ public class Constants {
         throw new IllegalAccessError();
     }
 
+    public static final String GAME_VERSION = "1.0.0";
     public static final int MAX_SHOT = 10_000;
     public static final double MAX_RADAR_RANGE = 10_000;
     public static final int MAX_BOARD_WIDTH  = 5_000;

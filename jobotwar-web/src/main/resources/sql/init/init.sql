@@ -22,7 +22,8 @@ create table match (
     max_duration_millis int8,
     winner_id uuid references robot(id),
     outcome varchar(20),
-    date_started timestamp
+    date_started timestamp,
+    game_version varchar(20)
 );
 
 create index match_winner on match(winner_id);

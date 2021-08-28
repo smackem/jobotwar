@@ -85,7 +85,7 @@ public class GameService {
     private static MatchFrame createFrameFromTickResult(Board board, GameEngine.TickResult tick) {
         return new MatchFrame(0)
                 .addRobots(board.robots().stream()
-                        .map(r -> new RobotVisual(r.getX(), r.getY(), r.name()))
+                        .map(r -> new RobotVisual(r.getX(), r.getY(), r.name(), r.getHealth()))
                         .toArray(RobotVisual[]::new))
                 .addProjectiles(board.projectiles().stream()
                         .map(p -> new ProjectileVisual(p.position().x(), p.position().y()))

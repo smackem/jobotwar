@@ -1,6 +1,7 @@
 package net.smackem.jobotwar.web;
 
 import io.javalin.http.Context;
+import net.smackem.jobotwar.runtime.Constants;
 import net.smackem.jobotwar.web.beans.IdGenerator;
 import net.smackem.jobotwar.web.beans.MatchBean;
 import net.smackem.jobotwar.web.beans.MatchRobot;
@@ -32,7 +33,7 @@ public class MatchController extends Controller {
     }
 
     public void create(@NotNull Context ctx) {
-        final MatchBean match = ctx.bodyAsClass(MatchBean.class);
+        final MatchBean match = ctx.bodyAsClass(MatchBean.class).gameVersion(Constants.GAME_VERSION);
         match.id(IdGenerator.next());
         log.info("create match (id = {}) [{}]", match.id(), ctx.fullUrl());
         final List<RobotBean> robotBeans = this.robotDao.get(match.robots().stream()

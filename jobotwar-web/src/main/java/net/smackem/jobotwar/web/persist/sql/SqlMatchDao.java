@@ -40,7 +40,7 @@ public class SqlMatchDao extends SqlDao implements MatchDao {
         final String offsetClause = query.offset().map(offset -> " offset " + offset).orElse("");
         final String limitClause = query.limit().map(limit -> " limit " + limit).orElse("");
         final String matchFullSql = """
-                select id, board_width, board_height, duration_millis, max_duration_millis, winner_id, outcome, date_started
+                select id, board_width, board_height, duration_millis, max_duration_millis, winner_id, outcome, date_started, game_version
                 from match
                 where
                 """ + whereClause + offsetClause + limitClause;
@@ -132,9 +132,9 @@ public class SqlMatchDao extends SqlDao implements MatchDao {
             // insert match
             final PreparedStatement stmt = conn.prepareStatement("""
                     insert into match
-                        (id, board_width, board_height, duration_millis, max_duration_millis, winner_id, outcome, date_started) 
+                        (id, board_width, board_height, duration_millis, max_duration_millis, winner_id, outcome, date_started, game_version) 
                     values
-                        (?, ?, ?, ?, ?, ?, ?, ?)
+                        (?, ?, ?, ?, ?, ?, ?, ?, ?)
                     """);
             stmt.setObject(1, matchId);
             stmt.setInt(2, bean.boardWidth());
@@ -144,6 +144,7 @@ public class SqlMatchDao extends SqlDao implements MatchDao {
             stmt.setObject(6, bean.winnerId() != null ? UUID.fromString(bean.winnerId()) : null);
             stmt.setString(7, bean.outcome().toString());
             stmt.setObject(8, bean.dateStarted());
+            stmt.setString(9, bean.gameVersion());
             stmt.executeUpdate();
 
             // insert match robots
@@ -215,6 +216,7 @@ public class SqlMatchDao extends SqlDao implements MatchDao {
                 .maxDuration(Duration.ofMillis(rs.getLong(5)))
                 .winnerId(rs.getString(6))
                 .outcome(Enum.valueOf(SimulationResult.Outcome.class, rs.getString(7)))
-                .dateStarted(rs.getTimestamp(8).toInstant().atOffset(ZoneOffset.UTC));
+                .dateStarted(rs.getTimestamp(8).toInstant().atOffset(ZoneOffset.UTC))
+                .gameVersion(rs.getString(9));
     }
 }

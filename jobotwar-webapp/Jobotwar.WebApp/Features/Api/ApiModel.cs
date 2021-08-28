@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
+// ReSharper disable ClassNeverInstantiated.Global
 
 namespace Jobotwar.WebApp.Features.Api
 {
     public record InstantMatchSetup(
         int MaxDurationMillis,
         double BoardWidth,
-        double boardHeight,
-        ICollection<InstantMatchRobot> robots) {}
+        double BoardHeight,
+        ICollection<InstantMatchRobot> Robots) {}
 
     public record InstantMatchRobot(
         string Name,

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import net.smackem.jobotwar.runtime.Constants;
 import net.smackem.jobotwar.runtime.simulation.SimulationResult;
 
 import java.time.Duration;
@@ -13,6 +14,7 @@ import java.util.*;
 public class MatchBean extends EntityBean {
     @JsonProperty private final Collection<MatchRobot> robots = new ArrayList<>();
     @JsonProperty private final Collection<MatchEvent> eventLog = new ArrayList<>();
+    @JsonProperty private String gameVersion;
     @JsonProperty private long durationMillis;
     @JsonProperty private int boardWidth;
     @JsonProperty private int boardHeight;
@@ -26,10 +28,21 @@ public class MatchBean extends EntityBean {
 
     @JsonCreator
     private MatchBean() {
+        this.gameVersion = null;
     }
 
     public MatchBean(String id) {
         super(id);
+        this.gameVersion = Constants.GAME_VERSION;
+    }
+
+    public String gameVersion() {
+        return this.gameVersion;
+    }
+
+    public MatchBean gameVersion(String gameVersion) {
+        this.gameVersion = gameVersion;
+        return this;
     }
 
     public int boardWidth() {
