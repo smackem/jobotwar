@@ -1,0 +1,30 @@
+@page "/info"
+@using Jobotwar.WebApp.Services
+@using Features.Api
+@inject HttpClientProvider _http
+
+<h3>GameInfo</h3>
+
+@if (_gameInfo == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <div>
+        Game Version: @_gameInfo.GameVersion
+    </div>
+    <div>
+        Frame Rate: @(1000 / _gameInfo.FrameDurationMillis) 
+    </div>
+}
+
+@code {
+    GameInfo? _gameInfo;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var api = new ApiClient(_http.Api);
+        _gameInfo = await api.GetGameInfo();
+    }
+}

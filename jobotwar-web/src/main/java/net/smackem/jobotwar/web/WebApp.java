@@ -28,6 +28,7 @@ public class WebApp implements AutoCloseable {
     private final RobotController robotController;
     private final MatchController matchController;
     private final RobotStatsController robotStatsController;
+    private final InfoController infoController;
     private final DaoFactory daoFactory;
 
     WebApp(int port, DaoFactory daoFactory) {
@@ -36,10 +37,13 @@ public class WebApp implements AutoCloseable {
         this.matchController = new MatchController(selectedRowCountLimit, daoFactory.getMatchDao(), daoFactory.getRobotDao());
         this.robotController = new RobotController(selectedRowCountLimit, daoFactory.getRobotDao());
         this.robotStatsController = new RobotStatsController(selectedRowCountLimit, daoFactory.getRobotDao());
+        this.infoController = new InfoController();
         this.app = Javalin.create(JavalinConfig::enableCorsForAllOrigins).start(port);
         this.app.routes(() -> {
             path("play", () ->
                 post(this.playController::create));
+            path("info", () ->
+                get(this.infoController::getAll));
             crud("robot/:robot-id", this.robotController);
             path("match", () -> {
                 get(this.matchController::getAll);

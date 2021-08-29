@@ -19,5 +19,10 @@ namespace Jobotwar.WebApp.Features.Api
             var result = await response.Content.ReadFromJsonAsync<InstantMatchResult>();
             return result!;
         }
+
+        public async Task<GameInfo?> GetGameInfo()
+        {
+            return await _http.GetFromJsonAsync<GameInfo>("/info");
+        }
     }
 }

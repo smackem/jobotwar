@@ -19,7 +19,7 @@ namespace Jobotwar.WebApp
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.RootComponents.Add<App>("#app");
 
-            System.Console.WriteLine($"base address: {builder.HostEnvironment.BaseAddress}");
+            Console.WriteLine($"base address: {builder.HostEnvironment.BaseAddress}");
 
             ConfigureServices(builder);
 
@@ -31,7 +31,7 @@ namespace Jobotwar.WebApp
                     while (cts.Token.IsCancellationRequested == false)
                     {
                         await Task.Delay(1000, cts.Token);
-                        Console.WriteLine($"tick: {System.Environment.TickCount}");
+                        //Console.WriteLine($"tick: {System.Environment.TickCount}");
                     }
                 }),
                 builder.Build().RunAsync()).ContinueWith(t => cts.Cancel());
