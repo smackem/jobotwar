@@ -2,8 +2,10 @@
 @using Blazor.Extensions
 @using Blazor.Extensions.Canvas.Canvas2D
 @using Features.Api
+@using Jobotwar.WebApp.Drawing
 @using Jobotwar.WebApp.Services
-@inject HttpClientProvider _http
+@using System.Threading
+@inject ApiClient _api
 @inject TickerFactory _tickerFactory
 
 <Info />
@@ -16,29 +18,11 @@
     private const int BoardWidth = 640;
     private const int BoardHeight = 480;
 
-    private Canvas2DContext? _gc;
     private BECanvasComponent? _canvas;
-    private InstantMatchResult? _match;
-    private IEnumerator<MatchFrame>? _frameEnumerator;
-    private readonly List<FadingRadarBeam> _fadingRadarBeams = new List<FadingRadarBeam>();
 
     protected override async Task OnInitializedAsync()
     {
         await PlayGame();
-    }
-
-    private bool Tick()
-    {
-        if (_gc == null || _frameEnumerator == null)
-        {
-            throw new InvalidOperationException();
-        }
-        if (_frameEnumerator.MoveNext() == false)
-        {
-            return false;
-        }
-        var _ = RenderFrame(_gc, _frameEnumerator.Current);
-        return true;
     }
 
     private async Task PlayGame()
@@ -59,6 +43,7 @@
         const string slowShooterCode = @"
             def angle = 0
             state main() {
+                @speed(@random(-50, 50), @random(-50, 50))
                 def r = @radar(angle)
                 if r < 0 {
                     @fire(angle, abs(r))
@@ -73,88 +58,14 @@
         var (fastX, fastY) = (random.Next(margin, width - margin), random.Next(margin, height - margin));
         var (slowX, slowY) = (random.Next(margin, width - margin), random.Next(margin, height - margin));
 
-        var api = new ApiClient(_http.Api);
-        var result = await api.Play(new InstantMatchSetup(5 * 60 * 1000, width, height,
+        var result = await _api.Play(new InstantMatchSetup(5 * 60 * 1000, width, height,
             new[]
             {
                 new InstantMatchRobot("fast", fastShooterCode, "V2", fastX, fastY),
                 new InstantMatchRobot("slow", slowShooterCode, "V2", slowX, slowY)
             }));
-
+        
         Console.WriteLine(result);
-        _match = result;
-        _frameEnumerator = result.Frames.GetEnumerator();
-        _tickerFactory.CreateTicker(40, Tick);
-        _gc = await _canvas.CreateCanvas2DAsync();
-    }
-
-    private record FadingRadarBeam(RadarBeamVisual RadarBeam)
-    {
-        public int Age { get; set; }
-    }
-
-    private async Task RenderFrame(Canvas2DContext gc, MatchFrame frame)
-    {
-        const double robotRadius = 18;
-        const double projectileRadius = 3;
-        await gc.SetFillStyleAsync("#000000");
-        await gc.FillRectAsync(0, 0, BoardWidth, BoardHeight);
-
-        await gc.BeginBatchAsync();
-        foreach (var fadingRadarBeam in _fadingRadarBeams)
-        {
-            await gc.SetStrokeStyleAsync($"rgba(255, 255, 255, {(10.0 - fadingRadarBeam.Age) / 10.0})");
-            await DrawRadarBeam(gc, fadingRadarBeam.RadarBeam);
-            fadingRadarBeam.Age++;
-        }
-        await gc.EndBatchAsync();
-        _fadingRadarBeams.RemoveAll(x => x.Age > 10);
-
-        await gc.BeginBatchAsync();
-        await gc.SetStrokeStyleAsync("#ffa000");
-        foreach (var radarBeam in frame.RadarBeams)
-        {
-            await DrawRadarBeam(gc, radarBeam);
-            _fadingRadarBeams.Add(new FadingRadarBeam(radarBeam));
-        }
-        await gc.EndBatchAsync();
-
-        await gc.BeginBatchAsync();
-        await gc.SetFillStyleAsync("#ffffff");
-        foreach (var (x, y) in frame.Projectiles)
-        {
-            await DrawCircle(gc, x, y, projectileRadius, false);
-        }
-        await gc.EndBatchAsync();
-
-        await gc.BeginBatchAsync();
-        await gc.SetFillStyleAsync("#c000a0");
-        await gc.SetStrokeStyleAsync("#ffffff");
-        await gc.SetLineWidthAsync(2);
-        foreach (var (_, x, y) in frame.Robots)
-        {
-            await DrawCircle(gc, x, y, robotRadius, true);
-        }
-        await gc.EndBatchAsync();
-    }
-
-    private static async Task DrawRadarBeam(Canvas2DContext gc, RadarBeamVisual radarBeam)
-    {
-        await gc.SetLineWidthAsync(radarBeam.Kind == "WALL" ? 1 : 2);
-        await gc.BeginPathAsync();
-        await gc.MoveToAsync(radarBeam.X1, radarBeam.Y1);
-        await gc.LineToAsync(radarBeam.X2, radarBeam.Y2);
-        await gc.StrokeAsync();
-    }
-
-    private static async Task DrawCircle(Canvas2DContext gc, double x, double y, double radius, bool stroke)
-    {
-        await gc.BeginPathAsync();
-        await gc.ArcAsync(x, y, radius, 0, 2 * Math.PI, false);
-        await gc.FillAsync();
-        if (stroke)
-        {
-            await gc.StrokeAsync();
-        }
+        await MatchReplay.Play(BoardWidth, BoardHeight, result, await _canvas.CreateCanvas2DAsync(), _tickerFactory);
     }
 }

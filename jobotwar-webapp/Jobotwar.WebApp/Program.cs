@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Threading;
+using Jobotwar.WebApp.Features.Api;
 using Jobotwar.WebApp.Services;
 
 namespace Jobotwar.WebApp
@@ -23,29 +24,21 @@ namespace Jobotwar.WebApp
 
             ConfigureServices(builder);
 
-            var cts = new CancellationTokenSource();
-
-            await Task.WhenAll(
-                Task.Run(async () =>
-                {
-                    while (cts.Token.IsCancellationRequested == false)
-                    {
-                        await Task.Delay(1000, cts.Token);
-                        //Console.WriteLine($"tick: {System.Environment.TickCount}");
-                    }
-                }),
-                builder.Build().RunAsync()).ContinueWith(t => cts.Cancel());
+            await builder.Build().RunAsync();
         }
 
         private static void ConfigureServices(WebAssemblyHostBuilder builder)
         {
             var baseUri = new Uri(builder.HostEnvironment.BaseAddress);
             var apiUri = new UriBuilder(baseUri) { Port = 8666 }.Uri;
-
-            builder.Services.AddScoped(sp => new HttpClientProvider(
-                new HttpClient { BaseAddress = baseUri },
-                new HttpClient { BaseAddress = apiUri }));
-
+            builder.Services.AddHttpClient("wwwroot", client =>
+            {
+                client.BaseAddress = baseUri;
+            });
+            builder.Services.AddHttpClient<ApiClient>(client =>
+            {
+                client.BaseAddress = apiUri;
+            });
             builder.Services.AddScoped(sp => new TickerFactory());
         }
     }

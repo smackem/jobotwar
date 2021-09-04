@@ -1,6 +1,6 @@
 ﻿@page "/fetchdata"
 @using Jobotwar.WebApp.Services
-@inject HttpClientProvider Http
+@inject IHttpClientFactory _http
 
 <h1>Weather forecast</h1>
 
@@ -40,7 +40,8 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        _forecasts = await Http.WwwRoot.GetFromJsonAsync<WeatherForecast[]>("sample-data/weather.json");
+        var wwwroot = _http.CreateClient("wwwroot");
+        _forecasts = await wwwroot.GetFromJsonAsync<WeatherForecast[]>("sample-data/weather.json");
     }
 
     // ReSharper disable once ClassNeverInstantiated.Global

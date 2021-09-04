@@ -1,7 +1,7 @@
 @page "/info"
 @using Jobotwar.WebApp.Services
 @using Features.Api
-@inject HttpClientProvider _http
+@inject ApiClient _api
 
 <h3>GameInfo</h3>
 
@@ -24,7 +24,6 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        var api = new ApiClient(_http.Api);
-        _gameInfo = await api.GetGameInfo();
+        _gameInfo = await _api.GetGameInfo();
     }
 }

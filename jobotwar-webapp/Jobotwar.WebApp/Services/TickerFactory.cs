@@ -1,36 +1,37 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using Jobotwar.WebApp.Util;
 
 namespace Jobotwar.WebApp.Services
 {
     internal class TickerFactory : IDisposable
     {
-        private readonly object _monitor = new object();
-        private readonly List<Ticker> _tickers = new List<Ticker>();
+        private readonly object _monitor = new();
+        private readonly List<CancellationTokenSource> _cancellationTokenSources = new();
 
-        public Ticker CreateTicker(int intervalMillis, Func<bool> tick)
+        public async Task Repeat(Func<Task<bool>> tick, TimeSpan interval)
         {
-            var ticker = new Ticker(intervalMillis, tick);
-
-            lock (_monitor)
+            var cts = new CancellationTokenSource();
+            _cancellationTokenSources.Add(cts);
+            while (cts.IsCancellationRequested == false)
             {
-                _tickers.RemoveAll(t => t.IsDisposed);
-                _tickers.Add(ticker);
+                await Task.Delay(interval, cts.Token).Continue();
+                await tick().Continue();
             }
-
-            return ticker;
         }
 
         public void Dispose()
         {
             lock (_monitor)
             {
-                foreach (var ticker in _tickers)
+                foreach (var cts in _cancellationTokenSources)
                 {
-                    ticker.Dispose();
+                    cts.Cancel();
                 }
 
-                _tickers.Clear();
+                _cancellationTokenSources.Clear();
             }
         }
     }
