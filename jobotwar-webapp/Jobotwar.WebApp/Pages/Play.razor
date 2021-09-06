@@ -1,16 +1,24 @@
 ﻿@page "/play"
 @using Blazor.Extensions
-@using Blazor.Extensions.Canvas.Canvas2D
 @using Features.Api
 @using Jobotwar.WebApp.Drawing
 @using Jobotwar.WebApp.Services
-@using System.Threading
-@inject ApiClient _api
+@using Microsoft.Extensions.Logging
+@inject IApiClient _api
 @inject TickerFactory _tickerFactory
+@inject NavigationManager _navigationManager
+@inject ILogger<Play> _log
 
 <Info />
 
 <h3>Play</h3>
+
+<p>
+    <div class="btn-group">
+        <button class="btn btn-info">Hepp</button>
+        <button class="btn btn-warning">Hopp</button>
+    </div>
+</p>
 
 <BECanvas Width="@BoardWidth" Height="@BoardHeight" @ref="_canvas" ></BECanvas>
 
@@ -22,10 +30,21 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await PlayGame();
+        _navigationManager.LocationChanged += NavigationManager_LocationChanged;
+
+        await PlayGameAsync();
     }
 
-    private async Task PlayGame()
+    private void NavigationManager_LocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        if (e.Location.EndsWith("/play") == false)
+        {
+            _log.LogInformation("navigate to: '{QueryUri}', intercepted: {NavigationIntercepted}", e.Location, e.IsNavigationIntercepted);
+            _navigationManager.LocationChanged -= NavigationManager_LocationChanged;
+        }
+    }
+
+    private async Task PlayGameAsync()
     {
         const string fastShooterCode = @"
             state main() {
@@ -58,7 +77,7 @@
         var (fastX, fastY) = (random.Next(margin, width - margin), random.Next(margin, height - margin));
         var (slowX, slowY) = (random.Next(margin, width - margin), random.Next(margin, height - margin));
 
-        var result = await _api.Play(new InstantMatchSetup(5 * 60 * 1000, width, height,
+        var result = await _api.PlayAsync(new InstantMatchSetup(5 * 60 * 1000, width, height,
             new[]
             {
                 new InstantMatchRobot("fast", fastShooterCode, "V2", fastX, fastY),

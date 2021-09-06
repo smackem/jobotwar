@@ -4,7 +4,7 @@ using System.Net.Http.Json;
 
 namespace Jobotwar.WebApp.Features.Api
 {
-    internal class ApiClient
+    internal class ApiClient : IApiClient
     {
         private readonly HttpClient _http;
 
@@ -13,14 +13,14 @@ namespace Jobotwar.WebApp.Features.Api
             _http = http;
         }
 
-        public async Task<InstantMatchResult> Play(InstantMatchSetup setup)
+        public async Task<InstantMatchResult> PlayAsync(InstantMatchSetup setup)
         {
             var response = await _http.PostAsJsonAsync("/play", setup);
             var result = await response.Content.ReadFromJsonAsync<InstantMatchResult>();
             return result!;
         }
 
-        public async Task<GameInfo?> GetGameInfo()
+        public async Task<GameInfo?> GetGameInfoAsync()
         {
             return await _http.GetFromJsonAsync<GameInfo>("/info");
         }

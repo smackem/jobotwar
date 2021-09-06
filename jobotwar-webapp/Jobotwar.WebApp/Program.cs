@@ -1,13 +1,7 @@
 using System;
-using System.Net.Http;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Text;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using System.Threading;
 using Jobotwar.WebApp.Features.Api;
 using Jobotwar.WebApp.Services;
 
@@ -31,11 +25,12 @@ namespace Jobotwar.WebApp
         {
             var baseUri = new Uri(builder.HostEnvironment.BaseAddress);
             var apiUri = new UriBuilder(baseUri) { Port = 8666 }.Uri;
+            builder.Services.AddLogging();
             builder.Services.AddHttpClient("wwwroot", client =>
             {
                 client.BaseAddress = baseUri;
             });
-            builder.Services.AddHttpClient<ApiClient>(client =>
+            builder.Services.AddHttpClient<IApiClient, ApiClient>(client =>
             {
                 client.BaseAddress = apiUri;
             });
