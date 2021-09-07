@@ -40,7 +40,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        var wwwroot = _http.CreateClient("wwwroot");
+        var wwwroot = _http.CreateClient("wwwroot")!;
         _forecasts = await wwwroot.GetFromJsonAsync<WeatherForecast[]>("sample-data/weather.json");
     }
 

@@ -84,7 +84,7 @@ namespace Jobotwar.WebApp.Drawing
             {
                 await DrawCircle(gc, x, y, robotRadius, true).Continue();
             }
-            await gc.EndBatchAsync().Return();
+            await gc.EndBatchAsync().Continue();
         }
 
         private static async Task DrawRadarBeam(Canvas2DContext gc, FadingRadarBeam fadingRadarBeam)
