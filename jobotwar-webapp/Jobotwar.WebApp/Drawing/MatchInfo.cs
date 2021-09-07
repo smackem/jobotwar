@@ -1,11 +1,13 @@
 using System.Collections.Immutable;
+using System.Drawing;
 using Jobotwar.WebApp.Features.Api;
 
 namespace Jobotwar.WebApp.Drawing
 {
-    public record MatchSetup(
-        InstantMatchSetup Model,
+    public record MatchInfo(
+        InstantMatchSetup Setup,
+        InstantMatchResult Result,
         IImmutableDictionary<string, RobotDrawingInfo> RobotInfos);
 
-    public record RobotDrawingInfo(string Color);
+    public record RobotDrawingInfo(Color Rgba);
 }

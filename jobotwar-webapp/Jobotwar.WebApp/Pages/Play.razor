@@ -4,6 +4,9 @@
 @using Jobotwar.WebApp.Drawing
 @using Jobotwar.WebApp.Services
 @using Microsoft.Extensions.Logging
+@using System.Collections.Immutable
+@using System.Collections.Generic
+@using System.Drawing
 @inject IApiClient _api
 @inject TickerFactory _tickerFactory
 @inject NavigationManager _navigationManager
@@ -76,15 +79,23 @@
         var (width, height) = (BoardWidth, BoardHeight);
         var (fastX, fastY) = (random.Next(margin, width - margin), random.Next(margin, height - margin));
         var (slowX, slowY) = (random.Next(margin, width - margin), random.Next(margin, height - margin));
+        var setup = new InstantMatchSetup(5 * 60 * 1000, width, height,
+                new[]
+                {
+                    new InstantMatchRobot("fast", fastShooterCode, "V2", fastX, fastY),
+                    new InstantMatchRobot("slow", slowShooterCode, "V2", slowX, slowY)
+                });
 
-        var result = await _api.PlayAsync(new InstantMatchSetup(5 * 60 * 1000, width, height,
-            new[]
-            {
-                new InstantMatchRobot("fast", fastShooterCode, "V2", fastX, fastY),
-                new InstantMatchRobot("slow", slowShooterCode, "V2", slowX, slowY)
-            }));
-        
-        Console.WriteLine(result);
-        await MatchReplay.Play(BoardWidth, BoardHeight, result, await _canvas.CreateCanvas2DAsync(), _tickerFactory);
+        var result = await _api.PlayAsync(setup);
+
+        _log.LogInformation("Result: {MatchResult}", result);
+        var match = new MatchInfo(setup, result,
+                new Dictionary<string, RobotDrawingInfo>
+                {
+                    { "fast", new RobotDrawingInfo(Color.FromArgb(0xff, 0, 0)) },
+                    { "slow", new RobotDrawingInfo(Color.FromArgb(0, 0xff, 0)) },
+                }.ToImmutableDictionary());
+
+        await MatchReplay.Play(match, await _canvas.CreateCanvas2DAsync(), _tickerFactory);
     }
 }

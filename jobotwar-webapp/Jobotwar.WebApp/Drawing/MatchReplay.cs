@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Threading.Tasks;
 using Blazor.Extensions.Canvas.Canvas2D;
 using Jobotwar.WebApp.Features.Api;
@@ -10,25 +11,21 @@ namespace Jobotwar.WebApp.Drawing
 {
     internal class MatchReplay
     {
-        private readonly int _boardWidth;
-        private readonly int _boardHeight;
         private readonly Canvas2DContext _gc;
-        private readonly InstantMatchResult _match;
+        private readonly MatchInfo _match;
         private readonly IEnumerator<MatchFrame> _frameEnumerator;
         private readonly List<FadingRadarBeam> _fadingRadarBeams = new();
 
-        private MatchReplay(int boardWidth, int boardHeight, InstantMatchResult match, Canvas2DContext gc)
+        private MatchReplay(MatchInfo match, Canvas2DContext gc)
         {
-            _boardWidth = boardWidth;
-            _boardHeight = boardHeight;
             _gc = gc;
             _match = match;
-            _frameEnumerator = match.Frames.GetEnumerator();
+            _frameEnumerator = match.Result.Frames.GetEnumerator();
         }
 
-        public static Task Play(int boardWidth, int boardHeight, InstantMatchResult match, Canvas2DContext gc, TickerFactory tickerFactory)
+        public static Task Play(MatchInfo match, Canvas2DContext gc, TickerFactory tickerFactory)
         {
-            var replay = new MatchReplay(boardWidth, boardHeight, match, gc);
+            var replay = new MatchReplay(match, gc);
             return tickerFactory.Repeat(replay.Tick, TimeSpan.FromMilliseconds(40));
         }
 
@@ -38,7 +35,7 @@ namespace Jobotwar.WebApp.Drawing
             {
                 return false;
             }
-            await RenderFrame(_gc, _frameEnumerator.Current).Return();
+            await RenderFrame(_gc, _frameEnumerator.Current);
             return true;
         }
 
@@ -46,65 +43,70 @@ namespace Jobotwar.WebApp.Drawing
         {
             const double robotRadius = 18;
             const double projectileRadius = 3;
-            await gc.SetFillStyleAsync("#000000").Continue();
-            await gc.FillRectAsync(0, 0, _boardWidth, _boardHeight).Continue();
+            await gc.SetFillStyleAsync("#000000");
+            await gc.FillRectAsync(0, 0, _match.Setup.BoardWidth, _match.Setup.BoardHeight);
 
-            await gc.BeginBatchAsync().Continue();
-            await gc.SetLineWidthAsync(1).Continue();
+            await gc.BeginBatchAsync();
+            await gc.SetLineWidthAsync(1);
             foreach (var fadingRadarBeam in _fadingRadarBeams)
             {
-                await DrawRadarBeam(gc, fadingRadarBeam).Continue();
+                await DrawRadarBeam(gc, fadingRadarBeam);
                 fadingRadarBeam.Opacity -= 0.1;
             }
             _fadingRadarBeams.RemoveAll(x => x.Opacity <= 0);
-            await gc.EndBatchAsync().Continue();
+            await gc.EndBatchAsync();
 
-            await gc.BeginBatchAsync().Continue();
+            await gc.BeginBatchAsync();
             foreach (var radarBeam in frame.RadarBeams)
             {
                 var fadingRadarBeam = new FadingRadarBeam(radarBeam);
-                await DrawRadarBeam(gc, fadingRadarBeam).Continue();
+                await DrawRadarBeam(gc, fadingRadarBeam);
                 _fadingRadarBeams.Add(fadingRadarBeam);
             }
-            await gc.EndBatchAsync().Continue();
+            await gc.EndBatchAsync();
 
-            await gc.BeginBatchAsync().Continue();
-            await gc.SetFillStyleAsync("#ffffff").Continue();
+            await gc.BeginBatchAsync();
+            await gc.SetFillStyleAsync("#ffffff");
             foreach (var (x, y) in frame.Projectiles)
             {
-                await DrawCircle(gc, x, y, projectileRadius, false).Continue();
+                await DrawCircle(gc, x, y, projectileRadius, false);
             }
-            await gc.EndBatchAsync().Continue();
+            await gc.EndBatchAsync();
 
-            await gc.BeginBatchAsync().Continue();
-            await gc.SetFillStyleAsync("#c000a0").Continue();
-            await gc.SetStrokeStyleAsync("#ffffff").Continue();
-            await gc.SetLineWidthAsync(2).Continue();
-            foreach (var (_, x, y) in frame.Robots)
+            await gc.BeginBatchAsync();
+            await gc.SetStrokeStyleAsync("#ffffff");
+            await gc.SetLineWidthAsync(2);
+            foreach (var (name, x, y) in frame.Robots)
             {
-                await DrawCircle(gc, x, y, robotRadius, true).Continue();
+                await gc.SetFillStyleAsync(ToFillStyle(_match.RobotInfos[name].Rgba));
+                await DrawCircle(gc, x, y, robotRadius, true);
             }
-            await gc.EndBatchAsync().Continue();
+            await gc.EndBatchAsync();
+        }
+
+        private static string ToFillStyle(Color rgba)
+        {
+            return $"rgba({rgba.R}, {rgba.G}, {rgba.B}, {rgba.A / 255.0})";
         }
 
         private static async Task DrawRadarBeam(Canvas2DContext gc, FadingRadarBeam fadingRadarBeam)
         {
             var radarBeam = fadingRadarBeam.RadarBeam;
-            await gc.SetStrokeStyleAsync($"rgba(255, {0xaa}, 00, {fadingRadarBeam.Opacity})").Continue();
-            await gc.BeginPathAsync().Continue();
-            await gc.MoveToAsync(radarBeam.X1, radarBeam.Y1).Continue();
-            await gc.LineToAsync(radarBeam.X2, radarBeam.Y2).Continue();
-            await gc.StrokeAsync().Continue();
+            await gc.SetStrokeStyleAsync($"rgba(255, {0xaa}, 00, {fadingRadarBeam.Opacity})");
+            await gc.BeginPathAsync();
+            await gc.MoveToAsync(radarBeam.X1, radarBeam.Y1);
+            await gc.LineToAsync(radarBeam.X2, radarBeam.Y2);
+            await gc.StrokeAsync();
         }
 
         private static async Task DrawCircle(Canvas2DContext gc, double x, double y, double radius, bool stroke)
         {
-            await gc.BeginPathAsync().Continue();
-            await gc.ArcAsync(x, y, radius, 0, 2 * Math.PI, false).Continue();
-            await gc.FillAsync().Continue();
+            await gc.BeginPathAsync();
+            await gc.ArcAsync(x, y, radius, 0, 2 * Math.PI, false);
+            await gc.FillAsync();
             if (stroke)
             {
-                await gc.StrokeAsync().Continue();
+                await gc.StrokeAsync();
             }
         }
 
