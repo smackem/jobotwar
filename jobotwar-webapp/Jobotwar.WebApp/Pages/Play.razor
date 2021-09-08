@@ -87,6 +87,7 @@
                 });
 
         var result = await _api.PlayAsync(setup);
+        var gameInfo = await _api.GetGameInfoAsync();
 
         _log.LogInformation("Result: {MatchResult}", result);
         var match = new MatchInfo(setup, result,
@@ -96,6 +97,6 @@
                     { "slow", new RobotDrawingInfo(Color.FromArgb(0, 0xff, 0)) },
                 }.ToImmutableDictionary());
 
-        await MatchReplay.Play(match, await _canvas.CreateCanvas2DAsync(), _tickerFactory);
+        await MatchReplay.Play(match, gameInfo, await _canvas.CreateCanvas2DAsync(), _tickerFactory);
     }
 }

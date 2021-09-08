@@ -6,6 +6,6 @@ namespace Jobotwar.WebApp.Features.Api
     {
         Task<InstantMatchResult> PlayAsync(InstantMatchSetup setup);
 
-        Task<GameInfo?> GetGameInfoAsync();
+        Task<GameInfo> GetGameInfoAsync();
     }
 }
