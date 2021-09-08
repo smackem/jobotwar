@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using System.Net.Http;
 using System.Net.Http.Json;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
 namespace Jobotwar.WebApp.Features.Api
@@ -9,12 +10,13 @@ namespace Jobotwar.WebApp.Features.Api
     {
         private readonly HttpClient _http;
         private readonly ILogger<ApiClient> _log;
-        private GameInfo? _cachedGameInfo;
+        private readonly IMemoryCache _cache;
 
-        public ApiClient(HttpClient http, ILogger<ApiClient> log)
+        public ApiClient(HttpClient http, ILogger<ApiClient> log, IMemoryCache cache)
         {
             _http = http;
             _log = log;
+            _cache = cache;
         }
 
         public async Task<InstantMatchResult> PlayAsync(InstantMatchSetup setup)
@@ -24,14 +26,14 @@ namespace Jobotwar.WebApp.Features.Api
             return result!;
         }
 
-        public async Task<GameInfo> GetGameInfoAsync()
+        public Task<GameInfo> GetGameInfoAsync()
         {
-            if (_cachedGameInfo == null)
+            return _cache.GetOrCreateAsync("GameInfo", async entry =>
             {
-                _cachedGameInfo = await _http.GetFromJsonAsync<GameInfo>("/info");
-                _log.LogInformation("got game info: {GameInfo}", _cachedGameInfo);
-            }
-            return _cachedGameInfo!;
+                var gameInfo = await _http.GetFromJsonAsync<GameInfo>("/info");
+                _log.LogInformation("got game info: {GameInfo}", gameInfo);
+                return gameInfo!;
+            });
         }
     }
 }

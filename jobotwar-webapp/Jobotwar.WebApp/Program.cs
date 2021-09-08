@@ -26,6 +26,7 @@ namespace Jobotwar.WebApp
             var baseUri = new Uri(builder.HostEnvironment.BaseAddress);
             var apiUri = new UriBuilder(baseUri) { Port = 8666 }.Uri;
             builder.Services.AddLogging();
+            builder.Services.AddMemoryCache();
             builder.Services.AddHttpClient("wwwroot", client =>
             {
                 client.BaseAddress = baseUri;
