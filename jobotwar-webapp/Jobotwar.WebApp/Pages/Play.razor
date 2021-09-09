@@ -5,13 +5,13 @@
 @using Jobotwar.WebApp.Services
 @using Microsoft.Extensions.Logging
 @using System.Collections.Immutable
-@using System.Collections.Generic
 @using System.Drawing
 @using System.Threading
 @inject IApiClient _api
 @inject TickerFactory _tickerFactory
 @inject NavigationManager _navigationManager
 @inject ILogger<Play> _log
+@inject ILoggerFactory _loggerFactory;
 @implements IDisposable
 
 <Info />
@@ -97,7 +97,12 @@
                 }.ToImmutableDictionary());
 
         _replayCancellationTokenSource = new CancellationTokenSource();
-        await MatchReplay.Play(match, gameInfo, await _canvas.CreateCanvas2DAsync(), _tickerFactory, _replayCancellationTokenSource.Token);
+        await MatchReplay.PlayAsync(match,
+            gameInfo,
+            await _canvas.CreateCanvas2DAsync(),
+            _tickerFactory,
+            _loggerFactory.CreateLogger<MatchReplay>(),
+            _replayCancellationTokenSource.Token);
     }
 
     public void Dispose()

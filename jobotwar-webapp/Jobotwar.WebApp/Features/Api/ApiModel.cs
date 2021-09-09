@@ -37,7 +37,8 @@ namespace Jobotwar.WebApp.Features.Api
     public record RobotVisual(
         string Name,
         double X,
-        double Y);
+        double Y,
+        int Health);
 
     public record ProjectileVisual(
         double X,

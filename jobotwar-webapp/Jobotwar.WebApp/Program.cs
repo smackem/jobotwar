@@ -24,7 +24,11 @@ namespace Jobotwar.WebApp
         private static void ConfigureServices(WebAssemblyHostBuilder builder)
         {
             var baseUri = new Uri(builder.HostEnvironment.BaseAddress);
-            var apiUri = new UriBuilder(baseUri) { Port = 8666 }.Uri;
+            var apiUri = new UriBuilder(baseUri)
+            {
+                Port = 8666,
+                Scheme = "http",
+            }.Uri;
             builder.Services.AddLogging();
             builder.Services.AddMemoryCache();
             builder.Services.AddHttpClient("wwwroot", client =>
