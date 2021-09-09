@@ -7,10 +7,12 @@
 @using System.Collections.Immutable
 @using System.Collections.Generic
 @using System.Drawing
+@using System.Threading
 @inject IApiClient _api
 @inject TickerFactory _tickerFactory
 @inject NavigationManager _navigationManager
 @inject ILogger<Play> _log
+@implements IDisposable
 
 <Info />
 
@@ -30,6 +32,7 @@
     private const int BoardHeight = 480;
 
     private BECanvasComponent? _canvas;
+    private CancellationTokenSource? _replayCancellationTokenSource;
 
     protected override async Task OnInitializedAsync()
     {
@@ -40,11 +43,7 @@
 
     private void NavigationManager_LocationChanged(object? sender, LocationChangedEventArgs e)
     {
-        if (e.Location.EndsWith("/play") == false)
-        {
-            _log.LogInformation("navigate to: '{QueryUri}', intercepted: {NavigationIntercepted}", e.Location, e.IsNavigationIntercepted);
-            _navigationManager.LocationChanged -= NavigationManager_LocationChanged;
-        }
+        _log.LogInformation("navigate to: '{QueryUri}', intercepted: {NavigationIntercepted}", e.Location, e.IsNavigationIntercepted);
     }
 
     private async Task PlayGameAsync()
@@ -97,6 +96,14 @@
                     { "slow", new RobotDrawingInfo(Color.FromArgb(0, 0xff, 0)) },
                 }.ToImmutableDictionary());
 
-        await MatchReplay.Play(match, gameInfo, await _canvas.CreateCanvas2DAsync(), _tickerFactory);
+        _replayCancellationTokenSource = new CancellationTokenSource();
+        await MatchReplay.Play(match, gameInfo, await _canvas.CreateCanvas2DAsync(), _tickerFactory, _replayCancellationTokenSource.Token);
+    }
+
+    public void Dispose()
+    {
+        _navigationManager.LocationChanged -= NavigationManager_LocationChanged;
+        _log.LogInformation("page disposed: {Page}", this);
+        _replayCancellationTokenSource?.Cancel();
     }
 }

@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Threading;
+using Microsoft.JSInterop;
 using Blazor.Extensions.Canvas.Canvas2D;
 using Jobotwar.WebApp.Features.Api;
 using Jobotwar.WebApp.Services;
@@ -24,10 +26,10 @@ namespace Jobotwar.WebApp.Drawing
             _frameEnumerator = match.Result.Frames.GetEnumerator();
         }
 
-        public static Task Play(MatchInfo match, GameInfo gameInfo, Canvas2DContext gc, TickerFactory tickerFactory)
+        public static Task Play(MatchInfo match, GameInfo gameInfo, Canvas2DContext gc, TickerFactory tickerFactory, CancellationToken cancellationToken)
         {
             var replay = new MatchReplay(match, gameInfo, gc);
-            return tickerFactory.Repeat(replay.Tick, TimeSpan.FromMilliseconds(40));
+            return tickerFactory.Repeat(replay.Tick, TimeSpan.FromMilliseconds(40), cancellationToken);
         }
 
         private async Task<bool> Tick()
@@ -36,7 +38,17 @@ namespace Jobotwar.WebApp.Drawing
             {
                 return false;
             }
-            await RenderFrame(_gc, _frameEnumerator.Current);
+
+            try
+            {
+                await RenderFrame(_gc, _frameEnumerator.Current);
+            }
+            catch (JSException)
+            {
+                // rendering failed because canvas has become invalid (e.g. when user has navigated to another page)
+                return false;
+            }
+
             return true;
         }
 

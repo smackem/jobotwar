@@ -11,11 +11,11 @@ namespace Jobotwar.WebApp.Services
         private readonly object _monitor = new();
         private readonly List<CancellationTokenSource> _cancellationTokenSources = new();
 
-        public async Task Repeat(Func<Task<bool>> tick, TimeSpan interval)
+        public async Task Repeat(Func<Task<bool>> tick, TimeSpan interval, CancellationToken cancellationToken)
         {
             var cts = new CancellationTokenSource();
             _cancellationTokenSources.Add(cts);
-            while (cts.IsCancellationRequested == false)
+            while (cts.IsCancellationRequested == false && cancellationToken.IsCancellationRequested == false)
             {
                 await Task.Delay(interval, cts.Token).Continue();
                 await tick().Continue();
