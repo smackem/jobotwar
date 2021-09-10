@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Threading.Tasks;
 using System.Threading;
 using Microsoft.JSInterop;
@@ -112,16 +113,22 @@ namespace Jobotwar.WebApp.Drawing
             await _gc.BeginBatchAsync();
             foreach (var robot in robots)
             {
-                await _gc.SetStrokeStyleAsync("#ffffff");
-                await _gc.SetLineWidthAsync(1);
-                await _gc.SetFillStyleAsync(_match.RobotInfos[robot.Name].Rgba.ToCssRgba());
-                await DrawCircleAsync(robot.X, robot.Y, _gameInfo.RobotRadius, DrawMode.FillAndStroke);
+                await _gc.SetFillStyleAsync("#303030");
+                await DrawCircleAsync(robot.X, robot.Y, _gameInfo.RobotRadius, DrawMode.Fill);
 
-                var angle = robot.Health / 100.0 * 2 * Math.PI;
                 await _gc.SetLineWidthAsync(2);
+                var healthRatio = robot.Health / 100.0;
+                var angle = healthRatio * 2.0 * Math.PI;
+                var hue = healthRatio * 120.0;
+                await _gc.SetStrokeStyleAsync($"hsl({hue}, 75%, 50%)");
                 await _gc.BeginPathAsync();
-                await _gc.ArcAsync(robot.X, robot.Y, _gameInfo.RobotRadius + 2, 0, angle, false);
+                await _gc.ArcAsync(robot.X, robot.Y, _gameInfo.RobotRadius, 0, angle, false);
                 await _gc.StrokeAsync();
+
+                await _gc.SetLineWidthAsync(1);
+                await _gc.SetStrokeStyleAsync("#000000");
+                await _gc.SetFillStyleAsync(_match.RobotInfos[robot.Name].Rgba.ToCssRgba());
+                await DrawCircleAsync(robot.X, robot.Y, _gameInfo.RobotRadius - 2, DrawMode.FillAndStroke);
             }
             await _gc.EndBatchAsync();
         }
