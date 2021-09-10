@@ -64,34 +64,31 @@ namespace Jobotwar.WebApp.Drawing
 
         private async Task RenderFrame(MatchFrame frame)
         {
+            await _gc.BeginBatchAsync();
             await _gc.SetFillStyleAsync("#000000");
             await _gc.FillRectAsync(0, 0, _match.Setup.BoardWidth, _match.Setup.BoardHeight);
-
             await DrawProjectilesAsync(frame.Projectiles);
             await DrawRadarBeamsAsync(frame.RadarBeams);
             await DrawRobotsAsync(frame.Robots);
             await DrawExplosionsAsync(frame.Explosions);
+            await _gc.EndBatchAsync();
         }
 
         private async Task DrawRadarBeamsAsync(IEnumerable<RadarBeamVisual> radarBeams)
         {
-            await _gc.BeginBatchAsync();
             await _gc.SetLineWidthAsync(1);
             foreach (var animatedRadarBeam in _animatedRadarBeams)
             {
                 await DrawRadarBeamAsync(animatedRadarBeam);
                 animatedRadarBeam.Tick();
             }
-            await _gc.EndBatchAsync();
 
-            await _gc.BeginBatchAsync();
             foreach (var radarBeam in radarBeams)
             {
                 var animatedRadarBeam = new AnimatedRadarBeam(radarBeam);
                 await DrawRadarBeamAsync(animatedRadarBeam);
                 _animatedRadarBeams.Add(animatedRadarBeam);
             }
-            await _gc.EndBatchAsync();
 
             _animatedRadarBeams.RemoveAll(x => x.IsAnimationFinished);
         }
@@ -99,18 +96,15 @@ namespace Jobotwar.WebApp.Drawing
         private async Task DrawProjectilesAsync(IEnumerable<ProjectileVisual> projectiles)
         {
             const double projectileRadius = 3;
-            await _gc.BeginBatchAsync();
             await _gc.SetFillStyleAsync("#ffffff");
             foreach (var (x, y) in projectiles)
             {
                 await DrawCircleAsync(x, y, projectileRadius, DrawMode.Fill);
             }
-            await _gc.EndBatchAsync();
         }
 
         private async Task DrawRobotsAsync(IEnumerable<RobotVisual> robots)
         {
-            await _gc.BeginBatchAsync();
             foreach (var robot in robots)
             {
                 await _gc.SetFillStyleAsync("#303030");
@@ -130,12 +124,10 @@ namespace Jobotwar.WebApp.Drawing
                 await _gc.SetFillStyleAsync(_match.RobotInfos[robot.Name].Rgba.ToCssRgba());
                 await DrawCircleAsync(robot.X, robot.Y, _gameInfo.RobotRadius - 2, DrawMode.FillAndStroke);
             }
-            await _gc.EndBatchAsync();
         }
 
         private async Task DrawExplosionsAsync(IEnumerable<ExplosionVisual> explosions)
         {
-            await _gc.BeginBatchAsync();
             await _gc.SetLineWidthAsync(8);
             foreach (var animatedExplosion in _animatedExplosions)
             {
@@ -143,7 +135,6 @@ namespace Jobotwar.WebApp.Drawing
                 await DrawCircleAsync(animatedExplosion.Explosion.X, animatedExplosion.Explosion.Y, animatedExplosion.Radius, DrawMode.Stroke);
                 animatedExplosion.Tick();
             }
-            await _gc.EndBatchAsync();
 
             _animatedExplosions.RemoveAll(x => x.IsAnimationFinished);
 
