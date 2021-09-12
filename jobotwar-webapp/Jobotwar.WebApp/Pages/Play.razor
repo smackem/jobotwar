@@ -14,25 +14,65 @@
 @inject ILoggerFactory _loggerFactory;
 @implements IDisposable
 
-<Info />
-
 <h3>Play</h3>
 
-<p>
-    <div class="btn-group">
-        <button class="btn btn-info">Hepp</button>
-        <button class="btn btn-warning">Hopp</button>
+<ul class="nav nav-pills">
+    @foreach (var robot in _robotModels)
+    {
+        var cssClass = robot == _selectedRobotModel ? "nav-link active" : "nav-link";
+        <li class="nav-item">
+            <a class="@cssClass" aria-current="page" style="cursor: hand" @onclick="() => SelectRobot(robot)">@robot.Name</a>
+        </li>
+    }
+    <button class="btn btn-info" @onclick="AddRobot">Add</button>
+</ul>
+
+<form class="row g-3" action="#">
+    <div class="col-12">
+        <label for="robotName" class="col-form-label">Name</label>
+        <input type="text" id="robotName" class="form-control" value="@_selectedRobotModel?.Name"/>
     </div>
-</p>
+    <div class="col-12">
+        <label for="robotColor" class="col-form-label">Name</label>
+        <input type="color" id="robotColor" class="form-control" value="@_selectedRobotModel?.Color"/>
+    </div>
+    <div class="col-12">
+        <label for="robotCode" class="col-form-label">Code</label>
+        <textarea id="robotCode" class="form-control" rows="12">@_selectedRobotModel?.Code</textarea>
+    </div>
+</form>
 
 <BECanvas Width="@BoardWidth" Height="@BoardHeight" @ref="_canvas" ></BECanvas>
 
 @code {
     private const int BoardWidth = 640;
     private const int BoardHeight = 480;
+    private readonly IList<RobotModel> _robotModels = new List<RobotModel>();
+    private RobotModel? _selectedRobotModel;
 
     private BECanvasComponent? _canvas;
     private CancellationTokenSource? _replayCancellationTokenSource;
+
+    private void SelectRobot(RobotModel robotModel)
+    {
+        _log.LogInformation("selected robot: {SelectedRobot}", robotModel);
+        if (robotModel != null && _robotModels.Contains(robotModel) == false)
+        {
+            throw new ArgumentException($"{nameof(robotModel)} is not contained in the robot list");
+        }
+        _selectedRobotModel = robotModel;
+    }
+
+    private void AddRobot()
+    {
+        _log.LogInformation("add robot");
+        var robot = new RobotModel
+        {
+            Name = "Robot " + (_robotModels.Count + 1),
+        };
+        _robotModels.Add(robot);
+        _selectedRobotModel = robot;
+    }
 
     protected override async Task OnInitializedAsync()
     {

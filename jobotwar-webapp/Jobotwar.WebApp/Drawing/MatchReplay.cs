@@ -39,7 +39,7 @@ namespace Jobotwar.WebApp.Drawing
             CancellationToken cancellationToken)
         {
             var replay = new MatchReplay(match, gameInfo, gc, log);
-            return tickerFactory.Repeat(replay.Tick, TimeSpan.FromMilliseconds(40), cancellationToken);
+            return tickerFactory.Repeat(replay.Tick, TimeSpan.FromMilliseconds(gameInfo.FrameDurationMillis), cancellationToken);
         }
 
         private async Task<bool> Tick()

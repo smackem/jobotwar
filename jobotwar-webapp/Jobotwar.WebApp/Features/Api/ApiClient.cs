@@ -28,12 +28,13 @@ namespace Jobotwar.WebApp.Features.Api
 
         public Task<GameInfo> GetGameInfoAsync()
         {
-            return _cache.GetOrCreateAsync("GameInfo", async entry =>
-            {
-                var gameInfo = await _http.GetFromJsonAsync<GameInfo>("/info");
-                _log.LogInformation("got game info: {GameInfo}", gameInfo);
-                return gameInfo!;
-            });
+            return _cache.GetOrCreateAsync("GameInfo",
+                async _ =>
+                {
+                    var gameInfo = await _http.GetFromJsonAsync<GameInfo>("/info");
+                    _log.LogInformation("got game info: {GameInfo}", gameInfo);
+                    return gameInfo!;
+                });
         }
     }
 }
