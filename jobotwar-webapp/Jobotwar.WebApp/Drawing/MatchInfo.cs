@@ -1,5 +1,4 @@
 using System.Collections.Immutable;
-using System.Drawing;
 using Jobotwar.WebApp.Features.Api;
 
 namespace Jobotwar.WebApp.Drawing
@@ -9,5 +8,5 @@ namespace Jobotwar.WebApp.Drawing
         InstantMatchResult Result,
         IImmutableDictionary<string, RobotDrawingInfo> RobotInfos);
 
-    public record RobotDrawingInfo(Color Rgba);
+    public record RobotDrawingInfo(string CssColor);
 }

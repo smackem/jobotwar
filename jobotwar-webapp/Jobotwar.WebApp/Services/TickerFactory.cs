@@ -18,7 +18,10 @@ namespace Jobotwar.WebApp.Services
             while (cts.IsCancellationRequested == false && cancellationToken.IsCancellationRequested == false)
             {
                 await Task.Delay(interval, cts.Token).Continue();
-                await tick().Continue();
+                if (await tick() == false)
+                {
+                    break;
+                }
             }
         }
 

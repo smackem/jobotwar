@@ -1,11 +1,10 @@
-namespace Jobotwar.WebApp.Pages
+namespace Jobotwar.WebApp.Shared
 {
     public class RobotModel
     {
         public string Name { get; set; } = string.Empty;
 
-        public string Code { get; set; } = @"
-state main() {
+        public string Code { get; set; } = @"state main() {
 }
 ";
 

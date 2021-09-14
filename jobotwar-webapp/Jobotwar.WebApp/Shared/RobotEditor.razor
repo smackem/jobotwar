@@ -1,0 +1,19 @@
+<form class="row g-3" action="#">
+    <div class="col-9">
+        <label for="robotName" class="col-form-label">Name</label>
+        <input type="text" id="robotName" class="form-control" @bind="Robot!.Name"/>
+    </div>
+    <div class="col-3">
+        <label for="robotColor" class="col-form-label">Color</label>
+        <input type="color" id="robotColor" class="form-control" @bind="Robot!.Color"/>
+    </div>
+    <div class="col-12">
+        <label for="robotCode" class="col-form-label">Code</label>
+        <textarea id="robotCode" class="form-control" rows="12" @bind="Robot!.Code"></textarea>
+    </div>
+</form>
+
+@code {
+    [Parameter]
+    public RobotModel? Robot { get; set; }
+}

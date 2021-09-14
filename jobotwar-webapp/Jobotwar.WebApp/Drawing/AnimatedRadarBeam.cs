@@ -23,7 +23,7 @@ namespace Jobotwar.WebApp.Drawing
 
         public void Tick()
         {
-            Opacity = Math.Max(0, Opacity - 0.1);
+            Opacity = Math.Max(0, Opacity - 0.05);
         }
     }
 }

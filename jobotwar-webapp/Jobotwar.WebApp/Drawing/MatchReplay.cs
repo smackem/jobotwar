@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Threading;
 using Microsoft.JSInterop;
@@ -68,25 +69,25 @@ namespace Jobotwar.WebApp.Drawing
             await _gc.SetFillStyleAsync("#000000");
             await _gc.FillRectAsync(0, 0, _match.Setup.BoardWidth, _match.Setup.BoardHeight);
             await DrawProjectilesAsync(frame.Projectiles);
-            await DrawRadarBeamsAsync(frame.RadarBeams);
+            await DrawRadarBeamsAsync(frame.RadarBeams, frame);
             await DrawRobotsAsync(frame.Robots);
             await DrawExplosionsAsync(frame.Explosions);
             await _gc.EndBatchAsync();
         }
 
-        private async Task DrawRadarBeamsAsync(IEnumerable<RadarBeamVisual> radarBeams)
+        private async Task DrawRadarBeamsAsync(IEnumerable<RadarBeamVisual> radarBeams, MatchFrame currentFrame)
         {
             await _gc.SetLineWidthAsync(1);
             foreach (var animatedRadarBeam in _animatedRadarBeams)
             {
-                await DrawRadarBeamAsync(animatedRadarBeam);
+                await DrawRadarBeamAsync(animatedRadarBeam, currentFrame);
                 animatedRadarBeam.Tick();
             }
 
             foreach (var radarBeam in radarBeams)
             {
                 var animatedRadarBeam = new AnimatedRadarBeam(radarBeam);
-                await DrawRadarBeamAsync(animatedRadarBeam);
+                await DrawRadarBeamAsync(animatedRadarBeam, currentFrame);
                 _animatedRadarBeams.Add(animatedRadarBeam);
             }
 
@@ -121,7 +122,7 @@ namespace Jobotwar.WebApp.Drawing
 
                 await _gc.SetLineWidthAsync(1);
                 await _gc.SetStrokeStyleAsync("#000000");
-                await _gc.SetFillStyleAsync(_match.RobotInfos[robot.Name].Rgba.ToCssRgba());
+                await _gc.SetFillStyleAsync(_match.RobotInfos[robot.Name].CssColor);
                 await DrawCircleAsync(robot.X, robot.Y, _gameInfo.RobotRadius - 2, DrawMode.FillAndStroke);
             }
         }
@@ -144,10 +145,18 @@ namespace Jobotwar.WebApp.Drawing
             }
         }
 
-        private async Task DrawRadarBeamAsync(AnimatedRadarBeam fadingRadarBeam)
+        private async Task DrawRadarBeamAsync(AnimatedRadarBeam beam, MatchFrame currentFrame)
         {
-            var radarBeam = fadingRadarBeam.RadarBeam;
-            await _gc.SetStrokeStyleAsync($"rgba(255, {0xaa}, 00, {fadingRadarBeam.Opacity})");
+            const double tolerance = 1.0;
+            var color =
+                (from r in currentFrame.Robots
+                where Math.Abs(r.X - beam.RadarBeam.X1) < tolerance && Math.Abs(r.Y - beam.RadarBeam.Y1) < tolerance
+                select _match.RobotInfos[r.Name].CssColor)
+                .FirstOrDefault() ?? "#ffffff";
+
+            var radarBeam = beam.RadarBeam;
+            var (red, green, blue) = Rgba.ParseCssColor(color);
+            await _gc.SetStrokeStyleAsync($"#{red:X2}{green:X2}{blue:X2}{(int) (beam.Opacity * 255):X2}");
             await _gc.BeginPathAsync();
             await _gc.MoveToAsync(radarBeam.X1, radarBeam.Y1);
             await _gc.LineToAsync(radarBeam.X2, radarBeam.Y2);

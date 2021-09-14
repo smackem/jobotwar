@@ -1,5 +1,4 @@
 ﻿@page "/play"
-@using Blazor.Extensions
 @using Features.Api
 @using Jobotwar.WebApp.Drawing
 @using Jobotwar.WebApp.Services
@@ -7,6 +6,7 @@
 @using System.Collections.Immutable
 @using System.Drawing
 @using System.Threading
+@using Color=System.Drawing.Color
 @inject IApiClient _api
 @inject TickerFactory _tickerFactory
 @inject NavigationManager _navigationManager
@@ -16,77 +16,41 @@
 
 <h3>Play</h3>
 
-<ul class="nav nav-pills">
-    @foreach (var robot in _robotModels)
-    {
-        var cssClass = robot == _selectedRobotModel ? "nav-link active" : "nav-link";
-        <li class="nav-item">
-            <a class="@cssClass" aria-current="page" style="cursor: hand" @onclick="() => SelectRobot(robot)">@robot.Name</a>
-        </li>
-    }
-    <button class="btn btn-info" @onclick="AddRobot">Add</button>
-</ul>
+@if (_playing == false)
+{
+    <ul class="nav nav-tabs">
+        @foreach (var robot in _robotModels)
+        {
+            var cssClass = robot == _selectedRobotModel ? "nav-link active" : "nav-link";
+            <li class="nav-item">
+                <a class="@cssClass" aria-current="page" style="cursor: hand" @onclick="() => SelectRobot(robot)">@robot.Name</a>
+            </li>
+        }
+        <button class="btn btn-info" @onclick="AddRobot">Add</button>
+    </ul>
 
-<form class="row g-3" action="#">
-    <div class="col-12">
-        <label for="robotName" class="col-form-label">Name</label>
-        <input type="text" id="robotName" class="form-control" value="@_selectedRobotModel?.Name"/>
-    </div>
-    <div class="col-12">
-        <label for="robotColor" class="col-form-label">Name</label>
-        <input type="color" id="robotColor" class="form-control" value="@_selectedRobotModel?.Color"/>
-    </div>
-    <div class="col-12">
-        <label for="robotCode" class="col-form-label">Code</label>
-        <textarea id="robotCode" class="form-control" rows="12">@_selectedRobotModel?.Code</textarea>
-    </div>
-</form>
+    <RobotEditor @ref="_robotEditor" Robot="@_selectedRobotModel" />
 
-<BECanvas Width="@BoardWidth" Height="@BoardHeight" @ref="_canvas" ></BECanvas>
+    <div>
+        <button class="btn btn-info" @onclick="PlayGameAsync">Play</button>
+    </div>
+}
+else
+{
+    <BECanvas Width="@BoardWidth" Height="@BoardHeight" @ref="_canvas"></BECanvas>
+}
 
 @code {
     private const int BoardWidth = 640;
     private const int BoardHeight = 480;
     private readonly IList<RobotModel> _robotModels = new List<RobotModel>();
+    private RobotEditor? _robotEditor;
     private RobotModel? _selectedRobotModel;
-
     private BECanvasComponent? _canvas;
     private CancellationTokenSource? _replayCancellationTokenSource;
+    private bool _playing;
 
-    private void SelectRobot(RobotModel robotModel)
-    {
-        _log.LogInformation("selected robot: {SelectedRobot}", robotModel);
-        if (robotModel != null && _robotModels.Contains(robotModel) == false)
-        {
-            throw new ArgumentException($"{nameof(robotModel)} is not contained in the robot list");
-        }
-        _selectedRobotModel = robotModel;
-    }
-
-    private void AddRobot()
-    {
-        _log.LogInformation("add robot");
-        var robot = new RobotModel
-        {
-            Name = "Robot " + (_robotModels.Count + 1),
-        };
-        _robotModels.Add(robot);
-        _selectedRobotModel = robot;
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
-        _navigationManager.LocationChanged += NavigationManager_LocationChanged;
-
-        await PlayGameAsync();
-    }
-
-    private void NavigationManager_LocationChanged(object? sender, LocationChangedEventArgs e)
-    {
-        _log.LogInformation("navigate to: '{QueryUri}', intercepted: {NavigationIntercepted}", e.Location, e.IsNavigationIntercepted);
-    }
-
-    private async Task PlayGameAsync()
+    public Play()
     {
         const string fastShooterCode = @"
             state main() {
@@ -113,36 +77,85 @@
                 }
             }";
 
+        _robotModels.Add(new RobotModel
+        {
+            Name = "Fast Shooter ",
+            Code = fastShooterCode,
+        });
+        _robotModels.Add(new RobotModel
+        {
+            Name = "Slow Shooter ",
+            Code = slowShooterCode,
+        });
+        _selectedRobotModel = _robotModels.First();
+    }
+
+    private void SelectRobot(RobotModel robotModel)
+    {
+        _log.LogInformation("selected robot: {SelectedRobot}", robotModel);
+        if (robotModel != null && _robotModels.Contains(robotModel) == false)
+        {
+            throw new ArgumentException($"{nameof(robotModel)} is not contained in the robot list");
+        }
+        _selectedRobotModel = robotModel;
+    }
+
+    private void AddRobot()
+    {
+        _log.LogInformation("add robot");
+        var robot = new RobotModel
+        {
+            Name = "Robot " + (_robotModels.Count + 1),
+        };
+        _robotModels.Add(robot);
+        SelectRobot(robot);
+    }
+
+    protected override Task OnInitializedAsync()
+    {
+        _navigationManager.LocationChanged += NavigationManager_LocationChanged;
+        return base.OnInitializedAsync();
+    }
+
+    private void NavigationManager_LocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        _log.LogInformation("navigate to: '{QueryUri}', intercepted: {NavigationIntercepted}", e.Location, e.IsNavigationIntercepted);
+    }
+
+    private async Task PlayGameAsync()
+    {
         var random = new Random();
         const int margin = 30;
         var (width, height) = (BoardWidth, BoardHeight);
-        var (fastX, fastY) = (random.Next(margin, width - margin), random.Next(margin, height - margin));
-        var (slowX, slowY) = (random.Next(margin, width - margin), random.Next(margin, height - margin));
+
         var setup = new InstantMatchSetup(5 * 60 * 1000, width, height,
-                new[]
-                {
-                    new InstantMatchRobot("fast", fastShooterCode, "V2", fastX, fastY),
-                    new InstantMatchRobot("slow", slowShooterCode, "V2", slowX, slowY)
-                });
+            (from r in _robotModels
+                let x = random.Next(margin, width - margin)
+                let y = random.Next(margin, height - margin)
+                select new InstantMatchRobot(r.Name, r.Code, "V2", x, y))
+                .ToArray());
 
         var result = await _api.PlayAsync(setup);
         var gameInfo = await _api.GetGameInfoAsync();
 
         _log.LogInformation("Result: {MatchResult}", result);
         var match = new MatchInfo(setup, result,
-                new Dictionary<string, RobotDrawingInfo>
-                {
-                    { "fast", new RobotDrawingInfo(Color.FromArgb(0xff, 0, 0)) },
-                    { "slow", new RobotDrawingInfo(Color.FromArgb(0, 0, 0xff)) },
-                }.ToImmutableDictionary());
+            _robotModels.ToImmutableDictionary(
+                r => r.Name,
+                r => new RobotDrawingInfo(r.Color)));
 
         _replayCancellationTokenSource = new CancellationTokenSource();
+        _playing = true;
+        StateHasChanged();
         await MatchReplay.PlayAsync(match,
             gameInfo,
             await _canvas.CreateCanvas2DAsync(),
             _tickerFactory,
             _loggerFactory.CreateLogger<MatchReplay>(),
             _replayCancellationTokenSource.Token);
+        _log.LogInformation("game replay finished");
+        _playing = false;
+        StateHasChanged();
     }
 
     public void Dispose()
