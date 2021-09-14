@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Threading;
@@ -8,7 +7,6 @@ using Microsoft.JSInterop;
 using Blazor.Extensions.Canvas.Canvas2D;
 using Jobotwar.WebApp.Features.Api;
 using Jobotwar.WebApp.Services;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Jobotwar.WebApp.Drawing

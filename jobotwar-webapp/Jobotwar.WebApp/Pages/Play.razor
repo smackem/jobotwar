@@ -129,10 +129,9 @@ else
         var (width, height) = (BoardWidth, BoardHeight);
 
         var setup = new InstantMatchSetup(5 * 60 * 1000, width, height,
-            (from r in _robotModels
-                let x = random.Next(margin, width - margin)
-                let y = random.Next(margin, height - margin)
-                select new InstantMatchRobot(r.Name, r.Code, "V2", x, y))
+            _robotModels.Select(r => new InstantMatchRobot(r.Name, r.Code, "V2",
+                    random.Next(margin, width - margin),
+                    random.Next(margin, height - margin)))
                 .ToArray());
 
         var result = await _api.PlayAsync(setup);
@@ -147,12 +146,14 @@ else
         _replayCancellationTokenSource = new CancellationTokenSource();
         _playing = true;
         StateHasChanged();
+
         await MatchReplay.PlayAsync(match,
             gameInfo,
             await _canvas.CreateCanvas2DAsync(),
             _tickerFactory,
             _loggerFactory.CreateLogger<MatchReplay>(),
             _replayCancellationTokenSource.Token);
+
         _log.LogInformation("game replay finished");
         _playing = false;
         StateHasChanged();

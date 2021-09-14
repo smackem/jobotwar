@@ -15,9 +15,11 @@ namespace Jobotwar.WebApp.Services
         {
             var cts = new CancellationTokenSource();
             _cancellationTokenSources.Add(cts);
+
             while (cts.IsCancellationRequested == false && cancellationToken.IsCancellationRequested == false)
             {
                 await Task.Delay(interval, cts.Token).Continue();
+
                 if (await tick() == false)
                 {
                     break;
