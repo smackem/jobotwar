@@ -26,13 +26,18 @@
                 <a class="@cssClass" aria-current="page" style="cursor: hand" @onclick="() => SelectRobot(robot)">@robot.Name</a>
             </li>
         }
-        <button class="btn btn-info" @onclick="AddRobot">Add</button>
+        <li class="nav-item">
+            <a class="nav-link bg-primary text-white" aria-current="page" style="cursor: hand" @onclick="AddRobot">Add</a>
+        </li>
+        @* <button class="btn btn-info mx-3" @onclick="AddRobot">Add</button> *@
     </ul>
 
-    <RobotEditor @ref="_robotEditor" Robot="@_selectedRobotModel" />
+    <div class="border border-top-0">
+        <RobotEditor @ref="_robotEditor" Robot="@_selectedRobotModel" />
+    </div>
 
-    <div>
-        <button class="btn btn-info" @onclick="PlayGameAsync">Play</button>
+    <div class="my-3">
+        <button class="btn btn-primary" @onclick="PlayGameAsync">Play</button>
     </div>
 }
 else
