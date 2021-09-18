@@ -92,8 +92,7 @@ public class GameService {
                         .toArray(ProjectileVisual[]::new))
                 .addRadarBeams(tick.radarBeams().stream()
                         .map(rb -> new RadarBeamVisual(
-                                rb.sourceRobot().getX(),
-                                rb.sourceRobot().getY(),
+                                rb.sourceRobot().name(),
                                 rb.hitPosition().x(),
                                 rb.hitPosition().y(),
                                 rb.hitKind()))

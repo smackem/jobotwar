@@ -7,46 +7,39 @@ import net.smackem.jobotwar.runtime.RadarBeamHitKind;
 import java.util.Objects;
 
 public class RadarBeamVisual {
-    @JsonProperty private final double x1;
-    @JsonProperty private final double y1;
-    @JsonProperty private final double x2;
-    @JsonProperty private final double y2;
-    @JsonProperty private final RadarBeamHitKind kind;
+    @JsonProperty private final String emittingRobotName;
+    @JsonProperty private final double hitX;
+    @JsonProperty private final double hitY;
+    @JsonProperty private final RadarBeamHitKind hitKind;
 
     @JsonCreator
     private RadarBeamVisual() {
-        this.x1 = 0;
-        this.y1 = 0;
-        this.x2 = 0;
-        this.y2 = 0;
-        this.kind = null;
+        this.emittingRobotName = null;
+        this.hitX = 0;
+        this.hitY = 0;
+        this.hitKind = null;
     }
 
-    public RadarBeamVisual(double x1, double y1, double x2, double y2, RadarBeamHitKind kind) {
-        this.x1 = x1;
-        this.y1 = y1;
-        this.x2 = x2;
-        this.y2 = y2;
-        this.kind = Objects.requireNonNull(kind);
+    public RadarBeamVisual(String emittingRobotName, double hitX, double hitY, RadarBeamHitKind hitKind) {
+        this.emittingRobotName = emittingRobotName;
+        this.hitX = hitX;
+        this.hitY = hitY;
+        this.hitKind = Objects.requireNonNull(hitKind);
     }
 
-    public double x1() {
-        return this.x1;
+    public String emittingRobotName() {
+        return this.emittingRobotName;
     }
 
-    public double y1() {
-        return this.y1;
+    public double hitX() {
+        return this.hitX;
     }
 
-    public double x2() {
-        return this.x2;
+    public double hitY() {
+        return this.hitY;
     }
 
-    public double y2() {
-        return this.y2;
-    }
-
-    public RadarBeamHitKind kind() {
-        return this.kind;
+    public RadarBeamHitKind hitKind() {
+        return this.hitKind;
     }
 }

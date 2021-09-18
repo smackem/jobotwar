@@ -21,7 +21,13 @@ namespace Jobotwar.WebApp.Features.Api
 
         public async Task<InstantMatchResult> PlayAsync(InstantMatchSetup setup)
         {
-            var response = await _http.PostAsJsonAsync("/play", setup);
+            const string uri = "/play";
+            var response = await _http.PostAsJsonAsync(uri, setup);
+            if (response.IsSuccessStatusCode == false)
+            {
+                throw new BadRequestException(uri, response.StatusCode, await response.Content.ReadAsStringAsync());
+            }
+
             var result = await response.Content.ReadFromJsonAsync<InstantMatchResult>();
             return result!;
         }
