@@ -145,19 +145,23 @@ namespace Jobotwar.WebApp.Drawing
 
         private async Task DrawRadarBeamAsync(AnimatedRadarBeam beam, MatchFrame currentFrame)
         {
-            const double tolerance = 1.0;
-            var color =
+            var emittingRobot =
                 (from r in currentFrame.Robots
-                where Math.Abs(r.X - beam.RadarBeam.X1) < tolerance && Math.Abs(r.Y - beam.RadarBeam.Y1) < tolerance
-                select _match.RobotInfos[r.Name].CssColor)
-                .FirstOrDefault() ?? "#ffffff";
+                where r.Name == beam.RadarBeam.EmittingRobotName
+                select r)
+                .FirstOrDefault();
+            if (emittingRobot == null)
+            {
+                return;
+            }
 
+            var color = _match.RobotInfos[emittingRobot.Name].CssColor;
             var radarBeam = beam.RadarBeam;
             var (red, green, blue) = Rgba.ParseCssColor(color);
             await _gc.SetStrokeStyleAsync($"#{red:X2}{green:X2}{blue:X2}{(int) (beam.Opacity * 255):X2}");
             await _gc.BeginPathAsync();
-            await _gc.MoveToAsync(radarBeam.X1, radarBeam.Y1);
-            await _gc.LineToAsync(radarBeam.X2, radarBeam.Y2);
+            await _gc.MoveToAsync(emittingRobot.X, emittingRobot.Y);
+            await _gc.LineToAsync(radarBeam.HitX, radarBeam.HitY);
             await _gc.StrokeAsync();
         }
 

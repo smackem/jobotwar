@@ -42,5 +42,18 @@ namespace Jobotwar.WebApp.Features.Api
                     return gameInfo!;
                 });
         }
+
+        public async Task<CompileResult> Compile(CompileRequest request)
+        {
+            const string uri = "/compile";
+            var response = await _http.PostAsJsonAsync(uri, request);
+            if (response.IsSuccessStatusCode == false)
+            {
+                throw new BadRequestException(uri, response.StatusCode, await response.Content.ReadAsStringAsync());
+            }
+
+            var result = await response.Content.ReadFromJsonAsync<CompileResult>();
+            return result!;
+        }
     }
 }

@@ -8,11 +8,11 @@ namespace Jobotwar.WebApp.Drawing
         public AnimatedRadarBeam(RadarBeamVisual radarBeam)
         {
             RadarBeam = radarBeam;
-            Opacity = radarBeam.Kind switch
+            Opacity = radarBeam.HitKind switch
             {
                 "WALL" => 0.4,
                 "ROBOT" => 0.9,
-                _ => throw new ArgumentException("Invalid radar beam hit kind!"),
+                _ => throw new ArgumentException($"Invalid radar beam hit kind '{radarBeam.HitKind}'!"),
             };
         }
 

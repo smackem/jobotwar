@@ -50,11 +50,10 @@ namespace Jobotwar.WebApp.Features.Api
         string Kind);
 
     public record RadarBeamVisual(
-        double X1,
-        double Y1,
-        double X2,
-        double Y2,
-        string Kind);
+        string EmittingRobotName,
+        double HitX,
+        double HitY,
+        string HitKind);
 
     public record GameInfo(
         double ExplosionRadius,
@@ -66,4 +65,12 @@ namespace Jobotwar.WebApp.Features.Api
         int MaxRobotHealth,
         double MaxRobotSpeed,
         double RobotRadius);
+
+    public record CompileRequest(
+        string RobotName,
+        string Language,
+        string Code);
+
+    public record CompileResult(
+        string Program);
 }

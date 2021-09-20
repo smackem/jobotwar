@@ -23,11 +23,11 @@
         {
             var cssClass = robot == _selectedRobotModel ? "nav-link active" : "nav-link";
             <li class="nav-item">
-                <a class="@cssClass" aria-current="page" style="cursor: hand" @onclick="() => SelectRobot(robot)">@robot.Name</a>
+                <a class="@cssClass" aria-current="page" @onclick="() => SelectRobot(robot)">@robot.Name</a>
             </li>
         }
         <li class="nav-item">
-            <a class="nav-link bg-primary text-white" aria-current="page" style="cursor: hand" @onclick="AddRobot">Add</a>
+            <a class="nav-link bg-secondary text-white" aria-current="page" style="font-weight: normal; cursor: hand;" @onclick="AddRobot">+</a>
         </li>
         @* <button class="btn btn-info mx-3" @onclick="AddRobot">Add</button> *@
     </ul>
@@ -37,7 +37,8 @@
     </div>
 
     <div class="my-3">
-        <button class="btn btn-primary" @onclick="PlayGameAsync">Play</button>
+        <button class="btn btn-primary" @onclick="PlayGameAsync">&nbsp;Play!&nbsp;</button>
+        <button class="btn btn-light" @onclick="() => _robotModels.Remove(_selectedRobotModel!)">Remove '@_selectedRobotModel?.Name'</button>
     </div>
 }
 else

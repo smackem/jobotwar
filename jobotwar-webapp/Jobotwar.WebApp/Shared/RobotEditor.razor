@@ -1,3 +1,12 @@
+@using Jobotwar.WebApp.Features.Api
+@using Jobotwar.WebApp.Services
+@using Microsoft.Extensions.Logging
+@using System.Threading
+@inject IApiClient _api
+@inject ILogger<RobotEditor> _log;
+@inject TickerFactory _tickerFactory;
+@implements IDisposable
+
 <form action="#" class="row p-3">
     <div class="col-9">
         <label for="robotName" class="col-form-label">Name</label>
@@ -9,11 +18,66 @@
     </div>
     <div class="col-12">
         <label for="robotCode" class="col-form-label">Code</label>
-        <textarea id="robotCode" class="form-control" rows="12" @bind="Robot!.Code" style="font-family: monospace"></textarea>
+        <textarea id="robotCode" class="form-control" rows="12" @bind="RobotCode" style="font-family: monospace"></textarea>
     </div>
 </form>
 
 @code {
     [Parameter]
     public RobotModel? Robot { get; set; }
+
+    private string RobotCode
+    {
+        get => Robot!.Code;
+        set
+        {
+            Robot!.Code = value;
+            CodeChanged();
+        }
+    }
+
+    private CancellationTokenSource? _tickerCancellationTokenSource;
+    private int? _lastCodeChangeTicks;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        _tickerCancellationTokenSource = new CancellationTokenSource();
+        var _ = _tickerFactory.Repeat(Tick, TimeSpan.FromSeconds(1), _tickerCancellationTokenSource.Token);
+    }
+
+    private async Task<bool> Tick()
+    {
+        var ticks = Environment.TickCount;
+        if (_lastCodeChangeTicks == null || ticks - _lastCodeChangeTicks.Value < 1000)
+        {
+            return true;
+        }
+
+        var robot = Robot!;
+        var request = new CompileRequest(robot.Name, robot.LanguageVersion, robot.Code);
+        _log.LogInformation("issuing compile request: {CompileRequest}", request);
+        try
+        {
+            await _api.Compile(request);
+        }
+        catch (BadRequestException e)
+        {
+            _log.LogError(e, "caught BadRequestException");
+        }
+        _lastCodeChangeTicks = null;
+        return true;
+    }
+
+    private Task CodeChanged()
+    {
+        _log.LogInformation("code changed");
+        _lastCodeChangeTicks = Environment.TickCount;
+        return Task.CompletedTask;
+    }
+
+    public void Dispose()
+    {
+        _tickerCancellationTokenSource?.Cancel();
+    }
 }
