@@ -7,10 +7,8 @@
     <file url="file://$PROJECT_DIR$/jobotwar-gui/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/jobotwar-gui/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/jobotwar-io/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/jobotwar-io/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/jobotwar-model" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/jobotwar-model/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/jobotwar-model/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/jobotwar-web/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/jobotwar-web/src/main/resources" charset="UTF-8" />
   </component>

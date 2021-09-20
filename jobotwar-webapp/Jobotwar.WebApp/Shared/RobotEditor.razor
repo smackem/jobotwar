@@ -18,24 +18,30 @@
     </div>
     <div class="col-12">
         <label for="robotCode" class="col-form-label">Code</label>
-        <textarea id="robotCode" class="form-control" rows="12" @bind="RobotCode" style="font-family: monospace"></textarea>
+        <textarea id="robotCode" class="form-control" rows="12" @bind="Robot!.Code" @oninput="CodeChanged" style="font-family: monospace"></textarea>
+@if (_compilationError != null)
+{
+        <div class="alert alert-danger mt-1">@_compilationError</div> 
+}
     </div>
 </form>
 
 @code {
     [Parameter]
-    public RobotModel? Robot { get; set; }
-
-    private string RobotCode
+    public RobotModel? Robot
     {
-        get => Robot!.Code;
+        get => _robotModel;
         set
         {
-            Robot!.Code = value;
-            CodeChanged();
+            _robotModel = value;
+            _currentRobotCode = null;
+            _compilationError = null;
         }
     }
 
+    private string? _currentRobotCode;
+    private RobotModel? _robotModel;
+    private string? _compilationError;
     private CancellationTokenSource? _tickerCancellationTokenSource;
     private int? _lastCodeChangeTicks;
 
@@ -49,31 +55,34 @@
     private async Task<bool> Tick()
     {
         var ticks = Environment.TickCount;
-        if (_lastCodeChangeTicks == null || ticks - _lastCodeChangeTicks.Value < 1000)
+        if (_lastCodeChangeTicks == null || ticks - _lastCodeChangeTicks.Value < 1000 || _currentRobotCode == null)
         {
             return true;
         }
 
         var robot = Robot!;
-        var request = new CompileRequest(robot.Name, robot.LanguageVersion, robot.Code);
+        var request = new CompileRequest(robot.Name, robot.LanguageVersion, _currentRobotCode);
         _log.LogInformation("issuing compile request: {CompileRequest}", request);
         try
         {
             await _api.Compile(request);
+            _compilationError = null;
         }
         catch (BadRequestException e)
         {
             _log.LogError(e, "caught BadRequestException");
+            _compilationError = e.RemoteMessage;
         }
         _lastCodeChangeTicks = null;
+        StateHasChanged();
         return true;
     }
 
-    private Task CodeChanged()
+    private void CodeChanged(ChangeEventArgs obj)
     {
         _log.LogInformation("code changed");
+        _currentRobotCode = obj?.Value as string;
         _lastCodeChangeTicks = Environment.TickCount;
-        return Task.CompletedTask;
     }
 
     public void Dispose()
