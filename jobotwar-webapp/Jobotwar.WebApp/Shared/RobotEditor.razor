@@ -81,7 +81,7 @@
     private void CodeChanged(ChangeEventArgs obj)
     {
         _log.LogInformation("code changed");
-        _currentRobotCode = obj?.Value as string;
+        _currentRobotCode = obj.Value as string;
         _lastCodeChangeTicks = Environment.TickCount;
     }
 

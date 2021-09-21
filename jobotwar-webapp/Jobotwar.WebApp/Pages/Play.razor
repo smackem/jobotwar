@@ -34,10 +34,14 @@
     <div class="border border-top-0">
         <RobotEditor @ref="_robotEditor" Robot="@_selectedRobotModel" />
     </div>
-
     <div class="my-3">
         <button class="btn btn-primary" @onclick="PlayGameAsync">&nbsp;Play!&nbsp;</button>
-        <button class="btn btn-light" @onclick="RemoveSelectedRobot">Remove '@_selectedRobotModel?.Name'</button>
+    @if (_model.Robots.Count > 1)
+    {
+        <button class="btn btn-light" @onclick="RemoveSelectedRobot">
+            Remove '@_selectedRobotModel?.Name'&nbsp;<span class="oi oi-circle-x"></span>
+        </button>
+    }
     </div>
 }
 else
