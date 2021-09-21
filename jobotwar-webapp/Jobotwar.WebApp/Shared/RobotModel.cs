@@ -5,6 +5,7 @@ namespace Jobotwar.WebApp.Shared
         public string Name { get; set; } = string.Empty;
 
         public string Code { get; set; } = @"state main() {
+    @fire(@random(360), @random(50, 500))
 }
 ";
 

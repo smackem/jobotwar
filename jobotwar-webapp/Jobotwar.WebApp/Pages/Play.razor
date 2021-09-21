@@ -3,15 +3,14 @@
 @using Jobotwar.WebApp.Drawing
 @using Jobotwar.WebApp.Services
 @using Microsoft.Extensions.Logging
-@using System.Collections.Immutable
-@using System.Drawing
 @using System.Threading
-@using Color=System.Drawing.Color
+@using System.Collections.Immutable
 @inject IApiClient _api
 @inject TickerFactory _tickerFactory
 @inject NavigationManager _navigationManager
 @inject ILogger<Play> _log
 @inject ILoggerFactory _loggerFactory;
+@inject IModelContainer _model
 @implements IDisposable
 
 <h3>Play</h3>
@@ -19,7 +18,7 @@
 @if (_playing == false)
 {
     <ul class="nav nav-tabs">
-        @foreach (var robot in _robotModels)
+        @foreach (var robot in _model.Robots)
         {
             var cssClass = robot == _selectedRobotModel ? "nav-link active" : "nav-link";
             <li class="nav-item">
@@ -38,7 +37,7 @@
 
     <div class="my-3">
         <button class="btn btn-primary" @onclick="PlayGameAsync">&nbsp;Play!&nbsp;</button>
-        <button class="btn btn-light" @onclick="() => _robotModels.Remove(_selectedRobotModel!)">Remove '@_selectedRobotModel?.Name'</button>
+        <button class="btn btn-light" @onclick="RemoveSelectedRobot">Remove '@_selectedRobotModel?.Name'</button>
     </div>
 }
 else
@@ -49,77 +48,42 @@ else
 @code {
     private const int BoardWidth = 640;
     private const int BoardHeight = 480;
-    private readonly IList<RobotModel> _robotModels = new List<RobotModel>();
     private RobotEditor? _robotEditor;
     private RobotModel? _selectedRobotModel;
     private BECanvasComponent? _canvas;
     private CancellationTokenSource? _replayCancellationTokenSource;
     private bool _playing;
 
-    public Play()
-    {
-        const string fastShooterCode = @"
-            state main() {
-                def angle
-                @speed(@random(-50, 50), @random(-50, 50))
-                while true {
-                    def r = @radar(angle)
-                    if r < 0 {
-                        @fire(angle, abs(r))
-                    } else {
-                        angle = angle + 7
-                    }
-                }
-            }";
-        const string slowShooterCode = @"
-            def angle = 0
-            state main() {
-                @speed(@random(-50, 50), @random(-50, 50))
-                def r = @radar(angle)
-                if r < 0 {
-                    @fire(angle, abs(r))
-                } else {
-                    angle = angle + 7
-                }
-            }";
-
-        _robotModels.Add(new RobotModel
-        {
-            Name = "Fast Shooter ",
-            Code = fastShooterCode,
-        });
-        _robotModels.Add(new RobotModel
-        {
-            Name = "Slow Shooter ",
-            Code = slowShooterCode,
-        });
-        _selectedRobotModel = _robotModels.First();
-    }
-
-    private void SelectRobot(RobotModel robotModel)
+    private void SelectRobot(RobotModel? robotModel)
     {
         _log.LogInformation("selected robot: {SelectedRobot}", robotModel);
-        if (robotModel != null && _robotModels.Contains(robotModel) == false)
+        if (robotModel != null && _model.Robots.Contains(robotModel) == false)
         {
             throw new ArgumentException($"{nameof(robotModel)} is not contained in the robot list");
         }
         _selectedRobotModel = robotModel;
     }
 
+    private void RemoveSelectedRobot()
+    {
+        if (_selectedRobotModel == null)
+        {
+            return;
+        }
+        _model.RemoveRobot(_selectedRobotModel);
+        SelectRobot(_model.Robots.FirstOrDefault());
+    }
+
     private void AddRobot()
     {
-        _log.LogInformation("add robot");
-        var robot = new RobotModel
-        {
-            Name = "Robot " + (_robotModels.Count + 1),
-        };
-        _robotModels.Add(robot);
+        var robot = _model.NewRobot();
         SelectRobot(robot);
     }
 
     protected override Task OnInitializedAsync()
     {
         _navigationManager.LocationChanged += NavigationManager_LocationChanged;
+        _selectedRobotModel = _model.Robots.FirstOrDefault();
         return base.OnInitializedAsync();
     }
 
@@ -135,7 +99,7 @@ else
         var (width, height) = (BoardWidth, BoardHeight);
 
         var setup = new InstantMatchSetup(5 * 60 * 1000, width, height,
-            _robotModels.Select(r => new InstantMatchRobot(r.Name, r.Code, "V2",
+            _model.Robots.Select(r => new InstantMatchRobot(r.Name, r.Code, "V2",
                     random.Next(margin, width - margin),
                     random.Next(margin, height - margin)))
                 .ToArray());
@@ -145,7 +109,7 @@ else
 
         _log.LogInformation("Result: {MatchResult}", result);
         var match = new MatchInfo(setup, result,
-            _robotModels.ToImmutableDictionary(
+            _model.Robots.ToImmutableDictionary(
                 r => r.Name,
                 r => new RobotDrawingInfo(r.Color)));
 

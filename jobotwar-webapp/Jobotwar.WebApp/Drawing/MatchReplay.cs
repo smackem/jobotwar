@@ -16,12 +16,12 @@ namespace Jobotwar.WebApp.Drawing
         private readonly Canvas2DContext _gc;
         private readonly MatchInfo _match;
         private readonly GameInfo _gameInfo;
-        private readonly ILogger _log;
+        private readonly ILogger<MatchReplay> _log;
         private readonly IEnumerator<MatchFrame> _frameEnumerator;
         private readonly List<AnimatedRadarBeam> _animatedRadarBeams = new();
         private readonly List<AnimatedExplosion> _animatedExplosions = new();
 
-        private MatchReplay(MatchInfo match, GameInfo gameInfo, Canvas2DContext gc, ILogger log)
+        private MatchReplay(MatchInfo match, GameInfo gameInfo, Canvas2DContext gc, ILogger<MatchReplay> log)
         {
             _gc = gc;
             _match = match;
@@ -34,7 +34,7 @@ namespace Jobotwar.WebApp.Drawing
             GameInfo gameInfo,
             Canvas2DContext gc,
             TickerFactory tickerFactory,
-            ILogger log,
+            ILogger<MatchReplay> log,
             CancellationToken cancellationToken)
         {
             var replay = new MatchReplay(match, gameInfo, gc, log);
