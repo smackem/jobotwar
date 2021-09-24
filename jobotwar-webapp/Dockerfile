@@ -1,8 +1,8 @@
 FROM mcr.microsoft.com/dotnet/aspnet:5.0-focal AS base
 WORKDIR /app
-EXPOSE 5000
+EXPOSE 80
 
-ENV ASPNETCORE_URLS=http://+:5000
+ENV ASPNETCORE_URLS=http://+:80
 
 # Creates a non-root user with an explicit UID and adds permission to access the /app folder
 # For more info, please refer to https://aka.ms/vscode-docker-dotnet-configure-containers
@@ -20,7 +20,6 @@ RUN dotnet build "Jobotwar.WebApp.csproj" -c Release -o /app/build
 FROM build AS publish
 RUN dotnet publish "Jobotwar.WebApp.csproj" -c Release -o /app/publish
 
-FROM base AS final
-WORKDIR /app
-COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "Jobotwar.WebApp.dll"]
+FROM nginx:alpine
+COPY --from=publish /app/publish/wwwroot /usr/local/webapp/nginx/html
+COPY nginx.conf /etc/nginx/nginx.conf

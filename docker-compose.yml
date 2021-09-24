@@ -1,6 +1,15 @@
 version: '3.4'
 
 services:
+    web:
+        image: jobotwar-webapp
+        build:
+            context: ./jobotwar-webapp
+            dockerfile: ./Dockerfile
+        ports:
+            - 80:80
+        depends_on:
+            - api
     api:
         image: jobotwar
         build:
