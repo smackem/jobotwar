@@ -1,8 +1,19 @@
 version: '3.4'
 
 services:
+    web:
+        image: jobotwar-webapp
+        restart: always
+        build:
+            context: ./jobotwar-webapp
+            dockerfile: ./Dockerfile
+        ports:
+            - 80:80
+        depends_on:
+            - api
     api:
         image: jobotwar
+        restart: always
         build:
             context: .
             dockerfile: ./Dockerfile
@@ -14,6 +25,7 @@ services:
             - db
     db:
         image: postgres:${POSTGRES_TAG}
+        restart: always
         ports:
             - 5432:5432
         volumes:

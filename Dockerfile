@@ -3,7 +3,7 @@ WORKDIR /src/app
 COPY . .
 RUN mvn clean package
 
-FROM openjdk:16-jdk-oraclelinux8 AS final
+FROM openjdk:16-slim AS final
 WORKDIR /app
 ENV DBURL="jdbc:h2:mem:jobotwar;INIT=RUNSCRIPT FROM 'classpath:sql/init.sql'"
 

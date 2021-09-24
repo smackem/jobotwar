@@ -18,7 +18,7 @@
     </div>
     <div class="col-12">
         <label for="robotCode" class="col-form-label">Code</label>
-        <textarea id="robotCode" class="form-control" rows="12" @bind="Robot!.Code" @oninput="CodeChanged" style="font-family: monospace"></textarea>
+        <textarea id="robotCode" class="form-control" rows="12" @bind="Robot!.Code" @oninput="CodeChanged"></textarea>
 @if (_compilationError != null)
 {
         <div class="alert alert-danger mt-1">@_compilationError</div> 
