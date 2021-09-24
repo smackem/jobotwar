@@ -38,8 +38,8 @@
         <button class="btn btn-primary" @onclick="PlayGameAsync">&nbsp;Play!&nbsp;</button>
     @if (_model.Robots.Count > 1)
     {
-        <button class="btn btn-light" @onclick="RemoveSelectedRobot">
-            Remove '@_selectedRobotModel?.Name'&nbsp;<span class="oi oi-circle-x"></span>
+        <button class="btn btn-light ml-1" @onclick="RemoveSelectedRobot">
+            <span class="oi oi-circle-x"></span> Remove '@_selectedRobotModel?.Name'
         </button>
     }
     </div>
