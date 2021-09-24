@@ -22,7 +22,15 @@
         {
             var cssClass = robot == _selectedRobotModel ? "nav-link active" : "nav-link";
             <li class="nav-item">
-                <a class="@cssClass" aria-current="page" @onclick="() => SelectRobot(robot)">@robot.Name</a>
+                <a class="@cssClass" aria-current="page" @onclick="() => SelectRobot(robot)">
+                    @robot.Name
+    @if (_model.Robots.Count > 1)
+    {
+                    <span class="oi text-secondary ml-3 oi-circle-x"
+                          style="vertical-align: center; top: 2px"
+                          @onclick="() => RemoveRobot(robot)"></span>
+    }
+                </a>
             </li>
         }
         <li class="nav-item">
@@ -38,12 +46,6 @@
     </div>
     <div class="my-3">
         <button class="btn btn-primary" @onclick="PlayGameAsync">&nbsp;Play!&nbsp;</button>
-    @if (_model.Robots.Count > 1)
-    {
-        <button class="btn btn-light ml-2" @onclick="RemoveSelectedRobot">
-            Remove '@_selectedRobotModel?.Name'&nbsp;<span class="oi oi-circle-x"></span>
-        </button>
-    }
     </div>
 }
 else
@@ -78,6 +80,15 @@ else
         }
         _model.RemoveRobot(_selectedRobotModel);
         SelectRobot(_model.Robots.FirstOrDefault());
+    }
+
+    private void RemoveRobot(RobotModel robot)
+    {
+        _model.RemoveRobot(robot);
+        if (robot == _selectedRobotModel)
+        {
+            SelectRobot(_model.Robots.FirstOrDefault());
+        }
     }
 
     private void AddRobot()
