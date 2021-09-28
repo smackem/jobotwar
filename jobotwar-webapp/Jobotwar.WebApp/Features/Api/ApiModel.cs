@@ -20,7 +20,7 @@ namespace Jobotwar.WebApp.Features.Api
         string Outcome,
         string Winner,
         int DurationMillis,
-        ICollection<MatchEvent> Events,
+        ICollection<MatchEvent> EventLog,
         ICollection<MatchFrame> Frames);
 
     public record MatchEvent(

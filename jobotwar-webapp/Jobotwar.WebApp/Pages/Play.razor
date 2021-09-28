@@ -13,32 +13,29 @@
 @inject IModelContainer _model
 @implements IDisposable
 
-<h3>Play</h3>
-
-@if (_playing == false)
+@* ReSharper disable once ConvertIfStatementToSwitchStatement *@
+@if (_uiState == UIState.Editor)
 {
     <ul class="nav nav-tabs">
         @foreach (var robot in _model.Robots)
         {
-            var cssClass = robot == _selectedRobotModel ? "nav-link active" : "nav-link";
             <li class="nav-item">
-                <a class="@cssClass" aria-current="page" @onclick="() => SelectRobot(robot)">
+                <a class="@GetCssClass(robot)" aria-current="page" @onclick="() => SelectRobot(robot)">
                     @robot.Name
-    @if (_model.Robots.Count > 1)
-    {
-                    <span class="oi text-secondary ml-3 oi-circle-x"
-                          style="vertical-align: center; top: 2px" 
+            @if (_model.Robots.Count > 1) 
+            {
+                    <span class="oi oi-circle-x text-secondary ml-3"
+                          style="cursor: pointer; top: 3px; max-width: 16px"
                           @onclick="() => RemoveRobot(robot)"></span>
-    }
+            }
                 </a>
             </li>
         }
         <li class="nav-item">
             <a class="nav-link bg-light border-bottom" aria-current="page" @onclick="AddRobot">
-                <span class="oi oi-plus"></span>
+                <span class="oi oi-plus" style="max-width: 16px;"></span>
             </a>
         </li>
-        @* <button class="btn btn-info mx-3" @onclick="AddRobot">Add</button> *@
     </ul>
 
     <div class="border border-top-0">
@@ -48,9 +45,48 @@
         <button class="btn btn-primary" @onclick="PlayGameAsync">&nbsp;Play!&nbsp;</button>
     </div>
 }
-else
+else if (_uiState == UIState.Play)
 {
-    <BECanvas Width="@BoardWidth" Height="@BoardHeight" @ref="_canvas"></BECanvas>
+    <div style="display: inline-block; border: solid 1px white; box-shadow: 0 0 8px rgba(255, 255, 255, 0.3)">
+        <BECanvas Width="@BoardWidth" Height="@BoardHeight" @ref="_canvas"></BECanvas>
+    </div>
+}
+else if (_uiState == UIState.Outcome)
+{
+    var match = _match!;
+    string style;
+    string text;
+    @if (string.IsNullOrEmpty(match.Result.Winner) == false)
+    {
+        style = $"color: {match.RobotInfos[match.Result.Winner].CssColor}";
+        text = $"{match.Result.Winner} has won!";
+    }
+    else
+    {
+        style = string.Empty;
+        text = "Draw!";
+    }
+    <div class="jumbotron">
+        <h1 class="display-4" style="@style">@text</h1>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">Game Time</th>
+                    <th scope="col">Event</th>
+                </tr>
+            </thead>
+            <tbody>
+        @foreach (var entry in match.Result.EventLog)
+        {
+                <tr>
+                    <td>@TimeSpan.FromMilliseconds(entry.GameTimeMillis)</td>
+                    <td>@entry.Event</td>
+                </tr>
+        }
+            </tbody>
+        </table>
+        <button class="btn btn-primary btn-lg" @onclick="() => _uiState = UIState.Editor">OK</button>
+    </div>
 }
 
 @code {
@@ -60,7 +96,22 @@ else
     private RobotModel? _selectedRobotModel;
     private BECanvasComponent? _canvas;
     private CancellationTokenSource? _replayCancellationTokenSource;
-    private bool _playing;
+    private UIState _uiState = UIState.Editor;
+    private MatchInfo? _match;
+
+    // ReSharper disable once InconsistentNaming
+    private enum UIState
+    {
+        Editor,
+        Play,
+        Outcome,
+    }
+
+    private string GetCssClass(RobotModel robot)
+    {
+        const string css = "nav-link default-cursor";
+        return robot == _selectedRobotModel ? css + " active" : css;
+    }
 
     private void SelectRobot(RobotModel? robotModel)
     {
@@ -70,16 +121,6 @@ else
             throw new ArgumentException($"{nameof(robotModel)} is not contained in the robot list");
         }
         _selectedRobotModel = robotModel;
-    }
-
-    private void RemoveSelectedRobot()
-    {
-        if (_selectedRobotModel == null)
-        {
-            return;
-        }
-        _model.RemoveRobot(_selectedRobotModel);
-        SelectRobot(_model.Robots.FirstOrDefault());
     }
 
     private void RemoveRobot(RobotModel robot)
@@ -131,7 +172,7 @@ else
                 r => new RobotDrawingInfo(r.Color)));
 
         _replayCancellationTokenSource = new CancellationTokenSource();
-        _playing = true;
+        _uiState = UIState.Play;
         StateHasChanged();
 
         await MatchReplay.PlayAsync(match,
@@ -142,7 +183,8 @@ else
             _replayCancellationTokenSource.Token);
 
         _log.LogInformation("game replay finished");
-        _playing = false;
+        _match = match;
+        _uiState = UIState.Outcome;
         StateHasChanged();
     }
 
