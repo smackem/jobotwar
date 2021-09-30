@@ -57,13 +57,13 @@ else if (_uiState == UIState.Play)
 }
 else if (_uiState == UIState.Outcome)
 {
-    var match = _match!;
+    var (_, result, robotInfos) = _match!;
     string style;
     string text;
-    @if (string.IsNullOrEmpty(match.Result.Winner) == false)
+    @if (string.IsNullOrEmpty(result.Winner) == false)
     {
-        style = $"color: {match.RobotInfos[match.Result.Winner].CssColor}";
-        text = $"{match.Result.Winner} has won!";
+        style = $"color: {robotInfos[result.Winner].CssColor}";
+        text = $"{result.Winner} has won!";
     }
     else
     {
@@ -80,11 +80,11 @@ else if (_uiState == UIState.Outcome)
                 </tr>
             </thead>
             <tbody>
-        @foreach (var entry in match.Result.EventLog)
+        @foreach (var (millis, message) in result.EventLog)
         {
                 <tr>
-                    <td>@TimeSpan.FromMilliseconds(entry.GameTimeMillis)</td>
-                    <td>@entry.Event</td>
+                    <td>@TimeSpan.FromMilliseconds(millis).ToString("g")</td>
+                    <td>@message</td>
                 </tr>
         }
             </tbody>

@@ -1,6 +1,43 @@
 @page "/Robots"
+@using Jobotwar.WebApp.Features.Api
+@inject IApiClient _http;
+
 <h3>Robots</h3>
 
+@if (_robots == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Language</th>
+            <th>Date Created</th>
+            <th>Date Modified</th>
+        </tr>
+        </thead>
+        <tbody>
+    @foreach (var robot in _robots)
+    {
+        <tr>
+            <td>@robot.Name</td>
+            <td>@robot.Language</td>
+            <td>@robot.DateCreated</td>
+            <td>@robot.DateModified</td>
+        </tr>
+    }
+        </tbody>
+    </table>
+}
+
 @code {
-    
+    private IEnumerable<Robot>? _robots;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _robots = await _http.GetRobotsAsync();
+    }
 }

@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Jobotwar.WebApp.Features.Api
 {
@@ -9,5 +10,7 @@ namespace Jobotwar.WebApp.Features.Api
         Task<GameInfo> GetGameInfoAsync();
 
         Task<CompileResult> Compile(CompileRequest request);
+
+        Task<IEnumerable<Robot>> GetRobotsAsync();
     }
 }

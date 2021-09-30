@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
@@ -58,6 +59,13 @@ namespace Jobotwar.WebApp.Features.Api
 
             var result = await response.Content.ReadFromJsonAsync<CompileResult>();
             return result!;
+        }
+
+        public async Task<IEnumerable<Robot>> GetRobotsAsync()
+        {
+            const string uri = "/robot";
+            var robots = await _http.GetFromJsonAsync<ICollection<Robot>>(uri);
+            return robots!;
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 // ReSharper disable ClassNeverInstantiated.Global
 
 namespace Jobotwar.WebApp.Features.Api
@@ -73,4 +74,13 @@ namespace Jobotwar.WebApp.Features.Api
 
     public record CompileResult(
         string Program);
+
+    public record Robot(
+        string Code,
+        string Language,
+        string Name,
+        double Acceleration,
+        int Rgb,
+        DateTimeOffset DateCreated,
+        DateTimeOffset? DateModified);
 }
