@@ -41,6 +41,10 @@
     <div class="border border-top-0">
         <RobotEditor @ref="_robotEditor" Robot="@_selectedRobotModel" />
     </div>
+    if (string.IsNullOrEmpty(_compilationError) == false)
+    {
+    <div class="alert alert-danger mt-1">@_compilationError</div> 
+    }
     <div class="my-3">
         <button class="btn btn-primary" @onclick="PlayGameAsync">&nbsp;Play!&nbsp;</button>
     </div>
@@ -98,6 +102,7 @@ else if (_uiState == UIState.Outcome)
     private CancellationTokenSource? _replayCancellationTokenSource;
     private UIState _uiState = UIState.Editor;
     private MatchInfo? _match;
+    private string? _compilationError;
 
     // ReSharper disable once InconsistentNaming
     private enum UIState
@@ -162,7 +167,18 @@ else if (_uiState == UIState.Outcome)
                     random.Next(margin, height - margin)))
                 .ToArray());
 
-        var result = await _api.PlayAsync(setup);
+        InstantMatchResult result;
+        try
+        {
+            result = await _api.PlayAsync(setup);
+            _compilationError = null;
+        }
+        catch (BadRequestException e)
+        {
+            _compilationError = e.RemoteMessage;
+            return;
+        }
+
         var gameInfo = await _api.GetGameInfoAsync();
 
         _log.LogInformation("Result: {MatchResult}", result);

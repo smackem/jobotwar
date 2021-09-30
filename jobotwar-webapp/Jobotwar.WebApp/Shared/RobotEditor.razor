@@ -8,20 +8,27 @@
 @implements IDisposable
 
 <form action="#" class="row p-3">
-    <div class="col-9">
+    <div class="col-8">
         <label for="robotName" class="col-form-label">Name</label>
         <input type="text" id="robotName" class="form-control" @bind="Robot!.Name"/>
     </div>
-    <div class="col-3">
+    <div class="col-2">
         <label for="robotColor" class="col-form-label">Color</label>
         <input type="color" id="robotColor" class="form-control" @bind="Robot!.Color"/>
+    </div>
+    <div class="col-2">
+        <label for="robotColor" class="col-form-label">Language</label>
+        <select id="languageVersion" class="form-control" @bind="Robot!.LanguageVersion">
+            <option value="V1">V1</option>
+            <option value="V2">V2</option>
+        </select>
     </div>
     <div class="col-12">
         <label for="robotCode" class="col-form-label">Code</label>
         <textarea id="robotCode" class="form-control" rows="12" @bind="Robot!.Code" @oninput="CodeChanged"></textarea>
 @if (_compilationError != null)
 {
-        <div class="alert alert-danger mt-1">@_compilationError</div> 
+        <div class="alert alert-warning my-1">@_compilationError</div> 
 }
     </div>
 </form>
