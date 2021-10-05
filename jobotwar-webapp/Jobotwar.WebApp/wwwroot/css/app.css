@@ -1,16 +1,26 @@
 @import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
 
+:root {
+    --focused-input-bg: #121516;
+    --focused-input-text: #e9ecef;
+}
+
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
+textarea:focus-within, input[type="text"]:focus-within {
+    background-color: var(--focused-input-bg);
+    color: var(--focused-input-text);
+}
+
 a, .btn-link {
-    color: #0366d6;
+    color: var(--primary);
 }
 
 .btn-primary {
-    color: #fff;
-    background-color: #1b6ec2;
+    color: var(--white);
+    background-color: var(--primary);
     border-color: #1861ac;
 }
 

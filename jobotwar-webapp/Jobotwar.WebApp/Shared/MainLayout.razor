@@ -1,3 +1,4 @@
+@using Blazored.Toast.Configuration
 @inherits LayoutComponentBase
 
 <div class="page">
@@ -14,4 +15,9 @@
             @Body
         </div>
     </div>
+
+    <BlazoredToasts Position="ToastPosition.BottomRight"
+                    Timeout="5"
+                    IconType="IconType.FontAwesome"
+                    SuccessIcon="oi oi-thumb-up"/>
 </div>

@@ -1,6 +1,9 @@
 @page "/Robots"
 @using Jobotwar.WebApp.Features.Api
+@using Jobotwar.WebApp.Services
 @inject IApiClient _http;
+@inject IModelContainer _model;
+@inject IToastService _toastService;
 
 <h3>Robots</h3>
 
@@ -15,26 +18,40 @@ else
         <tr>
             <th>Name</th>
             <th>Language</th>
-            <th>Date Created</th>
             <th>Date Modified</th>
+            <th>Actions</th>
         </tr>
         </thead>
         <tbody>
-    @foreach (var robot in _robots)
-    {
-        <tr>
-            <td>@robot.Name</td>
-            <td>@robot.Language</td>
-            <td>@robot.DateCreated</td>
-            <td>@robot.DateModified</td>
-        </tr>
-    }
+        @foreach (var robot in _robots)
+        {
+            <tr>
+                <td>@robot.Name</td>
+                <td>@robot.Language</td>
+                <td>@(robot.DateModified ?? robot.DateCreated)</td>
+                <td>
+                    <button class="btn btn-sm m-0 p-0" @onclick="() => AddRobotToMatch(robot)">
+                        <span class="oi oi-plus"></span>
+                    </button>
+                </td>
+            </tr>
+        }
         </tbody>
     </table>
 }
 
 @code {
     private IEnumerable<Robot>? _robots;
+
+    private void AddRobotToMatch(Robot robot)
+    {
+        var r = _model.NewRobot();
+        var number = _model.Robots.Count;
+        r.Code = robot.Code;
+        r.LanguageVersion = robot.Language;
+        r.Name = $"{robot.Name} {number}";
+        _toastService.ShowSuccess(message: $"{r.Name} added to roster", heading: "OK");
+    }
 
     protected override async Task OnInitializedAsync()
     {

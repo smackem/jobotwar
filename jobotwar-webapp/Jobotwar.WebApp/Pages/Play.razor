@@ -11,6 +11,7 @@
 @inject ILogger<Play> _log
 @inject ILoggerFactory _loggerFactory;
 @inject IModelContainer _model
+@inject IToastService _toastService
 @implements IDisposable
 
 @* ReSharper disable once ConvertIfStatementToSwitchStatement *@
@@ -37,14 +38,9 @@
             </a>
         </li>
     </ul>
-
     <div class="border border-top-0">
         <RobotEditor @ref="_robotEditor" Robot="@_selectedRobotModel" />
     </div>
-    if (string.IsNullOrEmpty(_compilationError) == false)
-    {
-    <div class="alert alert-danger mt-1">@_compilationError</div> 
-    }
     <div class="my-3">
         <button class="btn btn-primary" @onclick="PlayGameAsync">&nbsp;Play!&nbsp;</button>
     </div>
@@ -102,7 +98,6 @@ else if (_uiState == UIState.Outcome)
     private CancellationTokenSource? _replayCancellationTokenSource;
     private UIState _uiState = UIState.Editor;
     private MatchInfo? _match;
-    private string? _compilationError;
 
     // ReSharper disable once InconsistentNaming
     private enum UIState
@@ -162,7 +157,7 @@ else if (_uiState == UIState.Outcome)
         var (width, height) = (BoardWidth, BoardHeight);
 
         var setup = new InstantMatchSetup(5 * 60 * 1000, width, height,
-            _model.Robots.Select(r => new InstantMatchRobot(r.Name, r.Code, "V2",
+            _model.Robots.Select(r => new InstantMatchRobot(r.Name, r.Code, r.LanguageVersion,
                     random.Next(margin, width - margin),
                     random.Next(margin, height - margin)))
                 .ToArray());
@@ -171,11 +166,10 @@ else if (_uiState == UIState.Outcome)
         try
         {
             result = await _api.PlayAsync(setup);
-            _compilationError = null;
         }
         catch (BadRequestException e)
         {
-            _compilationError = e.RemoteMessage;
+            _toastService.ShowError(e.RemoteMessage);
             return;
         }
 
