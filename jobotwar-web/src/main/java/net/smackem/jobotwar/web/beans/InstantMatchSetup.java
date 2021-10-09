@@ -1,5 +1,6 @@
 package net.smackem.jobotwar.web.beans;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.Duration;
@@ -12,6 +13,7 @@ public class InstantMatchSetup {
     @JsonProperty private int maxDurationMillis;
     @JsonProperty private int boardWidth;
     @JsonProperty private int boardHeight;
+    @JsonProperty private boolean excludeFrames;
     @JsonProperty private final Collection<InstantMatchRobot> robots = new ArrayList<>();
 
     public int boardWidth() {
@@ -47,6 +49,16 @@ public class InstantMatchSetup {
 
     public InstantMatchSetup maxDuration(Duration maxDurationMillis) {
         this.maxDurationMillis = (int) maxDurationMillis.toMillis();
+        return this;
+    }
+
+    @JsonIgnore
+    public boolean isFramesExcluded() {
+        return this.excludeFrames;
+    }
+
+    public InstantMatchSetup excludeFrames(boolean value) {
+        this.excludeFrames = value;
         return this;
     }
 
