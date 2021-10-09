@@ -43,6 +43,7 @@ namespace Jobotwar.WebApp
             });
             builder.Services.AddSingleton(_ => new TickerFactory());
             builder.Services.AddSingleton<IModelContainer, ModelContainer>();
+            builder.Services.AddSingleton<IPlayService, PlayService>();
         }
     }
 }

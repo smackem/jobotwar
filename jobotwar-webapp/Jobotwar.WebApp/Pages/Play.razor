@@ -12,6 +12,7 @@
 @inject ILoggerFactory _loggerFactory;
 @inject IModelContainer _model
 @inject IToastService _toastService
+@inject IPlayService _playService;
 @implements IDisposable
 
 @* ReSharper disable once ConvertIfStatementToSwitchStatement *@
@@ -25,8 +26,7 @@
                     @robot.Name
             @if (_model.Robots.Count > 1) 
             {
-                    <span class="oi oi-circle-x text-secondary ml-3"
-                          style="cursor: pointer; top: 3px; max-width: 16px"
+                    <span class="oi oi-circle-x text-secondary ml-3 close-tab-icon"
                           @onclick="() => RemoveRobot(robot)"></span>
             }
                 </a>
@@ -34,7 +34,7 @@
         }
         <li class="nav-item">
             <a class="nav-link bg-light border-bottom" aria-current="page" @onclick="AddRobot">
-                <span class="oi oi-plus" style="max-width: 16px;"></span>
+                <span class="oi oi-plus"></span>
             </a>
         </li>
     </ul>
@@ -42,13 +42,14 @@
         <RobotEditor @ref="_robotEditor" Robot="@_selectedRobotModel" />
     </div>
     <div class="my-3">
-        <button class="btn btn-primary" @onclick="PlayGameAsync">&nbsp;Play!&nbsp;</button>
+        <button class="btn btn-primary px-3" @onclick="PlayGameAsync">&nbsp;Play!&nbsp;</button>
+        <button class="btn btn-secondary text-white" @onclick="Simulate100">Simulate 100 Matches</button>
     </div>
 }
 else if (_uiState == UIState.Play)
 {
-    <div style="display: inline-block; border: solid 1px white; box-shadow: 0 0 8px rgba(255, 255, 255, 0.3)">
-        <BECanvas Width="@BoardWidth" Height="@BoardHeight" @ref="_canvas"></BECanvas>
+    <div class="play-canvas">
+        <BECanvas Width="@_playService.BoardWidth" Height="@_playService.BoardHeight" @ref="_canvas"></BECanvas>
     </div>
 }
 else if (_uiState == UIState.Outcome)
@@ -90,8 +91,6 @@ else if (_uiState == UIState.Outcome)
 }
 
 @code {
-    private const int BoardWidth = 640;
-    private const int BoardHeight = 480;
     private RobotEditor? _robotEditor;
     private RobotModel? _selectedRobotModel;
     private BECanvasComponent? _canvas;
@@ -149,23 +148,14 @@ else if (_uiState == UIState.Outcome)
     {
         _log.LogInformation("navigate to: '{QueryUri}', intercepted: {NavigationIntercepted}", e.Location, e.IsNavigationIntercepted);
     }
-
+    
     private async Task PlayGameAsync()
     {
-        var random = new Random();
-        const int margin = 30;
-        var (width, height) = (BoardWidth, BoardHeight);
-
-        var setup = new InstantMatchSetup(5 * 60 * 1000, width, height,
-            _model.Robots.Select(r => new InstantMatchRobot(r.Name, r.Code, r.LanguageVersion,
-                    random.Next(margin, width - margin),
-                    random.Next(margin, height - margin)))
-                .ToArray());
-
+        InstantMatchSetup setup;
         InstantMatchResult result;
         try
         {
-            result = await _api.PlayAsync(setup);
+            (setup, result) = await _playService.PlayMatchAsync(_model.Robots);
         }
         catch (BadRequestException e)
         {
@@ -203,5 +193,10 @@ else if (_uiState == UIState.Outcome)
         _navigationManager.LocationChanged -= NavigationManager_LocationChanged;
         _log.LogInformation("page disposed: {Page}", this);
         _replayCancellationTokenSource?.Cancel();
+    }
+
+    private void Simulate100()
+    {
+        _navigationManager.NavigateTo("/simulation/100");
     }
 }

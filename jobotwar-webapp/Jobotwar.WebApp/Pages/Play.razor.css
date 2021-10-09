@@ -1,0 +1,14 @@
+.play-canvas {
+    display: inline-block;
+    border: solid 1px white;
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+}
+
+.close-tab-icon {
+    cursor: pointer;
+    top: 3px;
+}
+
+.oi {
+    max-width: 16px;
+}

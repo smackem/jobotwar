@@ -11,7 +11,8 @@ namespace Jobotwar.WebApp.Features.Api
         int MaxDurationMillis,
         double BoardWidth,
         double BoardHeight,
-        ICollection<InstantMatchRobot> Robots);
+        ICollection<InstantMatchRobot> Robots,
+        bool ExcludeFrames);
 
     public record InstantMatchRobot(
         string Name,

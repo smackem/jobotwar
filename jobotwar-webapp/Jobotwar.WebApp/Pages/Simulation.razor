@@ -1,0 +1,51 @@
+@page "/simulation/{MatchCount:int}"
+@using Jobotwar.WebApp.Services
+@using System.Collections.Immutable
+@inject IModelContainer _model
+@inject IPlayService _playService
+
+<h3>Result of @MatchCount Matches</h3>
+
+@if (_stats == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Robot</th>
+            <th>Win %</th>
+        </tr>
+        </thead>
+        <tbody>
+    @foreach (var (robotName, winCount) in _stats)
+    {
+        <tr>
+            <td>@(robotName ?? "---")</td>
+            <td>@(winCount * 100.0 / MatchCount)</td>
+        </tr>
+    }
+        </tbody>
+    </table>
+}
+
+@code {
+    [Parameter]
+    public int MatchCount { get; set; }
+
+    private IImmutableList<RobotStats>? _stats;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var results = await _playService.SimulateMatchesAsync(_model.Robots, MatchCount);
+        var groups = results.GroupBy(result => result.Winner);
+        _stats = groups
+            .Select(group => new RobotStats(group.Key, group.Count()))
+            .OrderByDescending(robotStats => robotStats.WinCount)
+            .ToImmutableList();
+    }
+
+    private record RobotStats(string RobotName, int WinCount);
+}
