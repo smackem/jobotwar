@@ -23,7 +23,7 @@ namespace Jobotwar.WebApp.Features.Api
 
     public record InstantMatchResult(
         string Outcome,
-        string Winner,
+        string? Winner,
         int DurationMillis,
         ICollection<MatchEvent> EventLog,
         ICollection<MatchFrame> Frames);

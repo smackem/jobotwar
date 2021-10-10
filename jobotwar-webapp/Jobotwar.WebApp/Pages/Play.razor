@@ -22,12 +22,14 @@
         @foreach (var robot in _model.Robots)
         {
             <li class="nav-item">
-                <a class="@GetCssClass(robot)" aria-current="page" @onclick="() => SelectRobot(robot)">
+                <a class="@GetCssClass(robot)" aria-current="page" @onclick="() => SelectRobot(robot)"
+                   style="color: @robot.Color">
                     @robot.Name
             @if (_model.Robots.Count > 1) 
             {
-                    <span class="oi oi-circle-x text-secondary ml-3 close-tab-icon"
-                          @onclick="() => RemoveRobot(robot)"></span>
+                    <span class="ml-3 close-tab-icon" @onclick="() => RemoveRobot(robot)">
+                        <strong>&times;</strong>
+                    </span>
             }
                 </a>
             </li>
@@ -137,11 +139,10 @@ else if (_uiState == UIState.Outcome)
         SelectRobot(robot);
     }
 
-    protected override Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         _navigationManager.LocationChanged += NavigationManager_LocationChanged;
         _selectedRobotModel = _model.Robots.FirstOrDefault();
-        return base.OnInitializedAsync();
     }
 
     private void NavigationManager_LocationChanged(object? sender, LocationChangedEventArgs e)

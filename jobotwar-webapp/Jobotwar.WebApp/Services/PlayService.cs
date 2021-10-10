@@ -24,13 +24,13 @@ namespace Jobotwar.WebApp.Services
 
         public async Task<(InstantMatchSetup, InstantMatchResult)> PlayMatchAsync(IEnumerable<RobotModel> robots)
         {
-            return await InternalPlayMatchAsync(robots, false);
+            return await InternalPlayMatchAsync(robots, excludeFrames: false);
         }
 
         public async Task<IEnumerable<InstantMatchResult>> SimulateMatchesAsync(IEnumerable<RobotModel> robots, int matchCount)
         {
             var tasks = Enumerable.Range(0, matchCount)
-                .Select(_ => InternalPlayMatchAsync(robots, true));
+                .Select(_ => InternalPlayMatchAsync(robots, excludeFrames: true));
             var tuples = await Task.WhenAll(tasks);
             return tuples.Select(t => t.Item2);
         }
