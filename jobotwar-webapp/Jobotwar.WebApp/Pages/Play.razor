@@ -11,25 +11,26 @@
 @inject ILogger<Play> _log
 @inject ILoggerFactory _loggerFactory;
 @inject IModelContainer _model
+@inject IToastService _toastService
+@inject IPlayService _playService;
 @implements IDisposable
 
-<h3>Play</h3>
-
-@if (_playing == false)
+@* ReSharper disable once ConvertIfStatementToSwitchStatement *@
+@if (_uiState == UIState.Editor)
 {
     <ul class="nav nav-tabs">
         @foreach (var robot in _model.Robots)
         {
-            var cssClass = robot == _selectedRobotModel ? "nav-link active" : "nav-link";
             <li class="nav-item">
-                <a class="@cssClass" aria-current="page" @onclick="() => SelectRobot(robot)">
+                <a class="@GetCssClass(robot)" aria-current="page" @onclick="() => SelectRobot(robot)"
+                   style="color: @robot.Color">
                     @robot.Name
-    @if (_model.Robots.Count > 1)
-    {
-                    <span class="oi text-secondary ml-3 oi-circle-x"
-                          style="vertical-align: center; top: 2px" 
-                          @onclick="() => RemoveRobot(robot)"></span>
-    }
+            @if (_model.Robots.Count > 1) 
+            {
+                    <span class="ml-3 close-tab-icon" @onclick="() => RemoveRobot(robot)">
+                        <strong>&times;</strong>
+                    </span>
+            }
                 </a>
             </li>
         }
@@ -38,29 +39,80 @@
                 <span class="oi oi-plus"></span>
             </a>
         </li>
-        @* <button class="btn btn-info mx-3" @onclick="AddRobot">Add</button> *@
     </ul>
-
     <div class="border border-top-0">
         <RobotEditor @ref="_robotEditor" Robot="@_selectedRobotModel" />
     </div>
     <div class="my-3">
-        <button class="btn btn-primary" @onclick="PlayGameAsync">&nbsp;Play!&nbsp;</button>
+        <button class="btn btn-primary px-3" @onclick="PlayGameAsync">&nbsp;Play!&nbsp;</button>
+        <button class="btn btn-secondary text-white" @onclick="Simulate100">Simulate 100 Matches</button>
     </div>
 }
-else
+else if (_uiState == UIState.Play)
 {
-    <BECanvas Width="@BoardWidth" Height="@BoardHeight" @ref="_canvas"></BECanvas>
+    <div class="play-canvas">
+        <BECanvas Width="@_playService.BoardWidth" Height="@_playService.BoardHeight" @ref="_canvas"></BECanvas>
+    </div>
+}
+else if (_uiState == UIState.Outcome)
+{
+    var (_, result, robotInfos) = _match!;
+    string style;
+    string text;
+    @if (string.IsNullOrEmpty(result.Winner) == false)
+    {
+        style = $"color: {robotInfos[result.Winner].CssColor}";
+        text = $"{result.Winner} has won!";
+    }
+    else
+    {
+        style = string.Empty;
+        text = "Draw!";
+    }
+    <div class="jumbotron">
+        <h1 class="display-4" style="@style">@text</h1>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">Game Time</th>
+                    <th scope="col">Event</th>
+                </tr>
+            </thead>
+            <tbody>
+        @foreach (var (millis, message) in result.EventLog)
+        {
+                <tr>
+                    <td>@TimeSpan.FromMilliseconds(millis).ToString("g")</td>
+                    <td>@message</td>
+                </tr>
+        }
+            </tbody>
+        </table>
+        <button class="btn btn-primary btn-lg" @onclick="() => _uiState = UIState.Editor">OK</button>
+    </div>
 }
 
 @code {
-    private const int BoardWidth = 640;
-    private const int BoardHeight = 480;
     private RobotEditor? _robotEditor;
     private RobotModel? _selectedRobotModel;
     private BECanvasComponent? _canvas;
     private CancellationTokenSource? _replayCancellationTokenSource;
-    private bool _playing;
+    private UIState _uiState = UIState.Editor;
+    private MatchInfo? _match;
+
+    // ReSharper disable once InconsistentNaming
+    private enum UIState
+    {
+        Editor,
+        Play,
+        Outcome,
+    }
+
+    private string GetCssClass(RobotModel robot)
+    {
+        const string css = "nav-link default-cursor";
+        return robot == _selectedRobotModel ? css + " active" : css;
+    }
 
     private void SelectRobot(RobotModel? robotModel)
     {
@@ -70,16 +122,6 @@ else
             throw new ArgumentException($"{nameof(robotModel)} is not contained in the robot list");
         }
         _selectedRobotModel = robotModel;
-    }
-
-    private void RemoveSelectedRobot()
-    {
-        if (_selectedRobotModel == null)
-        {
-            return;
-        }
-        _model.RemoveRobot(_selectedRobotModel);
-        SelectRobot(_model.Robots.FirstOrDefault());
     }
 
     private void RemoveRobot(RobotModel robot)
@@ -97,31 +139,31 @@ else
         SelectRobot(robot);
     }
 
-    protected override Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         _navigationManager.LocationChanged += NavigationManager_LocationChanged;
         _selectedRobotModel = _model.Robots.FirstOrDefault();
-        return base.OnInitializedAsync();
     }
 
     private void NavigationManager_LocationChanged(object? sender, LocationChangedEventArgs e)
     {
         _log.LogInformation("navigate to: '{QueryUri}', intercepted: {NavigationIntercepted}", e.Location, e.IsNavigationIntercepted);
     }
-
+    
     private async Task PlayGameAsync()
     {
-        var random = new Random();
-        const int margin = 30;
-        var (width, height) = (BoardWidth, BoardHeight);
+        InstantMatchSetup setup;
+        InstantMatchResult result;
+        try
+        {
+            (setup, result) = await _playService.PlayMatchAsync(_model.Robots);
+        }
+        catch (BadRequestException e)
+        {
+            _toastService.ShowError(e.RemoteMessage);
+            return;
+        }
 
-        var setup = new InstantMatchSetup(5 * 60 * 1000, width, height,
-            _model.Robots.Select(r => new InstantMatchRobot(r.Name, r.Code, "V2",
-                    random.Next(margin, width - margin),
-                    random.Next(margin, height - margin)))
-                .ToArray());
-
-        var result = await _api.PlayAsync(setup);
         var gameInfo = await _api.GetGameInfoAsync();
 
         _log.LogInformation("Result: {MatchResult}", result);
@@ -131,7 +173,7 @@ else
                 r => new RobotDrawingInfo(r.Color)));
 
         _replayCancellationTokenSource = new CancellationTokenSource();
-        _playing = true;
+        _uiState = UIState.Play;
         StateHasChanged();
 
         await MatchReplay.PlayAsync(match,
@@ -142,7 +184,8 @@ else
             _replayCancellationTokenSource.Token);
 
         _log.LogInformation("game replay finished");
-        _playing = false;
+        _match = match;
+        _uiState = UIState.Outcome;
         StateHasChanged();
     }
 
@@ -151,5 +194,10 @@ else
         _navigationManager.LocationChanged -= NavigationManager_LocationChanged;
         _log.LogInformation("page disposed: {Page}", this);
         _replayCancellationTokenSource?.Cancel();
+    }
+
+    private void Simulate100()
+    {
+        _navigationManager.NavigateTo("/simulation/100");
     }
 }

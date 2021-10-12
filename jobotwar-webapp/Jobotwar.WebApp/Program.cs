@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using Blazored.Toast;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Jobotwar.WebApp.Features.Api;
@@ -31,6 +32,7 @@ namespace Jobotwar.WebApp
             }.Uri;
             builder.Services.AddLogging();
             builder.Services.AddMemoryCache();
+            builder.Services.AddBlazoredToast();
             builder.Services.AddHttpClient("wwwroot", client =>
             {
                 client.BaseAddress = baseUri;
@@ -41,6 +43,7 @@ namespace Jobotwar.WebApp
             });
             builder.Services.AddSingleton(_ => new TickerFactory());
             builder.Services.AddSingleton<IModelContainer, ModelContainer>();
+            builder.Services.AddSingleton<IPlayService, PlayService>();
         }
     }
 }

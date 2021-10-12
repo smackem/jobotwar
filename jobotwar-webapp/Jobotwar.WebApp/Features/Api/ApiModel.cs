@@ -1,4 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using Microsoft.AspNetCore.Components.Rendering;
+
 // ReSharper disable ClassNeverInstantiated.Global
 
 namespace Jobotwar.WebApp.Features.Api
@@ -7,7 +11,8 @@ namespace Jobotwar.WebApp.Features.Api
         int MaxDurationMillis,
         double BoardWidth,
         double BoardHeight,
-        ICollection<InstantMatchRobot> Robots);
+        ICollection<InstantMatchRobot> Robots,
+        bool ExcludeFrames);
 
     public record InstantMatchRobot(
         string Name,
@@ -18,9 +23,9 @@ namespace Jobotwar.WebApp.Features.Api
 
     public record InstantMatchResult(
         string Outcome,
-        string Winner,
+        string? Winner,
         int DurationMillis,
-        ICollection<MatchEvent> Events,
+        ICollection<MatchEvent> EventLog,
         ICollection<MatchFrame> Frames);
 
     public record MatchEvent(
@@ -73,4 +78,13 @@ namespace Jobotwar.WebApp.Features.Api
 
     public record CompileResult(
         string Program);
+
+    public record Robot(
+        string Code,
+        string Language,
+        string Name,
+        double Acceleration,
+        int Rgb,
+        DateTimeOffset DateCreated,
+        DateTimeOffset? DateModified);
 }

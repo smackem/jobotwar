@@ -1,0 +1,69 @@
+@page "/simulation/{MatchCount:int}"
+@using Jobotwar.WebApp.Services
+@using System.Collections.Immutable
+@inject IModelContainer _model
+@inject IPlayService _playService
+@inject NavigationManager _navigationManager
+
+<h3>Result of @MatchCount Matches</h3>
+
+@if (_stats == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    int rank = 1;
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Rank</th>
+            <th>Robot</th>
+            <th>Win %</th>
+        </tr>
+        </thead>
+        <tbody>
+    @foreach (var (robotName, winCount, color) in _stats)
+    {
+        <tr>
+            <td><strong>@(rank++)</strong></td>
+            <td style="color: @color"><span class="oi oi-person"></span>@(robotName ?? "---")</td>
+            <td>@(winCount * 100.0 / MatchCount)</td>
+        </tr>
+    }
+        </tbody>
+    </table>
+    <div class="my-3">
+        <button class="btn btn-primary" @onclick="GoBack">Back</button>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int MatchCount { get; set; }
+
+    private IImmutableList<RobotStats>? _stats;
+
+    protected override void OnInitialized()
+    {
+        _playService.SimulateMatchesAsync(_model.Robots, MatchCount).ContinueWith(t =>
+        {
+            var results = t.Result;
+            var robotsByName = _model.Robots.ToImmutableDictionary(r => r.Name);
+            var groups = results.GroupBy(result => result.Winner);
+            _stats = groups
+                .Select(group => new RobotStats(group.Key, group.Count(),
+                    group.Key != null ? robotsByName[group.Key].Color : "var(--black)"))
+                .OrderByDescending(robotStats => robotStats.WinCount)
+                .ToImmutableList();
+            StateHasChanged();
+        });
+    }
+
+    private record RobotStats(string? RobotName, int WinCount, string Color);
+
+    private void GoBack()
+    {
+        _navigationManager.NavigateTo("/play");
+    }
+}

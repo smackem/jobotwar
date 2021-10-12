@@ -1,6 +1,8 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Text.Json;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
@@ -28,6 +30,9 @@ namespace Jobotwar.WebApp.Features.Api
                 throw new BadRequestException(uri, response.StatusCode, await response.Content.ReadAsStringAsync());
             }
 
+            // var json = await response.Content.ReadAsStringAsync();
+            // _log.LogInformation("received JSON {JSON}", json);
+            //var result = JsonSerializer.Deserialize<InstantMatchResult>(json);
             var result = await response.Content.ReadFromJsonAsync<InstantMatchResult>();
             return result!;
         }
@@ -54,6 +59,13 @@ namespace Jobotwar.WebApp.Features.Api
 
             var result = await response.Content.ReadFromJsonAsync<CompileResult>();
             return result!;
+        }
+
+        public async Task<IEnumerable<Robot>> GetRobotsAsync()
+        {
+            const string uri = "/robot";
+            var robots = await _http.GetFromJsonAsync<ICollection<Robot>>(uri);
+            return robots!;
         }
     }
 }

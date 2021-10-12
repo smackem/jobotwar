@@ -52,7 +52,7 @@ public final class SimulationRunner {
      * frame rate. Frames (aka ticks) are calculated in a tight loop, so simulation is much faster.
      * @param maxDuration The maximum simulated duration in game time (as if run based upon the
      *                    standard frame rate {@link Constants#TICK_DURATION}).
-     * @param tickCallback A function that is called after every game engine tick with the produced
+     * @param tickCallback An optional function that is called after every game engine tick with the produced
      *                     {@link GameEngine.TickResult}.
      * @return A {@link SimulationResult} with the winning {@link Robot} or {@code null} if no winner could be determined.
      *         This may be the case when both robots just sit or don't hit each other within the

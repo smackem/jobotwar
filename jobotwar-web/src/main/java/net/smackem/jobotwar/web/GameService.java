@@ -72,7 +72,9 @@ public class GameService {
         final Collection<MatchFrame> frames = new ArrayList<>();
         final SimulationResult result = new SimulationRunner(board).runGame(
                 setup.maxDuration(),
-                tick -> frames.add(createFrameFromTickResult(board, tick)));
+                setup.isFramesExcluded()
+                    ? null
+                    : tick -> frames.add(createFrameFromTickResult(board, tick)));
         return new InstantMatchResult(result.outcome())
                 .winner(result.winner() != null ? result.winner().name() : null)
                 .duration(result.duration())
