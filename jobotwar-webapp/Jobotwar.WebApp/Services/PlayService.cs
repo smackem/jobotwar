@@ -9,13 +9,14 @@ namespace Jobotwar.WebApp.Services
 {
     internal class PlayService : IPlayService
     {
-        private static readonly Random Rand = new();
         private readonly IApiClient _api;
+        private readonly Random _random;
         private const int PlacementMargin = 30;
         
-        public PlayService(IApiClient api)
+        public PlayService(IApiClient api, Random random)
         {
             _api = api;
+            _random = random;
         }
 
         public int BoardWidth => 640;
@@ -40,8 +41,8 @@ namespace Jobotwar.WebApp.Services
             const int margin = 30;
             var setup = new InstantMatchSetup(5 * 60 * 1000, BoardWidth, BoardHeight,
                 robots.Select(r => new InstantMatchRobot(r.Name, r.Code, r.LanguageVersion,
-                    Rand.Next(PlacementMargin, BoardWidth - margin),
-                    Rand.Next(margin, BoardHeight - margin)))
+                    _random.Next(PlacementMargin, BoardWidth - margin),
+                    _random.Next(margin, BoardHeight - margin)))
                     .ToArray(),
                 excludeFrames);
             var result = await _api.PlayAsync(setup);

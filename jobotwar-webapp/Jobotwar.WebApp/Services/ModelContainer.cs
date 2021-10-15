@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Collections.ObjectModel;
 using Jobotwar.WebApp.Shared;
 using Microsoft.Extensions.Logging;
 
@@ -8,7 +10,8 @@ namespace Jobotwar.WebApp.Services
     public class ModelContainer : IModelContainer
     {
         private readonly ILogger<ModelContainer> _log;
-        private static readonly Random Rand = new();
+        private readonly Random _random;
+        private readonly List<RobotModel> _robots;
         private static readonly string[] Colors = new[]
         {
             "#ff3333",
@@ -25,10 +28,11 @@ namespace Jobotwar.WebApp.Services
             "#ff3399",
         };
 
-        public ModelContainer(ILogger<ModelContainer> log)
+        public ModelContainer(ILogger<ModelContainer> log, Random random)
         {
             _log = log;
-            Robots = new List<RobotModel>
+            _random = random;
+            _robots = new List<RobotModel>
             {
                 new()
                 {
@@ -65,23 +69,23 @@ state main() {
             };
         }
 
-        public ICollection<RobotModel> Robots { get; }
+        public IReadOnlyCollection<RobotModel> Robots => new ReadOnlyCollection<RobotModel>(_robots);
 
         public RobotModel NewRobot()
         {
             var robot = new RobotModel
             {
                 Name = "Robot " + (Robots.Count + 1),
-                Color = Colors[Rand.Next(Colors.Length)],
+                Color = Colors[_random.Next(Colors.Length)],
             };
             _log.LogInformation("created new robot: {NewRobot}", robot);
-            Robots.Add(robot);
+            _robots.Add(robot);
             return robot;
         }
 
         public void RemoveRobot(RobotModel robot)
         {
-            Robots.Remove(robot);
+            _robots.Remove(robot);
         }
     }
 }

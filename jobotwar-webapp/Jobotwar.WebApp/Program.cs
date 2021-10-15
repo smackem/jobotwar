@@ -41,9 +41,10 @@ namespace Jobotwar.WebApp
             {
                 client.BaseAddress = apiUri;
             });
-            builder.Services.AddSingleton(_ => new TickerFactory());
+            builder.Services.AddSingleton<TickerFactory>();
             builder.Services.AddSingleton<IModelContainer, ModelContainer>();
             builder.Services.AddSingleton<IPlayService, PlayService>();
+            builder.Services.AddSingleton<Random>();
         }
     }
 }

@@ -1,7 +1,7 @@
 FROM maven:3.8.1-openjdk-16 AS build
 WORKDIR /src/app
 COPY . .
-RUN mvn clean package
+RUN mvn clean package --projects jobotwar-web,jobotwar-model
 
 FROM openjdk:16-slim AS final
 WORKDIR /app

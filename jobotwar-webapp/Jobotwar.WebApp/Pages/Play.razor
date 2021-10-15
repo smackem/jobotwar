@@ -53,6 +53,16 @@ else if (_uiState == UIState.Play)
     <div class="play-canvas">
         <BECanvas Width="@_playService.BoardWidth" Height="@_playService.BoardHeight" @ref="_canvas"></BECanvas>
     </div>
+    <div class="play-roster">
+        <ul>
+    @foreach (var robot in _model.Robots)
+    {
+        <li style="color: @robot.Color">
+            <span class="oi oi-person mr-2"></span>@robot.Name
+        </li>
+    }
+        </ul>
+    </div>
 }
 else if (_uiState == UIState.Outcome)
 {

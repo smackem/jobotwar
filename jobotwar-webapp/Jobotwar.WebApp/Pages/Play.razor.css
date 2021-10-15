@@ -4,6 +4,16 @@
     box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
 }
 
+.play-roster {
+    display: inline-block;
+    vertical-align: top;
+}
+
+.play-roster li {
+    list-style-type: none;
+    margin-bottom: 5px;
+}
+
 .close-tab-icon {
     cursor: pointer;
     top: 3px;

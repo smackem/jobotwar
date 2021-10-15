@@ -1,11 +1,12 @@
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using Jobotwar.WebApp.Shared;
 
 namespace Jobotwar.WebApp.Services
 {
     public interface IModelContainer
     {
-        public ICollection<RobotModel> Robots { get; }
+        public IReadOnlyCollection<RobotModel> Robots { get; }
 
         public RobotModel NewRobot();
 
