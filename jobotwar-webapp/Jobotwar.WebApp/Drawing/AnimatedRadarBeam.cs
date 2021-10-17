@@ -10,7 +10,7 @@ namespace Jobotwar.WebApp.Drawing
             RadarBeam = radarBeam;
             Opacity = radarBeam.HitKind switch
             {
-                "WALL" => 0.4,
+                "WALL" => 0.3,
                 "ROBOT" => 0.9,
                 _ => throw new ArgumentException($"Invalid radar beam hit kind '{radarBeam.HitKind}'!"),
             };

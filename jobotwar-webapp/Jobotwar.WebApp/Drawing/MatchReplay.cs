@@ -66,8 +66,8 @@ namespace Jobotwar.WebApp.Drawing
             await _gc.BeginBatchAsync();
             await _gc.SetFillStyleAsync("#000000");
             await _gc.FillRectAsync(0, 0, _match.Setup.BoardWidth, _match.Setup.BoardHeight);
-            await DrawProjectilesAsync(frame.Projectiles);
             await DrawRadarBeamsAsync(frame.RadarBeams, frame);
+            await DrawProjectilesAsync(frame.Projectiles);
             await DrawRobotsAsync(frame.Robots);
             await DrawExplosionsAsync(frame.Explosions);
             await _gc.EndBatchAsync();
@@ -75,7 +75,6 @@ namespace Jobotwar.WebApp.Drawing
 
         private async Task DrawRadarBeamsAsync(IEnumerable<RadarBeamVisual> radarBeams, MatchFrame currentFrame)
         {
-            await _gc.SetLineWidthAsync(1);
             foreach (var animatedRadarBeam in _animatedRadarBeams)
             {
                 await DrawRadarBeamAsync(animatedRadarBeam, currentFrame);
@@ -157,6 +156,7 @@ namespace Jobotwar.WebApp.Drawing
 
             var color = _match.RobotInfos[emittingRobot.Name].CssColor;
             var radarBeam = beam.RadarBeam;
+            await _gc.SetLineWidthAsync(radarBeam.HitKind == "WALL" ? 1 : 2);
             var (red, green, blue) = Rgba.ParseCssColor(color);
             await _gc.SetStrokeStyleAsync($"#{red:X2}{green:X2}{blue:X2}{(int) (beam.Opacity * 255):X2}");
             await _gc.BeginPathAsync();
