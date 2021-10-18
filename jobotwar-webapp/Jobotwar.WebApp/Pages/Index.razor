@@ -2,13 +2,13 @@
 
 <h1>jobotwar</h1>
 
-<p>
-    View the source code <a target="_blank" href="https://github.com/smackem/jobotwar">@@github</a>
-</p>
-
 <div class="row">
     <div class="col-sm-8">
-        A programming game based on RobotWar
+        A programming game based on <a target="_blank" href="https://en.wikipedia.org/wiki/RobotWar">RobotWar</a>
+        <p>
+            View the source code <a target="_blank" href="https://github.com/smackem/jobotwar">@@github</a>
+        </p>
+        <MonacoEditor Id="monaco-x" ConstructionOptions="EditorConstructionOptions" />
     </div>
     <div class="col-sm-4">
         <div class="card border-info m-3">
@@ -23,3 +23,17 @@
         </div>
     </div>
 </div>
+
+@code {
+    private StandaloneEditorConstructionOptions EditorConstructionOptions(MonacoEditor editor)
+    {
+        return new StandaloneEditorConstructionOptions
+        {
+            AutomaticLayout = true,
+            Language = "javascript",
+            Value = "function xyz() {\n" +
+                    "   console.log(\"Hello world!\");\n" +
+                    "}"
+        };
+    }
+}
