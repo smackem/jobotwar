@@ -1,4 +1,6 @@
 ﻿@page "/"
+@using Microsoft.Extensions.Logging
+@inject ILogger<Index> _log
 
 <h1>jobotwar</h1>
 
@@ -8,7 +10,7 @@
         <p>
             View the source code <a target="_blank" href="https://github.com/smackem/jobotwar">@@github</a>
         </p>
-        <MonacoEditor Id="monaco-x" ConstructionOptions="EditorConstructionOptions" />
+        <MonacoEditor @ref="_editor" Id="monaco-x" ConstructionOptions="EditorConstructionOptions" OnDidChangeModelContent="EditorModelContentChanged" />
     </div>
     <div class="col-sm-4">
         <div class="card border-info m-3">
@@ -16,8 +18,7 @@
                 Info
             </div>
             <div class="card-body">
-                <img src="/robotwar_cover.png" alt="robotwar game cover &copy; Muse Software"
-                     style="alignment: center" />
+                <img src="/robotwar_cover.png" alt="robotwar game cover &copy; Muse Software" /><br />
                 robotwar game cover &copy; Muse Software
             </div>
         </div>
@@ -25,15 +26,32 @@
 </div>
 
 @code {
+    private MonacoEditor? _editor;
+
     private StandaloneEditorConstructionOptions EditorConstructionOptions(MonacoEditor editor)
     {
         return new StandaloneEditorConstructionOptions
         {
+            Theme = "vs-dark",
+            RenderWhitespace = "all",
+            Minimap = new EditorMinimapOptions { Enabled = false },
+            Dimension = new Dimension { Height = 500 },
             AutomaticLayout = true,
             Language = "javascript",
             Value = "function xyz() {\n" +
                     "   console.log(\"Hello world!\");\n" +
-                    "}"
+                    "}",
         };
+    }
+
+    private async void EditorModelContentChanged()
+    {
+        if (_editor == null)
+        {
+            return;
+        }
+
+        var value = await _editor.GetValue();
+        _log.LogInformation("value: {SourceCode}", value);
     }
 }

@@ -25,7 +25,8 @@
     </div>
     <div class="col-12">
         <label for="robotCode" class="col-form-label">Code</label>
-        <textarea id="robotCode" class="form-control" rows="12" @bind="Robot!.Code" @oninput="CodeChanged"></textarea>
+        <MonacoEditor @ref="_codeEditor" Id="robotCode" ConstructionOptions="EditorConstructionOptions" OnDidChangeModelContent="EditorModelContentChanged" />
+        @*<textarea id="robotCode" class="form-control" rows="12" @bind="Robot!.Code" @oninput="CodeChanged"></textarea>*@
 @if (_compilationError != null)
 {
         <div class="alert alert-warning my-1">@_compilationError</div> 
@@ -34,6 +35,8 @@
 </form>
 
 @code {
+    private MonacoEditor? _codeEditor;
+
     [Parameter]
     public RobotModel? Robot
     {
@@ -41,12 +44,11 @@
         set
         {
             _robotModel = value;
-            _currentRobotCode = null;
             _compilationError = null;
+            _codeEditor?.SetValue(value?.Code);
         }
     }
 
-    private string? _currentRobotCode;
     private RobotModel? _robotModel;
     private string? _compilationError;
     private CancellationTokenSource? _tickerCancellationTokenSource;
@@ -62,13 +64,14 @@
     private async Task<bool> Tick()
     {
         var ticks = Environment.TickCount;
-        if (_lastCodeChangeTicks == null || ticks - _lastCodeChangeTicks.Value < 1000 || _currentRobotCode == null)
+        if (_lastCodeChangeTicks == null || ticks - _lastCodeChangeTicks.Value < 1000 || _codeEditor == null)
         {
             return true;
         }
 
         var robot = Robot!;
-        var request = new CompileRequest(robot.Name, robot.LanguageVersion, _currentRobotCode);
+        var code = await _codeEditor.GetValue();
+        var request = new CompileRequest(robot.Name, robot.LanguageVersion, code);
         _log.LogInformation("issuing compile request: {CompileRequest}", request);
         try
         {
@@ -85,15 +88,40 @@
         return true;
     }
 
-    private void CodeChanged(ChangeEventArgs obj)
-    {
-        _log.LogInformation("code changed");
-        _currentRobotCode = obj.Value as string;
-        _lastCodeChangeTicks = Environment.TickCount;
-    }
-
     public void Dispose()
     {
         _tickerCancellationTokenSource?.Cancel();
+    }
+
+    private StandaloneEditorConstructionOptions EditorConstructionOptions(MonacoEditor editor)
+    {
+        return new StandaloneEditorConstructionOptions
+        {
+            Theme = "vs-dark",
+            RenderWhitespace = "all",
+            Minimap = new EditorMinimapOptions { Enabled = false },
+            Dimension = new Dimension { Height = 500 },
+            AutomaticLayout = true,
+            Language = "javascript",
+            Value = Robot?.Code,
+        };
+    }
+
+    private async void EditorModelContentChanged()
+    {
+        if (_codeEditor == null)
+        {
+            return;
+        }
+
+        var value = await _codeEditor.GetValue();
+        _log.LogInformation("code changed: {SourceCode}", value);
+        _log.LogInformation("code changed");
+        _lastCodeChangeTicks = Environment.TickCount;
+
+        if (Robot != null)
+        {
+            Robot.Code = value;
+        }
     }
 }
