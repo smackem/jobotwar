@@ -20,6 +20,7 @@ namespace Jobotwar.WebApp.Drawing
         private readonly IEnumerator<MatchFrame> _frameEnumerator;
         private readonly List<AnimatedRadarBeam> _animatedRadarBeams = new();
         private readonly List<AnimatedExplosion> _animatedExplosions = new();
+        private const double Deg2Rad = Math.PI / 180;
 
         private MatchReplay(MatchInfo match, GameInfo gameInfo, Canvas2DContext gc, ILogger<MatchReplay> log)
         {
@@ -105,18 +106,32 @@ namespace Jobotwar.WebApp.Drawing
         {
             foreach (var robot in robots)
             {
-                await _gc.SetFillStyleAsync("#303030");
+                // draw gun
+                var aimRadians = robot.AimAngle * Deg2Rad;
+                var gunLength = _gameInfo.RobotRadius + 6;
+                var (dx, dy) = (Math.Cos(aimRadians) * gunLength, Math.Sin(aimRadians) * gunLength);
+                await _gc.SetStrokeStyleAsync("#404040");
+                await _gc.SetLineWidthAsync(8);
+                await _gc.BeginPathAsync();
+                await _gc.MoveToAsync(robot.X, robot.Y);
+                await _gc.LineToAsync(robot.X + dx, robot.Y + dy);
+                await _gc.StrokeAsync();
+
+                // draw frame
+                await _gc.SetFillStyleAsync("#404040");
                 await DrawCircleAsync(robot.X, robot.Y, _gameInfo.RobotRadius, DrawMode.Fill);
 
+                // draw health indicator
                 await _gc.SetLineWidthAsync(2);
                 var healthRatio = robot.Health / 100.0;
-                var angle = healthRatio * 2.0 * Math.PI;
+                var healthRadians = healthRatio * 2.0 * Math.PI;
                 var hue = healthRatio * 120.0;
                 await _gc.SetStrokeStyleAsync($"hsl({hue}, 75%, 50%)");
                 await _gc.BeginPathAsync();
-                await _gc.ArcAsync(robot.X, robot.Y, _gameInfo.RobotRadius, 0, angle, false);
+                await _gc.ArcAsync(robot.X, robot.Y, _gameInfo.RobotRadius, 0, healthRadians, false);
                 await _gc.StrokeAsync();
 
+                // draw body
                 await _gc.SetLineWidthAsync(1);
                 await _gc.SetStrokeStyleAsync("#000000");
                 await _gc.SetFillStyleAsync(_match.RobotInfos[robot.Name].CssColor);

@@ -43,7 +43,8 @@ namespace Jobotwar.WebApp.Features.Api
         string Name,
         double X,
         double Y,
-        int Health);
+        int Health,
+        double AimAngle);
 
     public record ProjectileVisual(
         double X,
