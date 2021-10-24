@@ -48,14 +48,14 @@ else
     {
         _playService.SimulateMatchesAsync(_model.Robots, MatchCount).ContinueWith(t =>
         {
-            var results = t.Result;
+            var matches = t.Result;
             var robotsByName = _model.Robots.ToImmutableDictionary(r => r.Name);
-            var groups = results.GroupBy(result => result.Winner);
+            var groups = matches.GroupBy(m => m.Winner);
             _stats = groups
                 .Select(group => new RobotStats(group.Key, group.Count(),
                     group.Key != null ? robotsByName[group.Key].Color : "var(--black)"))
                 .OrderByDescending(robotStats => robotStats.WinCount)
-                .ToImmutableList();
+                .ToImmutableArray();
             StateHasChanged();
         });
     }
