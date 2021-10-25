@@ -26,8 +26,6 @@ services:
     db:
         image: postgres:${POSTGRES_TAG}
         restart: always
-        ports:
-            - 5432:5432
         volumes:
             - ${DB_LOCAL_PATH}:/var/lib/postgresql/data
             - ./jobotwar-web/src/main/resources/sql/init:/docker-entrypoint-initdb.d
