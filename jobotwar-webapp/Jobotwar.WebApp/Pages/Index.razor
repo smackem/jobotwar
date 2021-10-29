@@ -10,48 +10,25 @@
         <p>
             View the source code <a target="_blank" href="https://github.com/smackem/jobotwar">@@github</a>
         </p>
-        <MonacoEditor @ref="_editor" Id="monaco-x" ConstructionOptions="EditorConstructionOptions" OnDidChangeModelContent="EditorModelContentChanged" />
+        <img src="/jobot.png" alt="jobot" /><br/>
+        <small><i>jobot image &copy; j3lly</i></small>
     </div>
     <div class="col-sm-4">
-        <div class="card border-info m-3">
+        <div class="card bg-info m-3">
             <div class="card-header">
                 Info
             </div>
             <div class="card-body">
-                <img src="/robotwar_cover.png" alt="robotwar game cover &copy; Muse Software" /><br />
-                robotwar game cover &copy; Muse Software
+                <p>
+                    Robotwar (&copy; Muse Software) is a classic programming game from the 80s, featuring a simple
+                    assembler-like programming language.<br/>
+                    Jobotwar features similar down-to-earth graphics, but uses a much nicer
+                    programming language, specifically designed for programming robots.
+                </p>
+                <p>
+                    Vist <a target="_blank" href="https://en.wikipedia.org/wiki/RobotWar">wikipedia</a> for more info on the original game.
+                </p>
             </div>
         </div>
     </div>
 </div>
-
-@code {
-    private MonacoEditor? _editor;
-
-    private StandaloneEditorConstructionOptions EditorConstructionOptions(MonacoEditor editor)
-    {
-        return new StandaloneEditorConstructionOptions
-        {
-            Theme = "vs-dark",
-            RenderWhitespace = "all",
-            Minimap = new EditorMinimapOptions { Enabled = false },
-            Dimension = new Dimension { Height = 500 },
-            AutomaticLayout = true,
-            Language = "javascript",
-            Value = "function xyz() {\n" +
-                    "   console.log(\"Hello world!\");\n" +
-                    "}",
-        };
-    }
-
-    private async void EditorModelContentChanged()
-    {
-        if (_editor == null)
-        {
-            return;
-        }
-
-        var value = await _editor.GetValue();
-        _log.LogInformation("value: {SourceCode}", value);
-    }
-}

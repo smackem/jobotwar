@@ -159,11 +159,7 @@ namespace Jobotwar.WebApp.Drawing
 
         private async Task DrawRadarBeamAsync(AnimatedRadarBeam beam, MatchFrame currentFrame)
         {
-            var emittingRobot =
-                (from r in currentFrame.Robots
-                where r.Name == beam.RadarBeam.EmittingRobotName
-                select r)
-                .FirstOrDefault();
+            var emittingRobot = currentFrame.Robots.FirstOrDefault(r => r.Name == beam.RadarBeam.EmittingRobotName);
             if (emittingRobot == null)
             {
                 return;
